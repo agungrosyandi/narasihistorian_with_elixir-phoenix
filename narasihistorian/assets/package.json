@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "quill": "^2.0.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19"
+  }
+}

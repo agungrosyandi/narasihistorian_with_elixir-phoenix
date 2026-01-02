@@ -88,6 +88,10 @@
             {truncate(article.article_description, 50)}
           </:col>
 
+          <:col :let={{_id, article}} label="Content">
+            {article.content |> quill_plain_text() |> String.slice(0, 120)}...
+          </:col>
+
           <:col :let={{_id, article}} label="Last Update">
             {Calendar.strftime(article.updated_at, "%d %b %Y %H:%M")}
           </:col>

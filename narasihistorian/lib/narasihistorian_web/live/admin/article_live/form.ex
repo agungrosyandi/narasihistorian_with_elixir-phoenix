@@ -51,6 +51,33 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
                 class="input w-full p-3 min-h-[100px] border shadow-sm"
               />
               
+    <!-- RICH TEXT EDITOR (QUILL) -->
+
+              <div class="form-field">
+                <label class="block text-sm font-medium mb-2 text-zinc-400">Content</label>
+                <div
+                  id={"quill-wrapper-#{@article.id || "new"}"}
+                  phx-hook="QuillEditor"
+                  phx-update="ignore"
+                  data-content={@form[:content].value || ""}
+                >
+                  <div class="quill-editor" style="height: 300px;"></div>
+
+                  <input
+                    type="hidden"
+                    name="article[content]"
+                    id="article_content"
+                    value={@form[:content].value || ""}
+                  />
+                </div>
+
+                <%= for {msg, _opts} <- @form[:content].errors do %>
+                  <p class="mt-2 text-sm text-rose-600 phx-no-feedback:hidden">
+                    {msg}
+                  </p>
+                <% end %>
+              </div>
+              
     <!-- kategori -->
 
               <.input

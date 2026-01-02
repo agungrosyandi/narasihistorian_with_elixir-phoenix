@@ -23,5 +23,13 @@ defmodule NarasihistorianWeb.ArticleHTML do
 
   def reading_time(nil), do: 1
 
+  # QUILL RICH TEXT EDITOR -------------------------------------------
+
+  def safe_quill_html(nil), do: ""
+
+  def safe_quill_html(html) do
+    HtmlSanitizeEx.basic_html(html)
+  end
+
   embed_templates "article_html/*"
 end

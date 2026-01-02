@@ -136,6 +136,19 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
     """
   end
 
+  # QUILL RICH TEXT EDITOR -------------------------------------------
+
+  def quill_plain_text(nil), do: ""
+
+  def quill_plain_text(html) do
+    html
+    |> String.replace(~r/<br\s*\/?>/i, " ")
+    |> String.replace(~r/<\/p>/i, " ")
+    |> String.replace(~r/<[^>]*>/, "")
+    |> String.replace(~r/\s+/, " ")
+    |> String.trim()
+  end
+
   # PRIVATE HELPER --------------------------------------------------------
 
   # Helper function to build pagination path with existing params

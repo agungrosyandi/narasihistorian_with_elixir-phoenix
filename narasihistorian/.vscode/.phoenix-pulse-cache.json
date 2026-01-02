@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "timestamp": 1767362704648,
+  "timestamp": 1767368397988,
   "workspaceRoot": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian",
   "registries": {
     "components": {
@@ -259,26 +259,233 @@
           "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
           [
             {
-              "name": "icon",
+              "name": "flash",
               "moduleName": "NarasihistorianWeb.CoreComponents",
               "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
-              "line": 442,
+              "line": 50,
               "attributes": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "rawType": ":string",
+                  "required": false,
+                  "doc": "the optional id of flash container"
+                },
+                {
+                  "name": "flash",
+                  "type": "map",
+                  "rawType": ":map",
+                  "required": false,
+                  "default": "%{}",
+                  "doc": "the map of flash messages to display"
+                },
+                {
+                  "name": "title",
+                  "type": "string",
+                  "rawType": ":string",
+                  "required": false,
+                  "default": "nil"
+                },
+                {
+                  "name": "kind",
+                  "type": "atom",
+                  "rawType": ":atom",
+                  "required": false,
+                  "values": [
+                    "info",
+                    "error"
+                  ],
+                  "doc": "used for styling and flash lookup"
+                },
+                {
+                  "name": "rest",
+                  "type": "global",
+                  "rawType": ":global",
+                  "required": false,
+                  "doc": "the arbitrary HTML attributes to add to the flash container"
+                }
+              ],
+              "slots": [
+                {
+                  "name": "inner_block",
+                  "required": false,
+                  "attributes": [],
+                  "doc": "the optional inner block that renders the flash message"
+                }
+              ]
+            },
+            {
+              "name": "button",
+              "moduleName": "NarasihistorianWeb.CoreComponents",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
+              "line": 96,
+              "attributes": [
+                {
+                  "name": "rest",
+                  "type": "global",
+                  "rawType": ":global",
+                  "required": false
+                },
                 {
                   "name": "class",
                   "type": "any",
-                  "required": false,
-                  "default": "\"size-4\"",
-                  "rawType": "any"
+                  "rawType": ":any",
+                  "required": false
                 },
                 {
-                  "name": "name",
+                  "name": "variant",
                   "type": "string",
+                  "rawType": ":string",
+                  "required": false
+                }
+              ],
+              "slots": [
+                {
+                  "name": "inner_block",
                   "required": true,
-                  "rawType": "string"
+                  "attributes": []
+                }
+              ]
+            },
+            {
+              "name": "input",
+              "moduleName": "NarasihistorianWeb.CoreComponents",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
+              "line": 195,
+              "attributes": [
+                {
+                  "name": "options",
+                  "type": "list",
+                  "rawType": ":list",
+                  "required": false,
+                  "doc": "the options to pass to Phoenix.HTML.Form.options_for_select/2"
+                },
+                {
+                  "name": "multiple",
+                  "type": "boolean",
+                  "rawType": ":boolean",
+                  "required": false,
+                  "default": "false",
+                  "doc": "the multiple flag for select inputs"
+                },
+                {
+                  "name": "class",
+                  "type": "any",
+                  "rawType": ":any",
+                  "required": false,
+                  "default": "nil",
+                  "doc": "the input class to use over defaults"
+                },
+                {
+                  "name": "error_class",
+                  "type": "any",
+                  "rawType": ":any",
+                  "required": false,
+                  "default": "nil",
+                  "doc": "the input error class to use over defaults"
+                },
+                {
+                  "name": "rest",
+                  "type": "global",
+                  "rawType": ":global",
+                  "required": false
                 }
               ],
               "slots": []
+            },
+            {
+              "name": "error",
+              "moduleName": "NarasihistorianWeb.CoreComponents",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
+              "line": 299,
+              "attributes": [],
+              "slots": []
+            },
+            {
+              "name": "header",
+              "moduleName": "NarasihistorianWeb.CoreComponents",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
+              "line": 315,
+              "attributes": [],
+              "slots": [
+                {
+                  "name": "inner_block",
+                  "required": true,
+                  "attributes": []
+                },
+                {
+                  "name": "subtitle",
+                  "required": false,
+                  "attributes": []
+                },
+                {
+                  "name": "actions",
+                  "required": false,
+                  "attributes": []
+                }
+              ]
+            },
+            {
+              "name": "table",
+              "moduleName": "NarasihistorianWeb.CoreComponents",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
+              "line": 356,
+              "attributes": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "rawType": ":string",
+                  "required": true
+                },
+                {
+                  "name": "rows",
+                  "type": "list",
+                  "rawType": ":list",
+                  "required": true
+                },
+                {
+                  "name": "row_id",
+                  "type": "any",
+                  "rawType": ":any",
+                  "required": false,
+                  "default": "nil",
+                  "doc": "the function for generating the row id"
+                },
+                {
+                  "name": "row_click",
+                  "type": "any",
+                  "rawType": ":any",
+                  "required": false,
+                  "default": "nil",
+                  "doc": "the function for handling phx-click on each row"
+                },
+                {
+                  "name": "row_item",
+                  "type": "any",
+                  "rawType": ":any",
+                  "required": false
+                }
+              ],
+              "slots": [
+                {
+                  "name": "col",
+                  "required": true,
+                  "attributes": [
+                    {
+                      "name": "label",
+                      "type": "string",
+                      "rawType": ":string",
+                      "required": false
+                    }
+                  ]
+                },
+                {
+                  "name": "action",
+                  "required": false,
+                  "attributes": [],
+                  "doc": "the slot for showing user actions in the last table column"
+                }
+              ]
             },
             {
               "name": "list",
@@ -292,12 +499,9 @@
                   "required": true,
                   "attributes": [
                     {
-                      "default": null,
-                      "line": 405,
                       "name": "title",
                       "type": "string",
-                      "values": null,
-                      "doc": null,
+                      "rawType": ":string",
                       "required": true
                     }
                   ]
@@ -305,292 +509,26 @@
               ]
             },
             {
-              "name": "table",
+              "name": "icon",
               "moduleName": "NarasihistorianWeb.CoreComponents",
               "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
-              "line": 356,
+              "line": 442,
               "attributes": [
                 {
-                  "name": "row_item",
-                  "type": "any",
-                  "required": false,
-                  "default": "{:&, [line: 347, column: 14], [{:/, [line: 347, column: 32], [{{:., [line: 347, column: 23], [{:__aliases__, [last: [line: 347, column: 15], line: 347, column: 15], [:Function]}, :identity]}, [no_parens: true, line: 347, column: 24], []}, 1]}]}",
-                  "doc": "the function for mapping each row before calling the :col and :action slots",
-                  "rawType": "any"
-                },
-                {
-                  "name": "row_click",
-                  "type": "any",
-                  "required": false,
-                  "default": "nil",
-                  "doc": "the function for handling phx-click on each row",
-                  "rawType": "any"
-                },
-                {
-                  "name": "row_id",
-                  "type": "any",
-                  "required": false,
-                  "default": "nil",
-                  "doc": "the function for generating the row id",
-                  "rawType": "any"
-                },
-                {
-                  "name": "rows",
-                  "type": "list",
-                  "required": true,
-                  "rawType": "list"
-                },
-                {
-                  "name": "id",
+                  "name": "name",
                   "type": "string",
-                  "required": true,
-                  "rawType": "string"
-                }
-              ],
-              "slots": [
-                {
-                  "name": "action",
-                  "required": false,
-                  "doc": "the slot for showing user actions in the last table column",
-                  "attributes": []
-                },
-                {
-                  "name": "col",
-                  "required": true,
-                  "attributes": [
-                    {
-                      "default": null,
-                      "line": 351,
-                      "name": "label",
-                      "type": "string",
-                      "values": null,
-                      "doc": null,
-                      "required": false
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "header",
-              "moduleName": "NarasihistorianWeb.CoreComponents",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
-              "line": 315,
-              "attributes": [],
-              "slots": [
-                {
-                  "name": "actions",
-                  "required": false,
-                  "attributes": []
-                },
-                {
-                  "name": "subtitle",
-                  "required": false,
-                  "attributes": []
-                },
-                {
-                  "name": "inner_block",
-                  "required": true,
-                  "attributes": []
-                }
-              ]
-            },
-            {
-              "name": "input",
-              "moduleName": "NarasihistorianWeb.CoreComponents",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
-              "line": 184,
-              "attributes": [
-                {
-                  "name": "rest",
-                  "type": "global",
-                  "required": false,
-                  "rawType": "global"
-                },
-                {
-                  "name": "error_class",
-                  "type": "any",
-                  "required": false,
-                  "default": "nil",
-                  "doc": "the input error class to use over defaults",
-                  "rawType": "any"
+                  "rawType": ":string",
+                  "required": true
                 },
                 {
                   "name": "class",
                   "type": "any",
+                  "rawType": ":any",
                   "required": false,
-                  "default": "nil",
-                  "doc": "the input class to use over defaults",
-                  "rawType": "any"
-                },
-                {
-                  "name": "multiple",
-                  "type": "boolean",
-                  "required": false,
-                  "default": "false",
-                  "doc": "the multiple flag for select inputs",
-                  "rawType": "boolean"
-                },
-                {
-                  "name": "options",
-                  "type": "list",
-                  "required": false,
-                  "doc": "the options to pass to Phoenix.HTML.Form.options_for_select/2",
-                  "rawType": "list"
-                },
-                {
-                  "name": "prompt",
-                  "type": "string",
-                  "required": false,
-                  "default": "nil",
-                  "doc": "the prompt for select inputs",
-                  "rawType": "string"
-                },
-                {
-                  "name": "checked",
-                  "type": "boolean",
-                  "required": false,
-                  "doc": "the checked flag for checkbox inputs",
-                  "rawType": "boolean"
-                },
-                {
-                  "name": "errors",
-                  "type": "list",
-                  "required": false,
-                  "default": "[]",
-                  "rawType": "list"
-                },
-                {
-                  "name": "field",
-                  "type": "{:__aliases__, [last: [line: 169, column: 29], line: 169, column: 16], [:Phoenix, :HTML, :FormField]}",
-                  "required": false,
-                  "doc": "a form field struct retrieved from the form, for example: @form[:email]",
-                  "rawType": "{:__aliases__, [last: [line: 169, column: 29], line: 169, column: 16], [:Phoenix, :HTML, :FormField]}"
-                },
-                {
-                  "name": "type",
-                  "type": "string",
-                  "required": false,
-                  "default": "\"text\"",
-                  "rawType": "string"
-                },
-                {
-                  "name": "value",
-                  "type": "any",
-                  "required": false,
-                  "rawType": "any"
-                },
-                {
-                  "name": "label",
-                  "type": "string",
-                  "required": false,
-                  "default": "nil",
-                  "rawType": "string"
-                },
-                {
-                  "name": "name",
-                  "type": "any",
-                  "required": false,
-                  "rawType": "any"
-                },
-                {
-                  "name": "id",
-                  "type": "any",
-                  "required": false,
-                  "default": "nil",
-                  "rawType": "any"
+                  "default": "\"size-4\""
                 }
               ],
               "slots": []
-            },
-            {
-              "name": "button",
-              "moduleName": "NarasihistorianWeb.CoreComponents",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
-              "line": 96,
-              "attributes": [
-                {
-                  "name": "variant",
-                  "type": "string",
-                  "required": false,
-                  "rawType": "string"
-                },
-                {
-                  "name": "class",
-                  "type": "any",
-                  "required": false,
-                  "rawType": "any"
-                },
-                {
-                  "name": "rest",
-                  "type": "global",
-                  "required": false,
-                  "rawType": "global"
-                }
-              ],
-              "slots": [
-                {
-                  "name": "inner_block",
-                  "required": true,
-                  "attributes": []
-                }
-              ]
-            },
-            {
-              "name": "flash",
-              "moduleName": "NarasihistorianWeb.CoreComponents",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex",
-              "line": 50,
-              "attributes": [
-                {
-                  "name": "rest",
-                  "type": "global",
-                  "required": false,
-                  "doc": "the arbitrary HTML attributes to add to the flash container",
-                  "rawType": "global"
-                },
-                {
-                  "name": "kind",
-                  "type": "atom",
-                  "required": false,
-                  "values": [
-                    "info",
-                    "error"
-                  ],
-                  "doc": "used for styling and flash lookup",
-                  "rawType": "atom"
-                },
-                {
-                  "name": "title",
-                  "type": "string",
-                  "required": false,
-                  "default": "nil",
-                  "rawType": "string"
-                },
-                {
-                  "name": "flash",
-                  "type": "map",
-                  "required": false,
-                  "default": "{:%{}, [closing: [line: 43, column: 33], line: 43, column: 32], []}",
-                  "doc": "the map of flash messages to display",
-                  "rawType": "map"
-                },
-                {
-                  "name": "id",
-                  "type": "string",
-                  "required": false,
-                  "doc": "the optional id of flash container",
-                  "rawType": "string"
-                }
-              ],
-              "slots": [
-                {
-                  "name": "inner_block",
-                  "required": false,
-                  "doc": "the optional inner block that renders the flash message",
-                  "attributes": []
-                }
-              ]
             }
           ]
         ],
@@ -598,12 +536,32 @@
           "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/layouts.ex",
           [
             {
-              "name": "theme_toggle",
+              "name": "app",
               "moduleName": "NarasihistorianWeb.Layouts",
               "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/layouts.ex",
-              "line": 190,
-              "attributes": [],
-              "slots": []
+              "line": 36,
+              "attributes": [
+                {
+                  "name": "flash",
+                  "type": "map",
+                  "rawType": ":map",
+                  "required": true,
+                  "doc": "the map of flash messages"
+                },
+                {
+                  "name": "current_scope",
+                  "type": "map",
+                  "rawType": ":map",
+                  "required": false
+                }
+              ],
+              "slots": [
+                {
+                  "name": "inner_block",
+                  "required": true,
+                  "attributes": []
+                }
+              ]
             },
             {
               "name": "flash_group",
@@ -612,52 +570,30 @@
               "line": 152,
               "attributes": [
                 {
-                  "name": "id",
-                  "type": "string",
-                  "required": false,
-                  "default": "\"flash-group\"",
-                  "doc": "the optional id of flash container",
-                  "rawType": "string"
-                },
-                {
                   "name": "flash",
                   "type": "map",
+                  "rawType": ":map",
                   "required": true,
-                  "doc": "the map of flash messages",
-                  "rawType": "map"
+                  "doc": "the map of flash messages"
+                },
+                {
+                  "name": "id",
+                  "type": "string",
+                  "rawType": ":string",
+                  "required": false,
+                  "default": "\"flash-group\"",
+                  "doc": "the optional id of flash container"
                 }
               ],
               "slots": []
             },
             {
-              "name": "app",
+              "name": "theme_toggle",
               "moduleName": "NarasihistorianWeb.Layouts",
               "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/layouts.ex",
-              "line": 36,
-              "attributes": [
-                {
-                  "name": "current_scope",
-                  "type": "map",
-                  "required": false,
-                  "default": "nil",
-                  "doc": "the current [scope](https://hexdocs.pm/phoenix/scopes.html)",
-                  "rawType": "map"
-                },
-                {
-                  "name": "flash",
-                  "type": "map",
-                  "required": true,
-                  "doc": "the map of flash messages",
-                  "rawType": "map"
-                }
-              ],
-              "slots": [
-                {
-                  "name": "inner_block",
-                  "required": true,
-                  "attributes": []
-                }
-              ]
+              "line": 190,
+              "attributes": [],
+              "slots": []
             }
           ]
         ],
@@ -672,7 +608,7 @@
       ],
       "fileHashes": {
         "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/core_components.ex": "b3a32d938e2a6f38e12dacd6998ed51013f8e243",
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/layouts.ex": "88a38cdcb6038fdc0e119e630d6732afc1a055ef",
+        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/components/layouts.ex": "47ae7c0b3d70870072ad47c8f5e85f542acc36bb",
         "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/controllers/article_html.ex": "5a2d97aa7b2707e745df6524bc099dd13cc2f26e",
         "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/controllers/error_html.ex": "213000462d8abf02b8a662fb75009659df2460bd"
       },
@@ -686,6 +622,10 @@
             "moduleName": "Narasihistorian.Articles.Article",
             "tableName": "articles",
             "fields": [
+              {
+                "name": "id",
+                "type": "id"
+              },
               {
                 "name": "article_name",
                 "type": "string"
@@ -710,20 +650,10 @@
               {
                 "name": "updated_at",
                 "type": "naive_datetime"
-              },
-              {
-                "name": "id",
-                "type": "id"
               }
             ],
             "associations": {},
-            "associationsDetailed": [
-              {
-                "fieldName": "category",
-                "targetModule": "Narasihistorian.Categories.Category",
-                "type": "belongs_to"
-              }
-            ],
+            "associationsDetailed": [],
             "aliases": {},
             "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian/articles/article.ex",
             "line": 5
@@ -735,6 +665,10 @@
             "moduleName": "Narasihistorian.Categories.Category",
             "tableName": "categories",
             "fields": [
+              {
+                "name": "id",
+                "type": "id"
+              },
               {
                 "name": "category_name",
                 "type": "string"
@@ -755,20 +689,10 @@
               {
                 "name": "updated_at",
                 "type": "naive_datetime"
-              },
-              {
-                "name": "id",
-                "type": "id"
               }
             ],
             "associations": {},
-            "associationsDetailed": [
-              {
-                "fieldName": "articles",
-                "targetModule": "Narasihistorian.Articles.Article",
-                "type": "has_many"
-              }
-            ],
+            "associationsDetailed": [],
             "aliases": {},
             "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian/categories/category.ex",
             "line": 5
@@ -783,6 +707,10 @@
               "moduleName": "Narasihistorian.Articles.Article",
               "tableName": "articles",
               "fields": [
+                {
+                  "name": "id",
+                  "type": "id"
+                },
                 {
                   "name": "article_name",
                   "type": "string"
@@ -807,20 +735,10 @@
                 {
                   "name": "updated_at",
                   "type": "naive_datetime"
-                },
-                {
-                  "name": "id",
-                  "type": "id"
                 }
               ],
               "associations": {},
-              "associationsDetailed": [
-                {
-                  "fieldName": "category",
-                  "targetModule": "Narasihistorian.Categories.Category",
-                  "type": "belongs_to"
-                }
-              ],
+              "associationsDetailed": [],
               "aliases": {},
               "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian/articles/article.ex",
               "line": 5
@@ -834,6 +752,10 @@
               "moduleName": "Narasihistorian.Categories.Category",
               "tableName": "categories",
               "fields": [
+                {
+                  "name": "id",
+                  "type": "id"
+                },
                 {
                   "name": "category_name",
                   "type": "string"
@@ -854,20 +776,10 @@
                 {
                   "name": "updated_at",
                   "type": "naive_datetime"
-                },
-                {
-                  "name": "id",
-                  "type": "id"
                 }
               ],
               "associations": {},
-              "associationsDetailed": [
-                {
-                  "fieldName": "articles",
-                  "targetModule": "Narasihistorian.Articles.Article",
-                  "type": "has_many"
-                }
-              ],
+              "associationsDetailed": [],
               "aliases": {},
               "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian/categories/category.ex",
               "line": 5
@@ -884,47 +796,76 @@
     "events": {
       "events": [
         [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex",
+          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex",
           [
             {
-              "name": "save",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex",
-              "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Form",
-              "line": 63,
-              "params": "%{}",
+              "name": "validate",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex",
+              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Form",
+              "line": 128,
+              "params": "%{\"article\" => article_params}",
               "kind": "handle_event",
+              "clause": "def handle_event(\"validate\", %{\"article\" => article_params}, socket) do",
               "nameKind": "string"
             },
             {
-              "name": "validate",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex",
-              "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Form",
-              "line": 58,
-              "params": "%{}",
+              "name": "save",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex",
+              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Form",
+              "line": 135,
+              "params": "%{\"article\" => article_params}",
               "kind": "handle_event",
+              "clause": "def handle_event(\"save\", %{\"article\" => article_params}, socket) do",
               "nameKind": "string"
             }
           ]
         ],
         [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex",
+          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
           [
             {
-              "name": "save",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex",
-              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Form",
-              "line": 123,
-              "params": "%{}",
+              "name": "filter",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
+              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Index",
+              "line": 60,
+              "params": "params",
               "kind": "handle_event",
+              "clause": "def handle_event(\"filter\", params, socket) do",
               "nameKind": "string"
             },
             {
-              "name": "validate",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex",
-              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Form",
-              "line": 116,
-              "params": "%{}",
+              "name": "delete",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
+              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Index",
+              "line": 78,
+              "params": "%{\"id\" => id}",
               "kind": "handle_event",
+              "clause": "def handle_event(\"delete\", %{\"id\" => id}, socket) do",
+              "nameKind": "string"
+            }
+          ]
+        ],
+        [
+          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex",
+          [
+            {
+              "name": "validate",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex",
+              "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Form",
+              "line": 58,
+              "params": "%{\"category\" => category_params}",
+              "kind": "handle_event",
+              "clause": "def handle_event(\"validate\", %{\"category\" => category_params}, socket) do",
+              "nameKind": "string"
+            },
+            {
+              "name": "save",
+              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex",
+              "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Form",
+              "line": 63,
+              "params": "%{\"category\" => category_params}",
+              "kind": "handle_event",
+              "clause": "def handle_event(\"save\", %{\"category\" => category_params}, socket) do",
               "nameKind": "string"
             }
           ]
@@ -937,41 +878,10 @@
               "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex",
               "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Index",
               "line": 54,
-              "params": "%{}",
+              "params": "%{\"id\" => id}",
               "kind": "handle_event",
+              "clause": "def handle_event(\"delete\", %{\"id\" => id}, socket) do",
               "nameKind": "string"
-            }
-          ]
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
-          [
-            {
-              "name": "delete",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
-              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Index",
-              "line": 78,
-              "params": "%{}",
-              "kind": "handle_event",
-              "nameKind": "string"
-            },
-            {
-              "name": "filter",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
-              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Index",
-              "line": 60,
-              "params": "params",
-              "kind": "handle_event",
-              "nameKind": "string"
-            },
-            {
-              "name": "load_articles",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
-              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Index",
-              "line": 45,
-              "params": "{load_articles, params}",
-              "kind": "handle_info",
-              "nameKind": "atom"
             }
           ]
         ],
@@ -981,10 +891,10 @@
         ]
       ],
       "fileHashes": {
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex": "13e5b2a3da164e4e76c31cf3ae42f60bf6e58840",
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex": "74cca050ff5f199f32bef0ec9db2f940d2fe7543",
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex": "4cd2264ca8375a4643b02210eb30c4a2b28098b7",
+        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex": "aac09718ebd316066c5cf433d36cbedbfa58fb65",
         "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex": "aefb920eae548d758112ef13eef407e762f56ca4",
+        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex": "13e5b2a3da164e4e76c31cf3ae42f60bf6e58840",
+        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex": "4cd2264ca8375a4643b02210eb30c4a2b28098b7",
         "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/show.ex": "bfa1cdb829ae8b37131df6e27deab4b40bf2e274"
       },
       "workspaceRoot": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian"
@@ -992,132 +902,144 @@
     "routes": {
       "routes": [
         {
-          "path": "/admin/categories/:id/edit",
-          "verb": "LIVE",
-          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
-          "line": 37,
-          "helperBase": "admin_categories_edit",
-          "params": [
-            "id"
-          ],
-          "isResource": false,
-          "liveModule": "CategoryLive.Form",
-          "liveAction": "edit",
-          "scopePath": "/admin"
-        },
-        {
-          "path": "/admin/categories/:id",
-          "verb": "LIVE",
-          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
-          "line": 36,
-          "helperBase": "admin_categories",
-          "params": [
-            "id"
-          ],
-          "isResource": false,
-          "liveModule": "CategoryLive.Show",
-          "liveAction": "show",
-          "scopePath": "/admin"
-        },
-        {
-          "path": "/admin/categories/new",
-          "verb": "LIVE",
-          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
-          "line": 35,
-          "helperBase": "admin_categories_new",
-          "params": [],
-          "isResource": false,
-          "liveModule": "CategoryLive.Form",
-          "liveAction": "new",
-          "scopePath": "/admin"
-        },
-        {
-          "path": "/admin/categories",
-          "verb": "LIVE",
-          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
-          "line": 34,
-          "helperBase": "admin_categories",
-          "params": [],
-          "isResource": false,
-          "liveModule": "CategoryLive.Index",
-          "liveAction": "index",
-          "scopePath": "/admin"
-        },
-        {
-          "path": "/admin/articles/:id/edit",
-          "verb": "LIVE",
-          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
-          "line": 32,
-          "helperBase": "admin_articles_edit",
-          "params": [
-            "id"
-          ],
-          "isResource": false,
-          "liveModule": "ArticleLive.Form",
-          "liveAction": "edit",
-          "scopePath": "/admin"
-        },
-        {
-          "path": "/admin/articles/new",
-          "verb": "LIVE",
-          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
-          "line": 31,
-          "helperBase": "admin_articles_new",
-          "params": [],
-          "isResource": false,
-          "liveModule": "ArticleLive.Form",
-          "liveAction": "new",
-          "scopePath": "/admin"
-        },
-        {
-          "path": "/admin/articles",
-          "verb": "LIVE",
-          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
-          "line": 30,
-          "helperBase": "admin_articles",
-          "params": [],
-          "isResource": false,
-          "liveModule": "ArticleLive.Index",
-          "liveAction": "index",
-          "scopePath": "/admin"
-        },
-        {
-          "path": "/articles/:id",
           "verb": "GET",
-          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
-          "line": 22,
-          "helperBase": "articles",
-          "params": [
-            "id"
-          ],
-          "isResource": false,
-          "controller": "ArticleController",
-          "action": "show",
-          "scopePath": "/"
-        },
-        {
-          "path": "/articles",
-          "verb": "GET",
-          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
-          "line": 21,
-          "helperBase": "articles",
-          "params": [],
-          "isResource": false,
-          "controller": "ArticleController",
-          "action": "index",
-          "scopePath": "/"
-        },
-        {
           "path": "/",
-          "verb": "GET",
           "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
           "line": 20,
+          "controller": "ArticleController",
+          "action": "index",
           "helperBase": "root",
           "params": [],
           "isResource": false,
+          "pipeline": "browser"
+        },
+        {
+          "verb": "GET",
+          "path": "/articles",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 21,
           "controller": "ArticleController",
           "action": "index",
-          "scopePath": "/"
+          "helperBase": "article",
+          "params": [],
+          "isResource": false,
+          "pipeline": "browser"
+        },
+        {
+          "verb": "GET",
+          "path": "/articles/:id",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 22,
+          "controller": "ArticleController",
+          "action": "show",
+          "helperBase": "article",
+          "params": [
+            "id"
+          ],
+          "isResource": false,
+          "pipeline": "browser"
+        },
+        {
+          "verb": "LIVE",
+          "path": "/admin/articles",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 30,
+          "liveModule": "ArticleLive.Index",
+          "liveAction": "Index",
+          "helperBase": "article",
+          "params": [],
+          "isResource": false,
+          "scopePath": "/admin"
+        },
+        {
+          "verb": "LIVE",
+          "path": "/admin/articles/new",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 31,
+          "liveModule": "ArticleLive.Form",
+          "liveAction": "Form",
+          "helperBase": "article_new",
+          "params": [],
+          "isResource": false,
+          "scopePath": "/admin"
+        },
+        {
+          "verb": "LIVE",
+          "path": "/admin/articles/:id/edit",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 32,
+          "liveModule": "ArticleLive.Form",
+          "liveAction": "Form",
+          "helperBase": "article_edit",
+          "params": [
+            "id"
+          ],
+          "isResource": false,
+          "scopePath": "/admin"
+        },
+        {
+          "verb": "LIVE",
+          "path": "/admin/categories",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 34,
+          "liveModule": "CategoryLive.Index",
+          "liveAction": "Index",
+          "helperBase": "category",
+          "params": [],
+          "isResource": false,
+          "scopePath": "/admin"
+        },
+        {
+          "verb": "LIVE",
+          "path": "/admin/categories/new",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 35,
+          "liveModule": "CategoryLive.Form",
+          "liveAction": "Form",
+          "helperBase": "category_new",
+          "params": [],
+          "isResource": false,
+          "scopePath": "/admin"
+        },
+        {
+          "verb": "LIVE",
+          "path": "/admin/categories/:id",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 36,
+          "liveModule": "CategoryLive.Show",
+          "liveAction": "Show",
+          "helperBase": "category",
+          "params": [
+            "id"
+          ],
+          "isResource": false,
+          "scopePath": "/admin"
+        },
+        {
+          "verb": "LIVE",
+          "path": "/admin/categories/:id/edit",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 37,
+          "liveModule": "CategoryLive.Form",
+          "liveAction": "Form",
+          "helperBase": "category_edit",
+          "params": [
+            "id"
+          ],
+          "isResource": false,
+          "scopePath": "/admin"
+        },
+        {
+          "verb": "FORWARD",
+          "path": "/dev/mailbox",
+          "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/router.ex",
+          "line": 58,
+          "forwardTo": "Plug.Swoosh.MailboxPreview",
+          "helperBase": "mailbox",
+          "params": [],
+          "isResource": false,
+          "pipeline": "browser",
+          "scopePath": "/dev"
         }
       ],
       "fileHashes": {
@@ -1156,61 +1078,6 @@
               "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/controllers/article_html/show.html.heex"
             }
           ]
-        ],
-        [
-          "NarasihistorianWeb.Admin.ArticleLive.Form",
-          [
-            {
-              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Form",
-              "name": "render",
-              "format": "html",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex#render"
-            }
-          ]
-        ],
-        [
-          "NarasihistorianWeb.Admin.CategoryLive.Form",
-          [
-            {
-              "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Form",
-              "name": "render",
-              "format": "html",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex#render"
-            }
-          ]
-        ],
-        [
-          "NarasihistorianWeb.Admin.CategoryLive.Index",
-          [
-            {
-              "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Index",
-              "name": "render",
-              "format": "html",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex#render"
-            }
-          ]
-        ],
-        [
-          "NarasihistorianWeb.Admin.ArticleLive.Index",
-          [
-            {
-              "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Index",
-              "name": "pagination_controls",
-              "format": "html",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex#pagination_controls"
-            }
-          ]
-        ],
-        [
-          "NarasihistorianWeb.Admin.CategoryLive.Show",
-          [
-            {
-              "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Show",
-              "name": "render",
-              "format": "html",
-              "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/show.ex#render"
-            }
-          ]
         ]
       ],
       "templatesByPath": [
@@ -1231,257 +1098,25 @@
             "format": "html",
             "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/controllers/article_html/show.html.heex"
           }
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex#render",
-          {
-            "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Form",
-            "name": "render",
-            "format": "html",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex#render"
-          }
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex#render",
-          {
-            "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Form",
-            "name": "render",
-            "format": "html",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex#render"
-          }
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex#render",
-          {
-            "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Index",
-            "name": "render",
-            "format": "html",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex#render"
-          }
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex#pagination_controls",
-          {
-            "moduleName": "NarasihistorianWeb.Admin.ArticleLive.Index",
-            "name": "pagination_controls",
-            "format": "html",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex#pagination_controls"
-          }
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/show.ex#render",
-          {
-            "moduleName": "NarasihistorianWeb.Admin.CategoryLive.Show",
-            "name": "render",
-            "format": "html",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/show.ex#render"
-          }
         ]
       ],
       "moduleByFile": [
         [
           "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/controllers/article_html.ex",
           "NarasihistorianWeb.ArticleHTML"
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex",
-          "NarasihistorianWeb.Admin.ArticleLive.Form"
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex",
-          "NarasihistorianWeb.Admin.CategoryLive.Form"
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex",
-          "NarasihistorianWeb.Admin.CategoryLive.Index"
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
-          "NarasihistorianWeb.Admin.ArticleLive.Index"
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/show.ex",
-          "NarasihistorianWeb.Admin.CategoryLive.Show"
         ]
       ],
       "fileHashes": {
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/controllers/article_html.ex": "5a2d97aa7b2707e745df6524bc099dd13cc2f26e",
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex": "74cca050ff5f199f32bef0ec9db2f940d2fe7543",
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex": "13e5b2a3da164e4e76c31cf3ae42f60bf6e58840",
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex": "4cd2264ca8375a4643b02210eb30c4a2b28098b7",
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex": "aefb920eae548d758112ef13eef407e762f56ca4",
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/show.ex": "bfa1cdb829ae8b37131df6e27deab4b40bf2e274"
+        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/controllers/article_html.ex": "5a2d97aa7b2707e745df6524bc099dd13cc2f26e"
       },
       "workspaceRoot": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian"
     },
     "liveview": {
-      "liveViews": [
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex",
-          {
-            "module": "NarasihistorianWeb.Admin.CategoryLive.Form",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex",
-            "functions": [
-              {
-                "line": 63,
-                "name": "save",
-                "type": "handle_event",
-                "module_name": "NarasihistorianWeb.Admin.CategoryLive.Form",
-                "event_name": "save"
-              },
-              {
-                "line": 58,
-                "name": "validate",
-                "type": "handle_event",
-                "module_name": "NarasihistorianWeb.Admin.CategoryLive.Form",
-                "event_name": "validate"
-              },
-              {
-                "line": 29,
-                "name": "mount",
-                "type": "mount",
-                "module_name": "NarasihistorianWeb.Admin.CategoryLive.Form"
-              },
-              {
-                "line": 8,
-                "name": "render",
-                "type": "render",
-                "module_name": "NarasihistorianWeb.Admin.CategoryLive.Form"
-              }
-            ]
-          }
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
-          {
-            "module": "NarasihistorianWeb.Admin.ArticleLive.Index",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex",
-            "functions": [
-              {
-                "line": 78,
-                "name": "delete",
-                "type": "handle_event",
-                "module_name": "NarasihistorianWeb.Admin.ArticleLive.Index",
-                "event_name": "delete"
-              },
-              {
-                "line": 60,
-                "name": "filter",
-                "type": "handle_event",
-                "module_name": "NarasihistorianWeb.Admin.ArticleLive.Index",
-                "event_name": "filter"
-              },
-              {
-                "line": 45,
-                "name": "load_articles",
-                "type": "handle_info",
-                "module_name": "NarasihistorianWeb.Admin.ArticleLive.Index",
-                "event_name": "load_articles"
-              },
-              {
-                "line": 23,
-                "name": "handle_params",
-                "type": "handle_params",
-                "module_name": "NarasihistorianWeb.Admin.ArticleLive.Index"
-              },
-              {
-                "line": 9,
-                "name": "mount",
-                "type": "mount",
-                "module_name": "NarasihistorianWeb.Admin.ArticleLive.Index"
-              }
-            ]
-          }
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex",
-          {
-            "module": "NarasihistorianWeb.Admin.ArticleLive.Form",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex",
-            "functions": [
-              {
-                "line": 123,
-                "name": "save",
-                "type": "handle_event",
-                "module_name": "NarasihistorianWeb.Admin.ArticleLive.Form",
-                "event_name": "save"
-              },
-              {
-                "line": 116,
-                "name": "validate",
-                "type": "handle_event",
-                "module_name": "NarasihistorianWeb.Admin.ArticleLive.Form",
-                "event_name": "validate"
-              },
-              {
-                "line": 104,
-                "name": "mount",
-                "type": "mount",
-                "module_name": "NarasihistorianWeb.Admin.ArticleLive.Form"
-              },
-              {
-                "line": 12,
-                "name": "render",
-                "type": "render",
-                "module_name": "NarasihistorianWeb.Admin.ArticleLive.Form"
-              }
-            ]
-          }
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex",
-          {
-            "module": "NarasihistorianWeb.Admin.CategoryLive.Index",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex",
-            "functions": [
-              {
-                "line": 54,
-                "name": "delete",
-                "type": "handle_event",
-                "module_name": "NarasihistorianWeb.Admin.CategoryLive.Index",
-                "event_name": "delete"
-              },
-              {
-                "line": 46,
-                "name": "mount",
-                "type": "mount",
-                "module_name": "NarasihistorianWeb.Admin.CategoryLive.Index"
-              },
-              {
-                "line": 7,
-                "name": "render",
-                "type": "render",
-                "module_name": "NarasihistorianWeb.Admin.CategoryLive.Index"
-              }
-            ]
-          }
-        ],
-        [
-          "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/show.ex",
-          {
-            "module": "NarasihistorianWeb.Admin.CategoryLive.Show",
-            "filePath": "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/show.ex",
-            "functions": [
-              {
-                "line": 63,
-                "name": "mount",
-                "type": "mount",
-                "module_name": "NarasihistorianWeb.Admin.CategoryLive.Show"
-              },
-              {
-                "line": 7,
-                "name": "render",
-                "type": "render",
-                "module_name": "NarasihistorianWeb.Admin.CategoryLive.Show"
-              }
-            ]
-          }
-        ]
-      ],
+      "liveViews": [],
       "fileHashes": {
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex": "13e5b2a3da164e4e76c31cf3ae42f60bf6e58840",
+        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex": "aac09718ebd316066c5cf433d36cbedbfa58fb65",
         "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/index.ex": "aefb920eae548d758112ef13eef407e762f56ca4",
-        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/admin/article_live/form.ex": "74cca050ff5f199f32bef0ec9db2f940d2fe7543",
+        "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/form.ex": "13e5b2a3da164e4e76c31cf3ae42f60bf6e58840",
         "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/index.ex": "4cd2264ca8375a4643b02210eb30c4a2b28098b7",
         "/home/agung/project agung web development/elixir phoenix/narasihistorian_app/narasihistorian/lib/narasihistorian_web/live/category_live/show.ex": "bfa1cdb829ae8b37131df6e27deab4b40bf2e274"
       },

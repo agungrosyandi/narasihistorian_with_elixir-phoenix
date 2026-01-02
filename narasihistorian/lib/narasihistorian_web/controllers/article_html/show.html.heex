@@ -27,6 +27,7 @@
           <div>
             {@article.category.category_name}
           </div>
+
           <div class="flex items-center gap-4 text-white/80">
             <time class="text-sm">
               {Calendar.strftime(@article.inserted_at, "%B %d, %Y")}
@@ -46,6 +47,10 @@
       <div class="prose prose-lg max-w-none">
         <p class="text-xl leading-relaxed text-base-content/80 mb-8">
           {@article.article_description}
+        </p>
+
+        <p class="text-4xl leading-relaxed text-base-content/80 mb-8">
+          {Phoenix.HTML.raw(safe_quill_html(@article.content))}
         </p>
       </div>
       

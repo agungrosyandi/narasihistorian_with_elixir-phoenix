@@ -8,5 +8,8 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [require("./assets/vendor/daisyui.js")],
+  plugins: [
+    require("./assets/vendor/daisyui.js"),
+    require("@tailwindcss/typography"),
+  ],
 };

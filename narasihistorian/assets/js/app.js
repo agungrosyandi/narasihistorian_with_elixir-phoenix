@@ -18,33 +18,110 @@
 // To load it, simply add a second `<link>` to your `root.html.heex` file.
 
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
-import "phoenix_html"
+import "phoenix_html";
 // Establish Phoenix Socket and LiveView configuration.
-import {Socket} from "phoenix"
-import {LiveSocket} from "phoenix_live_view"
-import {hooks as colocatedHooks} from "phoenix-colocated/narasihistorian"
-import topbar from "../vendor/topbar"
+import { Socket } from "phoenix";
+import { LiveSocket } from "phoenix_live_view";
+import { hooks as colocatedHooks } from "phoenix-colocated/narasihistorian";
+import topbar from "../vendor/topbar";
 
-const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+import Quill from "quill";
+
+// quil text editor -----------------------------------------------------
+
+let Hooks = {};
+
+Hooks.QuillEditor = {
+  mounted() {
+    console.log("QuillEditor hook mounted");
+    console.log("Element:", this.el);
+
+    const editorContainer = this.el.querySelector(".quill-editor");
+    console.log("Editor container:", editorContainer);
+
+    if (!editorContainer) {
+      console.error("Quill editor container not found");
+      return;
+    }
+
+    try {
+      const quill = new Quill(editorContainer, {
+        theme: "snow",
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, 3, false] }],
+            ["bold", "italic", "underline", "strike"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            [{ align: [] }],
+            ["link", "image"],
+            ["clean"],
+          ],
+        },
+        placeholder: "Write your article content here...",
+      });
+
+      console.log("Quill initialized:", quill);
+
+      // Load content from data attribute
+
+      const initialContent = this.el.dataset.content;
+      console.log("Initial content:", initialContent);
+
+      if (initialContent && initialContent.trim() !== "") {
+        quill.root.innerHTML = initialContent;
+      }
+
+      // Update hidden input when content changes
+
+      quill.on("text-change", () => {
+        const content = quill.root.innerHTML;
+        const hiddenInput = this.el.querySelector('input[type="hidden"]');
+        if (hiddenInput) {
+          hiddenInput.value = content;
+        }
+      });
+
+      this.quill = quill;
+    } catch (error) {
+      console.error("Error initializing Quill:", error);
+    }
+  },
+
+  destroyed() {
+    console.log("QuillEditor hook destroyed");
+    if (this.quill) {
+      this.quill = null;
+    }
+  },
+};
+
+// -------------------------------------------------------------
+
+const csrfToken = document
+  .querySelector("meta[name='csrf-token']")
+  .getAttribute("content");
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
-})
+  params: { _csrf_token: csrfToken },
+  hooks: { ...colocatedHooks, ...Hooks },
+});
 
 // Show progress bar on live navigation and form submits
-topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
-window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
-window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
+
+topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
+window.addEventListener("phx:page-loading-start", (_info) => topbar.show(300));
+window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
 
 // connect if there are any LiveViews on the page
-liveSocket.connect()
+
+liveSocket.connect();
 
 // expose liveSocket on window for web console debug logs and latency simulation:
 // >> liveSocket.enableDebug()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
-window.liveSocket = liveSocket
+
+window.liveSocket = liveSocket;
 
 // The lines below enable quality of life phoenix_live_reload
 // development features:
@@ -52,32 +129,39 @@ window.liveSocket = liveSocket
 //     1. stream server logs to the browser console
 //     2. click on elements to jump to their definitions in your code editor
 //
+
 if (process.env.NODE_ENV === "development") {
-  window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
-    // Enable server log streaming to client.
-    // Disable with reloader.disableServerLogs()
-    reloader.enableServerLogs()
+  window.addEventListener(
+    "phx:live_reload:attached",
+    ({ detail: reloader }) => {
+      // Enable server log streaming to client.
+      // Disable with reloader.disableServerLogs()
+      reloader.enableServerLogs();
 
-    // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
-    //
-    //   * click with "c" key pressed to open at caller location
-    //   * click with "d" key pressed to open at function component definition location
-    let keyDown
-    window.addEventListener("keydown", e => keyDown = e.key)
-    window.addEventListener("keyup", _e => keyDown = null)
-    window.addEventListener("click", e => {
-      if(keyDown === "c"){
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        reloader.openEditorAtCaller(e.target)
-      } else if(keyDown === "d"){
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        reloader.openEditorAtDef(e.target)
-      }
-    }, true)
+      // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
+      //
+      //   * click with "c" key pressed to open at caller location
+      //   * click with "d" key pressed to open at function component definition location
+      let keyDown;
+      window.addEventListener("keydown", (e) => (keyDown = e.key));
+      window.addEventListener("keyup", (_e) => (keyDown = null));
+      window.addEventListener(
+        "click",
+        (e) => {
+          if (keyDown === "c") {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            reloader.openEditorAtCaller(e.target);
+          } else if (keyDown === "d") {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            reloader.openEditorAtDef(e.target);
+          }
+        },
+        true
+      );
 
-    window.liveReloader = reloader
-  })
+      window.liveReloader = reloader;
+    }
+  );
 }
-
