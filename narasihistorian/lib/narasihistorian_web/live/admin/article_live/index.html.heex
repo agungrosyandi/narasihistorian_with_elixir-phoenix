@@ -1,0 +1,116 @@
+<Layouts.app flash={@flash}>
+  <div class="container mx-auto px-4">
+    
+<!-- header -->
+
+    <div class="flex justify-between items-center mb-8">
+      <.header>
+        {@page_title}
+      </.header>
+      <.link patch={~p"/admin/articles/new"} class="btn btn-primary">
+        New Article
+      </.link>
+    </div>
+    
+<!-- Search -->
+
+    <div class="relative mb-6 items-center">
+      <.form
+        class="flex flex-row gap-5"
+        for={@form}
+        id="filter-form"
+        phx-change="filter"
+      >
+        <.input
+          field={@form[:q]}
+          placeholder="Search ...."
+          autocomplete="off"
+          phx-debounce="500"
+        />
+
+        <.input
+          type="select"
+          field={@form[:sort_by]}
+          prompt="Sort By"
+          options={[
+            Latest: "inserted_at_asc",
+            Oldest: "inserted_at_desc",
+            "A to Z": "article_name_asc",
+            "Z to A": "article_name_desc"
+          ]}
+        />
+
+        <.link class=" px-3 py-2" patch={~p"/admin/articles"}>
+          Reset
+        </.link>
+      </.form>
+    </div>
+    
+<!-- loading and table -->
+
+    <%= cond do %>
+      <% @searching -> %>
+        <div class="text-center py-12">
+          <span class="loading loading-spinner loading-lg"></span>
+          <p class="mt-4 text-gray-600">Searching articles...</p>
+        </div>
+      <% @pagination == nil -> %>
+        <div class="text-center py-12">
+          <span class="loading loading-spinner loading-lg"></span>
+          <p class="mt-4 text-gray-600">Loading articles...</p>
+        </div>
+      <% @pagination && @pagination.entries == [] -> %>
+        <div class="alert alert-info max-w-2xl mx-auto">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            class="stroke-current shrink-0 w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>No articles found matching your search</span>
+        </div>
+      <% true -> %>
+        <.table id="articles" rows={@streams.articles}>
+          <:col :let={{_id, article}} label="Name">
+            <.link navigate={~p"/articles/#{article.id}"}>
+              {article.article_name}
+            </.link>
+          </:col>
+
+          <:col :let={{_id, article}} label="Description">
+            {truncate(article.article_description, 50)}
+          </:col>
+
+          <:col :let={{_id, article}} label="Last Update">
+            {Calendar.strftime(article.updated_at, "%d %b %Y %H:%M")}
+          </:col>
+
+          <:action :let={{_id, article}}>
+            <.link patch={~p"/admin/articles/#{article.id}/edit"}>Edit</.link>
+          </:action>
+
+          <:action :let={{id, article}}>
+            <.link
+              phx-click={JS.push("delete", value: %{id: article.id}) |> hide("##{id}")}
+              data-confirm="Kamu yakin ingin menghapus artikel ?"
+            >
+              Delete
+            </.link>
+          </:action>
+        </.table>
+        
+<!-- Pagination -->
+
+        <%= if @pagination do %>
+          <.pagination_controls pagination={@pagination} params={@form.params} />
+        <% end %>
+    <% end %>
+  </div>
+</Layouts.app>

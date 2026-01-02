@@ -1,0 +1,182 @@
+<Layouts.app flash={@flash}>
+  <div class="relative py-5">
+    
+<!-- Header -->
+
+    <div class="text-center mb-5">
+      <h1 class="text-5xl font-bold mb-4">
+        Everything about <span class="text-[#fedf16e0]">history</span>
+      </h1>
+      <p class="text-base text-base-content/60">
+        Explore the pivotal moments that shaped our world
+      </p>
+    </div>
+    
+<!-- filter -->
+
+    <form
+      method="get"
+      action={~p"/articles"}
+      class="max-w-2xl mx-auto mb-5 border-b border-gray-500 pb-10"
+    >
+      <div class="form-control">
+        <div class="input-group flex flex-col items-center gap-3 md:flex-row">
+          
+<!-- filter by category  -->
+
+          <select name="category" class="select w-full" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            <%= for {category_name, category_slug} <- @category_options do %>
+              <option value={category_slug} selected={category_slug == @selected_category}>
+                {category_name}
+              </option>
+            <% end %>
+          </select>
+          
+<!-- Search Form -->
+
+          <div class="flex flex-row w-full gap-2">
+            <input
+              type="text"
+              name="q"
+              value={@search_query}
+              placeholder="Cari Artikel ......"
+              class="input input-bordered w-full input-lg"
+            />
+
+            <button class="btn btn-square btn-primary btn-lg">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 "
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+    
+<!-- Articles Grid -->
+
+    <%= if @articles == [] do %>
+      <div class="alert alert-info max-w-2xl mx-auto">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          class="stroke-current shrink-0 w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          >
+          </path>
+        </svg>
+        <span>No articles found matching your criteria</span>
+      </div>
+    <% else %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <%= for article <- @articles do %>
+          <.link
+            href={~p"/articles/#{article.id}"}
+            class="group card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
+          >
+            <div class="flex justify-center p-5 text-sm font-bold shadow-xl">
+              {article.category.category_name}
+            </div>
+
+            <div class="flex flex-row md:flex-col">
+              <figure class="relative overflow-hidden h-64">
+                <img
+                  src={article.image}
+                  alt={article.article_name}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </figure>
+              <div class="card-body">
+                <h2 class="card-title group-hover:text-primary transition-colors">
+                  {article.article_name}
+                </h2>
+                <p class="text-base-content/70 line-clamp-3">
+                  {truncate(article.article_description, 100)}
+                </p>
+                <div class="card-actions justify-between items-center mt-4">
+                  <span class="text-sm text-base-content/50">
+                    {reading_time(article.article_description)} min read
+                  </span>
+                  <span class="text-primary font-semibold group-hover:gap-2 flex items-center transition-all">
+                    Read More
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 ml-1 w-5 group-hover:translate-x-1 transition-transform"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </.link>
+        <% end %>
+      </div>
+      
+<!-- Pagination -->
+
+      <%= if @total_pages > 1 do %>
+        <div class="flex justify-center mt-12">
+          <div class="join">
+            <%= if @current_page > 1 do %>
+              <.link
+                href={
+                  ~p"/articles?#{%{q: @search_query, category: @selected_category, page: @current_page - 1}}"
+                }
+                class="join-item btn"
+              >
+                «
+              </.link>
+            <% end %>
+
+            <%= for page <- 1..@total_pages do %>
+              <.link
+                href={
+                  ~p"/articles?#{%{q: @search_query, category: @selected_category, page: page}}"
+                }
+                class={"join-item btn #{if page == @current_page, do: "btn-active"}"}
+              >
+                {page}
+              </.link>
+            <% end %>
+
+            <%= if @current_page < @total_pages do %>
+              <.link
+                href={
+                  ~p"/articles?#{%{q: @search_query, category: @selected_category, page: @current_page + 1}}"
+                }
+                class="join-item btn"
+              >
+                »
+              </.link>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</Layouts.app>

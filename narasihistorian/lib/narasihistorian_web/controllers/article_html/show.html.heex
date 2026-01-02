@@ -1,0 +1,110 @@
+<Layouts.app flash={@flash}>
+  <!-- Article Hero Section -->
+
+  <article class="min-h-screen bg-base-100">
+    
+<!-- Hero Image -->
+
+    <div class="relative w-full h-[60vh] overflow-hidden">
+      <img
+        src={@article.image}
+        alt={@article.article_name}
+        class="w-full h-full object-cover"
+      />
+      <!-- Gradient Overlay -->
+
+      <div class="absolute inset-0 bg-gradient-to-t from-base-100 via-base-100/50 to-transparent">
+      </div>
+      
+<!-- Title Overlay -->
+
+      <div class="absolute bottom-0 left-0 right-0 p-8 md:p-16">
+        <div class="max-w-4xl mx-auto">
+          <h1 class="text-4xl md:text-6xl font-bold text-white drop-shadow-lg mb-4">
+            {@article.article_name}
+          </h1>
+
+          <div>
+            {@article.category.category_name}
+          </div>
+          <div class="flex items-center gap-4 text-white/80">
+            <time class="text-sm">
+              {Calendar.strftime(@article.inserted_at, "%B %d, %Y")}
+            </time>
+            <span>•</span>
+            <span class="text-sm">{reading_time(@article.article_description)} min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+<!-- Article Content -->
+
+    <div class="max-w-4xl mx-auto px-4 md:px-8 py-12">
+      <!-- Article Body -->
+
+      <div class="prose prose-lg max-w-none">
+        <p class="text-xl leading-relaxed text-base-content/80 mb-8">
+          {@article.article_description}
+        </p>
+      </div>
+      
+<!-- Divider -->
+
+      <div class="divider my-16"></div>
+      
+<!-- Related Articles Section -->
+
+      <section>
+        <h2 class="text-3xl font-bold mb-8">Continue Reading</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <%= for article <- @featured_articles do %>
+            <.link
+              href={~p"/articles/#{article.id}"}
+              class="group card bg-base-200 hover:bg-base-300 transition-all duration-300 hover:shadow-xl"
+            >
+              <figure class="relative overflow-hidden h-48">
+                <img
+                  src={article.image}
+                  alt={article.article_name}
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </figure>
+              <div class="card-body">
+                <h3 class="card-title text-lg group-hover:text-primary transition-colors">
+                  {article.article_name}
+                </h3>
+                <p class="text-sm text-base-content/70 line-clamp-2">
+                  {article.article_description}
+                </p>
+              </div>
+            </.link>
+          <% end %>
+        </div>
+      </section>
+      
+<!-- Back to Articles -->
+      <div class="mt-16 text-center">
+        <.link
+          href={~p"/articles"}
+          class="btn btn-outline btn-lg gap-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Back to All Articles
+        </.link>
+      </div>
+    </div>
+  </article>
+</Layouts.app>
