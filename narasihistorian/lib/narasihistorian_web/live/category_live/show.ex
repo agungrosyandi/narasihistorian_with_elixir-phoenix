@@ -48,7 +48,7 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Show do
                   {article.article_name}
                 </h3>
                 <p class="text-sm text-base-content/70 line-clamp-2">
-                  {article.article_description}
+                  {article.content |> quill_plain_text() |> String.slice(0, 120)}...
                 </p>
               </div>
             </.link>
@@ -65,5 +65,18 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Show do
      socket
      |> assign(:page_title, "Show Category")
      |> assign(:category, Categories.get_category_with_articles!(id))}
+  end
+
+  # QUILL RICH TEXT EDITOR -------------------------------------------
+
+  def quill_plain_text(nil), do: ""
+
+  def quill_plain_text(html) do
+    html
+    |> String.replace(~r/<br\s*\/?>/i, " ")
+    |> String.replace(~r/<\/p>/i, " ")
+    |> String.replace(~r/<[^>]*>/, "")
+    |> String.replace(~r/\s+/, " ")
+    |> String.trim()
   end
 end

@@ -58,7 +58,7 @@ cold =
 
 %Article{
   article_name: "Ancient Rome",
-  article_description:
+  content:
     "Periode Roma yang paling dikenal dan sering dikutip oleh ahli sejarah Roma era Republik, karena menjadi dasar bagi pilar peradaban dunia barat",
   image: "/images/ancient-rome.jpg",
   category: rome
@@ -67,7 +67,7 @@ cold =
 
 %Article{
   article_name: "Middle Ages",
-  article_description:
+  content:
     "Periode Eropa setelah keruntuhan Romawi barat, yang dimana peran Gereja Katolik Roma menjadi sangat dominan secara ekonomi maupun politik",
   image: "/images/medieval-age.jpg",
   category: middle
@@ -76,7 +76,7 @@ cold =
 
 %Article{
   article_name: "Age of Discovery",
-  article_description:
+  content:
     "Era dimulainya penjelajahan samudera yang diinisiasi oleh Spanyol untuk mencari dunia baru dengan semangat Gospel, Glory, dan Gold",
   image: "/images/age-of-discovery.jpg",
   category: discovery
@@ -85,7 +85,7 @@ cold =
 
 %Article{
   article_name: "Napoleonic War",
-  article_description:
+  content:
     "Peperangan besar yang melanda benua Eropa setelah revolusi Perancis, ketika naiknya Napoleon Bonaparte menjadi kaisar Perancis berambisi menguasai seluruh daratan Eropa",
   image: "/images/napoleonic-war.jpg",
   category: napoleonic
@@ -94,7 +94,7 @@ cold =
 
 %Article{
   article_name: "World War 1/2",
-  article_description:
+  content:
     "Awal abad ke 20 ditandai dengan situasi peperangan besar yang dampaknya melanda seluruh dunia terutama di Eropa, akibat munculnya persaingan militer antar blok negara-negara besar Eropa",
   image: "/images/world-war-2.jpg",
   category: world
@@ -103,7 +103,7 @@ cold =
 
 %Article{
   article_name: "Cold War",
-  article_description:
+  content:
     "Berakhirnya perang dunia ke 2 tidak membuat persaingan antar blok belum berakhir, karena melahirkan 2 kubu pemenang perang, yaitu blok barat pimpinan Amerika Serikat dan blok timur pimpinan Uni Soviet",
   image: "/images/cold-war.jpg",
   category: cold
@@ -112,7 +112,7 @@ cold =
 
 %Article{
   article_name: "Mesopotamian Civilization",
-  article_description:
+  content:
     "Salah satu peradaban tertua di dunia yang berkembang di antara Sungai Tigris dan Eufrat, dikenal sebagai tempat lahirnya tulisan dan hukum tertulis.",
   image:
     "https://humanoriginproject.com/wp-content/uploads/2018/11/ancient-mesopotamian-civilizations-thumbnail.jpg",
@@ -122,7 +122,7 @@ cold =
 
 %Article{
   article_name: "Ancient Egypt",
-  article_description:
+  content:
     "Peradaban besar di lembah Sungai Nil yang terkenal dengan piramida, hieroglif, dan sistem kepercayaan terhadap kehidupan setelah kematian.",
   image:
     "https://cdn.britannica.com/57/122157-050-21261E20/Side-view-Sphinx-Great-Pyramid-of-Khufu.jpg?w=300",
@@ -132,7 +132,7 @@ cold =
 
 %Article{
   article_name: "Indus Valley Civilization",
-  article_description:
+  content:
     "Peradaban kuno di wilayah Asia Selatan yang memiliki tata kota maju seperti Mohenjo-daro dan Harappa.",
   image:
     "https://cdn.britannica.com/22/196822-050-0E40EBC2/Ruins-city-Harappa-Pakistan-Punjab.jpg?w=300",
@@ -142,7 +142,7 @@ cold =
 
 %Article{
   article_name: "Ancient China",
-  article_description:
+  content:
     "Peradaban besar Asia Timur yang berkembang sepanjang Sungai Kuning, terkenal dengan dinasti, filsafat Konfusianisme, dan inovasi teknologi.",
   image: "https://cdn.mos.cms.futurecdn.net/kBZA9k5TiE3GwrehfFLMv3-650-80.jpg.webp",
   category: discovery

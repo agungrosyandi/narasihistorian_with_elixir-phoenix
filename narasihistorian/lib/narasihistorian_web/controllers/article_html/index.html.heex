@@ -1,7 +1,7 @@
 <Layouts.app flash={@flash}>
   <div class="relative py-5">
     
-<!-- Header -->
+<!-- HEADER -->
 
     <div class="text-center mb-5">
       <h1 class="text-5xl font-bold mb-4">
@@ -12,7 +12,7 @@
       </p>
     </div>
     
-<!-- filter -->
+<!-- FILTER -->
 
     <form
       method="get"
@@ -22,7 +22,7 @@
       <div class="form-control">
         <div class="input-group flex flex-col items-center gap-3 md:flex-row">
           
-<!-- filter by category  -->
+<!-- FILTER BY CATEGORY  -->
 
           <select name="category" class="select w-full" onchange="this.form.submit()">
             <option value="">All Categories</option>
@@ -33,7 +33,7 @@
             <% end %>
           </select>
           
-<!-- Search Form -->
+<!-- SEARCH FORM -->
 
           <div class="flex flex-row w-full gap-2">
             <input
@@ -65,7 +65,10 @@
       </div>
     </form>
     
-<!-- Articles Grid -->
+<!-- ARTICLE GRID -->
+
+
+<!-- if content and artikel not found or nil -->
 
     <%= if @articles == [] do %>
       <div class="alert alert-info max-w-2xl mx-auto">
@@ -86,17 +89,28 @@
         <span>No articles found matching your criteria</span>
       </div>
     <% else %>
+      
+<!-- if content and artikel found  -->
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <%= for article <- @articles do %>
           <.link
             href={~p"/articles/#{article.id}"}
             class="group card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
           >
+            
+<!-- categoryy -->
+
             <div class="flex justify-center p-5 text-sm font-bold shadow-xl">
               {article.category.category_name}
             </div>
+            
+<!-- card -->
 
             <div class="flex flex-row md:flex-col">
+              
+<!-- image -->
+
               <figure class="relative overflow-hidden h-64">
                 <img
                   src={article.image}
@@ -104,16 +118,28 @@
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </figure>
+              
+<!-- body -->
+
               <div class="card-body">
+                
+<!-- article name -->
+
                 <h2 class="card-title group-hover:text-primary transition-colors">
                   {article.article_name}
                 </h2>
+                
+<!-- article content -->
+
                 <p class="text-base-content/70 line-clamp-3">
-                  {truncate(article.article_description, 100)}
+                  {article.content |> quill_plain_text() |> String.slice(0, 120)}...
                 </p>
+                
+<!-- reading time calculation -->
+
                 <div class="card-actions justify-between items-center mt-4">
                   <span class="text-sm text-base-content/50">
-                    {reading_time(article.article_description)} min read
+                    {reading_time(article.content)} min read
                   </span>
                   <span class="text-primary font-semibold group-hover:gap-2 flex items-center transition-all">
                     Read More

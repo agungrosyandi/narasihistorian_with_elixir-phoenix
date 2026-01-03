@@ -35,7 +35,7 @@ defmodule Narasihistorian.Admin do
     from a in query,
       where:
         ilike(a.article_name, ^search_term) or
-          ilike(a.article_description, ^search_term)
+          ilike(a.content, ^search_term)
   end
 
   # FILTER BY SORT

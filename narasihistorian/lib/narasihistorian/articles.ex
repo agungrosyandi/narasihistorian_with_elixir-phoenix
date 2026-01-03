@@ -46,7 +46,7 @@ defmodule Narasihistorian.Articles do
       query,
       [a],
       ilike(a.article_name, ^search_term) or
-        ilike(a.article_description, ^search_term)
+        ilike(a.content, ^search_term)
     )
   end
 

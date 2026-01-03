@@ -84,10 +84,6 @@
             </.link>
           </:col>
 
-          <:col :let={{_id, article}} label="Description">
-            {truncate(article.article_description, 50)}
-          </:col>
-
           <:col :let={{_id, article}} label="Content">
             {article.content |> quill_plain_text() |> String.slice(0, 120)}...
           </:col>

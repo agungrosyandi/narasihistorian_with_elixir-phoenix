@@ -41,16 +41,6 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
                 class="input w-full border p-3 shadow-sm"
               />
               
-    <!-- DESCRIPTION -->
-
-              <.input
-                field={@form[:article_description]}
-                type="textarea"
-                label="Description"
-                phx-debounce="blur"
-                class="input w-full p-3 min-h-[100px] border shadow-sm"
-              />
-              
     <!-- RICH TEXT EDITOR (QUILL) -->
 
               <div class="form-field">

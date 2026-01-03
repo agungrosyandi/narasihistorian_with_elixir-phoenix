@@ -23,7 +23,18 @@ defmodule NarasihistorianWeb.ArticleHTML do
 
   def reading_time(nil), do: 1
 
-  # QUILL RICH TEXT EDITOR -------------------------------------------
+  # QUILL RICH TEXT EDITOR  -------------------------------------------
+
+  def quill_plain_text(nil), do: ""
+
+  def quill_plain_text(html) do
+    html
+    |> String.replace(~r/<br\s*\/?>/i, " ")
+    |> String.replace(~r/<\/p>/i, " ")
+    |> String.replace(~r/<[^>]*>/, "")
+    |> String.replace(~r/\s+/, " ")
+    |> String.trim()
+  end
 
   def safe_quill_html(nil), do: ""
 

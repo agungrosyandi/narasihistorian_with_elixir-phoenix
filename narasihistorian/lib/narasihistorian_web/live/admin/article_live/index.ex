@@ -62,8 +62,6 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
       params
       |> Map.take(~w(q sort_by))
       |> Map.reject(fn {_, v} -> v == "" end)
-      # Reset to page 1 when searching
-
       |> Map.put("page", "1")
 
     socket =
@@ -176,18 +174,6 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
 
       true ->
         (current_page - 3)..(current_page + 3)
-    end
-  end
-
-  # Helper to truncate paragrapgh
-
-  defp truncate(nil, _length), do: ""
-
-  defp truncate(text, length) do
-    if String.length(text) > length do
-      String.slice(text, 0, length) <> "..."
-    else
-      text
     end
   end
 end
