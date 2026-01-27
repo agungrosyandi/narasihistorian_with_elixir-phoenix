@@ -3,16 +3,24 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
 
   alias Narasihistorian.Admin
 
+  import NarasihistorianWeb.Admin.Components, only: [admin_nav: 1]
+
   # MOUNT ---------------------------------------------------------------------------------
 
   @impl true
   def mount(_params, _session, socket) do
+    # testing live patch web socket
+
+    # IO.inspect(self(), label: "MOUNT")
+
     socket =
       socket
       |> assign(:page_title, "Listing Articles")
       |> assign(:form, to_form(%{}))
       |> assign(:pagination, nil)
       |> assign(:searching, false)
+      |> assign(:current_nav, :articles)
+      |> assign(:current_page, :articles)
 
     {:ok, socket}
   end
@@ -21,12 +29,14 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
 
   @impl true
   def handle_params(params, _uri, socket) do
-    # If we're searching, load asynchronously to show loading state
+    # testing live patch web socket
+
+    # IO.inspect(self(), label: "HANDLE PARAMS")
+
     if socket.assigns.searching do
       send(self(), {:load_articles, params})
       {:noreply, socket}
     else
-      # Normal page load or pagination - load immediately
       pagination = Admin.filter_articles(params, per_page: 10)
 
       socket =
@@ -43,6 +53,10 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
 
   @impl true
   def handle_info({:load_articles, params}, socket) do
+    # testing live patch web socket
+
+    # IO.inspect(self(), label: "HANDLE INFO")
+
     pagination = Admin.filter_articles(params, per_page: 10)
 
     socket =
@@ -75,14 +89,23 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     article = Admin.get_article!(id)
-    {:ok, _} = Admin.delete_article(article)
 
-    # Refresh the current page after deletion
+    case Admin.delete_article(article) do
+      {:ok, _} ->
+        socket =
+          socket
+          |> put_flash(:info, "Article and image deleted successfully from cloud!")
+          |> stream_delete(:articles, article)
 
-    params = socket.assigns.form.params
-    socket = push_patch(socket, to: ~p"/admin/articles?#{params}")
+        {:noreply, socket}
 
-    {:noreply, socket}
+      {:error, _changeset} ->
+        socket =
+          socket
+          |> put_flash(:error, "Failed to delete article")
+
+        {:noreply, socket}
+    end
   end
 
   # PAGINATION CONTROL -----------------------------------------------------------------

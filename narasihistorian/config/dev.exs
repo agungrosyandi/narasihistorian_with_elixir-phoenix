@@ -91,3 +91,22 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# R2/S3 Configuration
+config :ex_aws,
+  json_codec: Jason,
+  access_key_id: System.get_env("R2_ACCESS_KEY_ID"),
+  secret_access_key: System.get_env("R2_SECRET_ACCESS_KEY"),
+  region: "auto"
+
+config :ex_aws, :s3,
+  scheme: "https://",
+  host: System.get_env("R2_ACCOUNT_ID") <> ".r2.cloudflarestorage.com",
+  region: "auto"
+
+# Your R2 bucket name
+
+config :narasihistorian,
+  r2_bucket: "narasihistorian-uploads",
+  r2_public_url:
+    System.get_env("R2_PUBLIC_URL") || "https://pub-c1a9a52503974422b82e0ceb60305c18.r2.dev"

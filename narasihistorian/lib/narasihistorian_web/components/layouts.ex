@@ -5,31 +5,14 @@ defmodule NarasihistorianWeb.Layouts do
   """
   use NarasihistorianWeb, :html
 
-  # Embed all files in layouts/* within this module.
-  # The default root.html.heex file contains the HTML
-  # skeleton of your application, namely HTML headers
-  # and other static content.
   embed_templates "layouts/*"
 
   @doc """
-  Renders your app layout.
-
-  This function is typically invoked from every template,
-  and it often contains your application menu, sidebar,
-  or similar.
-
-  ## Examples
-
-      <Layouts.app flash={@flash}>
-        <h1>Content</h1>
-      </Layouts.app>
-
+  Renders your app layout with authentication support.
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
-
-  attr :current_scope, :map,
-    default: nil,
-    doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
+  attr :current_user, :map, default: nil, doc: "the current authenticated user"
+  attr :current_scope, :map, default: nil, doc: "the current scope"
 
   slot :inner_block, required: true
 
@@ -37,56 +20,116 @@ defmodule NarasihistorianWeb.Layouts do
     ~H"""
     <%!-- NAVBAR --%>
 
-    <main class="relative w-[90%] mx-auto lg:w-[85%] xl:w-[80%]">
+    <main class="relative w-[90%] mx-auto lg:w-[85%] xl:w-[75%]">
       <.header>
         <nav class="py-5">
           <div class="flex items-center justify-between">
             <%!-- Logo --%>
+
             <div class="relative">
               <.link href={~p"/"}>
                 <img
-                  class="h-[2rem] w-[8rem] md:h-[3rem] md:w-[11rem] lg:h-[5rem] lg:w-[13rem] object-cover"
+                  class="h-[2rem] w-[12rem] md:h-[2rem] md:w-[15rem] lg:h-[5rem] lg:w-[13rem] object-cover"
                   src="/images/logo-narasihistorian-1-02-1.png"
                   alt="Narasi Historian"
                 />
               </.link>
             </div>
 
-            <%!-- Desktop Navigation --%>
+            <%!-- Desktop Navigation & User Menu --%>
 
             <div class="hidden md:flex items-center gap-8">
               <.link
                 href={~p"/articles"}
-                class="text-white hover:text-[#fedf16e0] font-medium transition-colors duration-200"
+                class="text-white hover:text-[#fedf16e0] font-normal text-base transition-colors duration-200"
               >
-                Article
+                Artikel
               </.link>
 
               <.link
-                href={~p"/admin/articles"}
-                class="text-white hover:text-[#fedf16e0] font-medium transition-colors duration-200"
+                href={~p"/"}
+                class="text-white hover:text-[#fedf16e0] font-normal text-base transition-colors duration-200"
               >
-                Admin
+                Kategori
               </.link>
 
-              <.link
-                href={~p"/admin/categories"}
-                class="text-white hover:text-[#fedf16e0] font-medium transition-colors duration-200"
-              >
-                Category
-              </.link>
+              <%= if Map.get(assigns, :current_user) do %>
+                <%!-- Desktop Avatar Dropdown --%>
+
+                <div class="relative" id="desktop-user-menu">
+                  <button
+                    phx-click={
+                      JS.toggle(to: "#desktop-dropdown")
+                      |> JS.toggle_class("hidden", to: "#desktop-dropdown")
+                    }
+                    class="flex items-center gap-2 p-1 rounded-full hover:bg-white/10 transition-colors duration-200"
+                  >
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#fedf16e0] to-yellow-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                      {String.first(@current_user.username) |> String.upcase()}
+                    </div>
+                  </button>
+
+                  <%!-- Dropdown Menu --%>
+
+                  <div
+                    id="desktop-dropdown"
+                    class="hidden absolute right-0 mt-2 w-56 bg-base-100 rounded-lg shadow-xl border border-gray-700 overflow-hidden z-50"
+                    phx-click-away={JS.add_class("hidden", to: "#desktop-dropdown")}
+                  >
+                    <%!-- User Info --%>
+
+                    <div class="px-4 py-3 border-b border-gray-700">
+                      <p class="text-sm font-medium text-white">{@current_user.username}</p>
+                      <p class="text-xs text-gray-400 truncate">{@current_user.email}</p>
+                    </div>
+
+                    <%!-- Menu Items --%>
+
+                    <div class="py-2">
+                      <.link
+                        href={~p"/admin/articles"}
+                        class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <.icon name="hero-squares-plus" class="w-5 h-5" /> Dashboard
+                      </.link>
+
+                      <.link
+                        href={~p"/users/settings"}
+                        class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <.icon name="hero-cog-8-tooth" class="w-5 h-5" /> Settings
+                      </.link>
+
+                      <.link
+                        href={~p"/users/log-out"}
+                        method="delete"
+                        class="flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors duration-200"
+                      >
+                        <.icon name="hero-arrow-right-start-on-rectangle" class="w-5 h-5" /> Log out
+                      </.link>
+                    </div>
+                  </div>
+                </div>
+              <% else %>
+                <.link
+                  href={~p"/users/log-in"}
+                  class="text-white text-sm border border-white/30 py-2 px-6 rounded-full hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200"
+                >
+                  Login
+                </.link>
+              <% end %>
             </div>
 
             <%!-- Mobile Menu Button --%>
 
             <button
               id="mobile-menu-button"
-              class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 z-50"
+              class="md:hidden p-2 rounded-lg hover:bg-gray-100/10 transition-colors duration-200 z-50"
               phx-click={
                 JS.toggle(to: "#mobile-menu") |> JS.toggle_class("hidden", to: "#mobile-menu")
               }
             >
-              <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -98,30 +141,73 @@ defmodule NarasihistorianWeb.Layouts do
           </div>
 
           <%!-- Mobile Menu --%>
+
           <div
             id="mobile-menu"
-            class="hidden md:hidden mt-4 pb-4 border-t border-gray-500"
+            class="hidden md:hidden mt-5 pb-4 border-t border-b border-gray-500"
           >
             <div class="flex flex-col gap-4 pt-4">
+              <%!-- Mobile User Info --%>
+
+              <%= if Map.get(assigns, :current_user) do %>
+                <div class="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-lg mb-2">
+                  <div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#fedf16e0] to-yellow-600 flex items-center justify-center text-white font-bold shadow-lg">
+                    {String.first(@current_user.username) |> String.upcase()}
+                  </div>
+                  <div>
+                    <p class="text-white font-medium">{@current_user.username}</p>
+                    <p class="text-xs text-gray-400">{@current_user.email}</p>
+                  </div>
+                </div>
+              <% end %>
+
+              <%= if Map.get(assigns, :current_user) do %>
+                <.link
+                  href={~p"/admin/articles"}
+                  class="flex items-center gap-3 text-base text-white hover:text-[#fedf16e0] font-medium transition-colors duration-200 py-2 px-4"
+                >
+                  <.icon name="hero-squares-plus" class="w-5 h-5" /> Dashboard
+                </.link>
+
+                <.link
+                  href={~p"/users/settings"}
+                  class="flex items-center gap-3 text-base text-white hover:text-[#fedf16e0] font-medium transition-colors duration-200 py-2 px-4"
+                >
+                  <.icon name="hero-cog-8-tooth" class="w-5 h-5" /> Settings
+                </.link>
+
+                <.link
+                  href={~p"/users/log-out"}
+                  method="delete"
+                  class="flex items-center gap-3 text-base text-red-400 hover:text-red-300 font-medium transition-colors duration-200 py-2 px-4"
+                >
+                  <.icon name="hero-arrow-right-start-on-rectangle" class="w-5 h-5" /> Log out
+                </.link>
+
+                <div class="border-t border-gray-500 my-2"></div>
+              <% else %>
+                <.link
+                  href={~p"/users/log-in"}
+                  class="text-white hover:text-[#fedf16e0] text-base font-medium transition-colors duration-200 py-2 px-4"
+                >
+                  <.icon name="hero-user-circle" class="w-5 h-5 mr-2 mb-1" /> Login
+                </.link>
+              <% end %>
+
+              <%!-- NAVBAR MENU --%>
+
               <.link
                 href={~p"/articles"}
-                class="text-white hover:text-[#fedf16e0] font-medium transition-colors duration-200 py-2"
+                class="text-white hover:text-[#fedf16e0] text-base font-medium transition-colors duration-200 py-2 px-4"
               >
-                Article
+                <.icon name="hero-chevron-right" class="w-5 h-5 mr-2 mb-1" /> Artikel
               </.link>
 
               <.link
-                href={~p"/admin/articles"}
-                class="text-white hover:text-[#fedf16e0] font-medium transition-colors duration-200 py-2"
+                href={~p"/"}
+                class="text-white hover:text-[#fedf16e0] text-base font-medium transition-colors duration-200 py-2 px-4"
               >
-                Admin
-              </.link>
-
-              <.link
-                href={~p"/admin/categories"}
-                class="text-white hover:text-[#fedf16e0] font-medium transition-colors duration-200 py-2"
-              >
-                Category
+                <.icon name="hero-chevron-right" class="w-5 h-5 mr-2 mb-1" /> Kategori
               </.link>
             </div>
           </div>
@@ -141,10 +227,6 @@ defmodule NarasihistorianWeb.Layouts do
 
   @doc """
   Shows the flash group with standard titles and content.
-
-  ## Examples
-
-      <.flash_group flash={@flash} />
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
   attr :id, :string, default: "flash-group", doc: "the optional id of flash container"
@@ -184,8 +266,6 @@ defmodule NarasihistorianWeb.Layouts do
 
   @doc """
   Provides dark vs light theme toggle based on themes defined in app.css.
-
-  See <head> in root.html.heex which applies the theme before page load.
   """
   def theme_toggle(assigns) do
     ~H"""

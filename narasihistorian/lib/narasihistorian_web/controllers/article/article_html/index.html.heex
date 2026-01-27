@@ -1,0 +1,50 @@
+<Layouts.app flash={@flash} current_user={@current_user}>
+  <div class="relative pb-5">
+    
+<!-- HEADER TITLE -->
+
+    <.header_title />
+    
+<!-- FILTER -->
+
+    <form
+      method="get"
+      action={~p"/articles"}
+      class="max-w-2xl mx-auto mb-5 border-b border-gray-500 pb-10"
+    >
+      <div class="form-control">
+        <div class="input-group flex flex-col items-center gap-3 md:flex-row">
+          <.category_select
+            category_options={@category_options}
+            selected_category={@selected_category}
+          />
+
+          <.search_query />
+        </div>
+      </div>
+    </form>
+    
+<!-- ARTICLE GRID -->
+
+    <%= if @articles == [] do %>
+      <.content_article_not_found />
+    <% else %>
+      <.article_found articles={@articles} />
+
+      <%= if @total_pages > 1 do %>
+        <.pagination_home
+          current_page={@current_page}
+          total_pages={@total_pages}
+          search_query={@search_query}
+          selected_category={@selected_category}
+        />
+      <% end %>
+    <% end %>
+    
+<!-- FOOTER -->
+
+    <div class="border-t border-gray-500 mt-10"></div>
+
+    <.footer_description class="bg-neutral" />
+  </div>
+</Layouts.app>

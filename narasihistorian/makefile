@@ -1,11 +1,17 @@
 .PHONY: help setup install start server test test.watch format check deps clean db.create db.migrate db.rollback db.reset db.seed routes
 
+# Load .env file if it exists
+ifneq (,$(wildcard .env))
+    include .env
+    export
+endif
+
 # Default target
 help:
 	@echo "Available commands:"
 	@echo "  make setup        						- Initial project setup (install deps + setup db)"
 	@echo "  make install      						- Install dependencies"
-	@echo "  make start        						- Start Phoenix server"
+	@echo "  make start        						- Start Phoenix server (auto-loads .env)"
 	@echo "  make server       						- Start Phoenix server (alias)"
 	@echo "  make test         						- Run tests"
 	@echo "  make test.watch   						- Run tests in watch mode"
@@ -70,6 +76,11 @@ install:
 # Start server
 
 start:
+	@if [ -f .env ]; then \
+		echo "✓ Loading environment variables from .env"; \
+	else \
+		echo "⚠️  No .env file found. R2 uploads may not work."; \
+	fi
 	mix phx.server
 
 server: start
@@ -77,6 +88,9 @@ server: start
 # Interactive shell with server
 
 shell:
+	@if [ -f .env ]; then \
+		echo "✓ Loading environment variables from .env"; \
+	fi
 	iex -S mix phx.server
 
 # Run tests

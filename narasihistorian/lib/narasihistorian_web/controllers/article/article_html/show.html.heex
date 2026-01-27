@@ -1,0 +1,186 @@
+<Layouts.app flash={@flash} current_user={@current_user}>
+  <!-- Article Hero Section -->
+
+  <article class="min-h-screen bg-base-100">
+    <div class="relative w-full h-[60vh] overflow-hidden">
+      <img
+        src={@article.image}
+        alt={@article.article_name}
+        class="w-full h-full object-cover"
+      />
+      <!-- Gradient Overlay -->
+
+      <div class="absolute inset-0 bg-gradient-to-t from-base-100 via-base-100/50 to-transparent">
+      </div>
+      
+<!-- Title Overlay -->
+
+      <div class="absolute bottom-0 left-0 right-0 p-4 md:p-8 lg:p-16">
+        <div class="max-w-4xl mx-auto">
+          <h1 class="text-2xl font-bold text-white drop-shadow-lg mb-4 md:text-4xl">
+            {@article.article_name}
+          </h1>
+
+          <div class="py-2 text-base md:text-lg">
+            {@article.category.category_name}
+          </div>
+
+          <div class="flex items-center gap-4 text-white/80 justify-between">
+            <time class="text-sm">
+              {Calendar.strftime(@article.inserted_at, "%B %d, %Y")}
+            </time>
+            <span>
+              •<span class="text-sm ml-2">{reading_time(@article.content)} min read</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+<!-- Article Content -->
+
+    <div class="max-w-4xl mx-auto px-4 py-12 md:px-8 ">
+      <div class="prose prose-lg max-w-none text-white text-lg">
+        {Phoenix.HTML.raw(safe_quill_html(@article.content))}
+      </div>
+
+      <div class="divider my-10"></div>
+      
+<!-- Comments Section -->
+
+      <section class="mb-10">
+        <h2 class="text-2xl font-bold mb-6">
+          Komentar ({length(@comments)})
+        </h2>
+
+        <%= if @comments == [] do %>
+          <div class="text-center py-8 text-base-content/60">
+            <p>Belum ada komentar. Jadilah yang pertama berkomentar!</p>
+          </div>
+        <% else %>
+          <div class="space-y-4">
+            <%= for comment <- @comments do %>
+              <div class="card bg-base-200">
+                <div class="card-body">
+                  <div class="flex items-start gap-4">
+                    
+<!-- Avatar -->
+
+                    <div class="avatar placeholder">
+                      <div class="bg-primary text-primary-content rounded-full w-10 h-10">
+                        <span class="text-base h-full font-bold flex justify-center items-center">
+                          {String.first(comment.user.username) |> String.upcase()}
+                        </span>
+                      </div>
+                    </div>
+                    
+<!-- Comment Content -->
+
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold">{comment.user.username}</span>
+                        <span class="text-sm text-base-content/60">
+                          {Calendar.strftime(comment.inserted_at, "%B %d, %Y at %I:%M %p")}
+                        </span>
+                      </div>
+
+                      <%= if @current_user && (@current_user.id == comment.user_id || @current_user.role == :admin) do %>
+                        <.link
+                          href={~p"/articles/#{@article.id}/comments/#{comment.id}"}
+                          method="delete"
+                          data-confirm="Hapus komentar ini?"
+                          class="text-error my-5"
+                        >
+                          <.icon name="hero-x-circle" class="w-4 h-4 mb-1" /> Hapus
+                        </.link>
+                      <% end %>
+
+                      <p class="text-base-content/90">{comment.comment}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+
+      <div class="divider my-10"></div>
+      
+<!-- Comment Form -->
+
+      <%= if @current_user do %>
+        <h3 class="text-xl font-semibold mb-5">Tinggalkan Komentar</h3>
+
+        <.form
+          class="flex flex-col gap-3"
+          for={@form}
+          id="comment-form"
+          action={~p"/articles/#{@article.id}/comments"}
+          method="post"
+        >
+          <input type="hidden" name="article_id" value={@article.id} />
+
+          <.input field={@form[:comment]} placeholder="Tulis komentar Anda..." autofocus />
+          <.button>Submit Komentar</.button>
+        </.form>
+      <% else %>
+        <div class="alert flex flex-row py-5">
+          <.icon name="hero-exclamation-circle" class="w-5 h-5" />
+          <span>Anda harus login untuk berkomentar</span>
+          <div>
+            <.link href={~p"/users/log-in"} class="btn btn-sm btn-primary">
+              Login
+            </.link>
+          </div>
+        </div>
+      <% end %>
+      
+<!-- Divider -->
+
+      <div class="divider my-16"></div>
+      
+<!-- Related Articles Section -->
+
+      <section>
+        <h2 class="text-2xl font-bold mb-8">Baca Juga</h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <%= for article <- @featured_articles do %>
+            <.link
+              href={~p"/articles/#{article.id}"}
+              class="group card bg-base-200 hover:bg-base-300 transition-all duration-300 hover:shadow-xl"
+            >
+              <div class="flex flex-col">
+                <figure class="relative overflow-hidden h-48">
+                  <img
+                    src={article.image}
+                    alt={article.article_name}
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                </figure>
+                <div class="card-body">
+                  <h3 class="card-title text-lg group-hover:text-primary transition-colors">
+                    {article.article_name}
+                  </h3>
+
+                  <p class="text-sm text-base-content/70 line-clamp-2">
+                    {article.content |> quill_plain_text() |> String.slice(0, 120)}...
+                  </p>
+                </div>
+              </div>
+            </.link>
+          <% end %>
+        </div>
+      </section>
+      
+<!-- Back to Articles -->
+
+      <div class="mt-16 text-center">
+        <.link href={~p"/articles"} class="btn btn-outline btn-lg gap-2">
+          <.icon name="hero-arrow-uturn-left" class="w-4 h-4" /> Back to All Articles
+        </.link>
+      </div>
+    </div>
+  </article>
+</Layouts.app>

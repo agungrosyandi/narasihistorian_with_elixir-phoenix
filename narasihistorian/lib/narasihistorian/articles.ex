@@ -1,4 +1,5 @@
 defmodule Narasihistorian.Articles do
+  alias Narasihistorian.Comments.Comment
   alias Narasihistorian.Articles.Article
   alias Narasihistorian.Repo
 
@@ -76,10 +77,17 @@ defmodule Narasihistorian.Articles do
   # ---------------------------------------------------------
 
   def get_articles!(id) do
-    Process.sleep(500)
-
-    Repo.get!(Article, id)
-    |> Repo.preload(:category)
+    Article
+    |> where([a], a.id == ^id)
+    |> preload([
+      :category,
+      comments:
+        ^from(c in Comment,
+          order_by: [desc: c.inserted_at],
+          preload: [:user]
+        )
+    ])
+    |> Repo.one!()
   end
 
   def featured_article(articles) do

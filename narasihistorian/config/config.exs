@@ -12,6 +12,7 @@ config :narasihistorian,
   generators: [timestamp_type: :utc_datetime]
 
 # Configure the endpoint
+
 config :narasihistorian, NarasihistorianWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
@@ -20,7 +21,11 @@ config :narasihistorian, NarasihistorianWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Narasihistorian.PubSub,
-  live_view: [signing_salt: "oKnkPjqq"]
+  live_view: [signing_salt: "oKnkPjqq"],
+
+  # ... other config
+
+  static: ~w(assets uploads fonts images favicon.ico robots.txt)
 
 # Configure the mailer
 #
@@ -29,9 +34,11 @@ config :narasihistorian, NarasihistorianWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
+
 config :narasihistorian, Narasihistorian.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
+
 config :esbuild,
   version: "0.25.4",
   narasihistorian: [
@@ -42,6 +49,7 @@ config :esbuild,
   ]
 
 # Configure tailwind (the version is required)
+
 config :tailwind,
   version: "4.1.12",
   narasihistorian: [
@@ -53,13 +61,16 @@ config :tailwind,
   ]
 
 # Configure Elixir's Logger
+
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
 # Use Jason for JSON parsing in Phoenix
+
 config :phoenix, :json_library, Jason
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
+
 import_config "#{config_env()}.exs"

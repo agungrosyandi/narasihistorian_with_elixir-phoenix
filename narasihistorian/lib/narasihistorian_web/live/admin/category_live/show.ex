@@ -6,7 +6,7 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} current_user={@current_user}>
       <.header>
         Category {@category.id}
         <:subtitle>This is a category record from your database.</:subtitle>

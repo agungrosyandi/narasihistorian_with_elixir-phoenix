@@ -1,6 +1,8 @@
 defmodule NarasihistorianWeb.ArticleHTML do
   use NarasihistorianWeb, :html
 
+  import NarasihistorianWeb.CustomComponents
+
   # TRUNCATE TEXT / DESCRIPTION
 
   def truncate(text, length) when is_binary(text) do

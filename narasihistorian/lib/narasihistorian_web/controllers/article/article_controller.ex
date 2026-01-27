@@ -3,6 +3,12 @@ defmodule NarasihistorianWeb.ArticleController do
 
   alias Narasihistorian.Articles
   alias Narasihistorian.Categories
+  alias Narasihistorian.Dashboard
+
+  alias Narasihistorian.Comments
+  alias Narasihistorian.Comments.Comment
+
+  # INDEX (all list article)
 
   def index(conn, params) do
     page = String.to_integer(params["page"] || "1")
@@ -21,13 +27,24 @@ defmodule NarasihistorianWeb.ArticleController do
     |> render(:index)
   end
 
+  # SHOW (get article by id)
+
   def show(conn, %{"id" => id}) do
     article = Articles.get_articles!(id)
+    featured_articles = Articles.featured_article(article)
+    changeset = Comments.change_comment(%Comment{})
+    form_comment = Phoenix.Component.to_form(changeset, as: :comment)
+
+    # Increment view count
+
+    Dashboard.increment_article_views(article.id)
 
     conn
     |> assign(:article, article)
     |> assign(:page_title, article.article_name)
-    |> assign(:featured_articles, Articles.featured_article(article))
+    |> assign(:featured_articles, featured_articles)
+    |> assign(:comments, article.comments)
+    |> assign(:form, form_comment)
     |> render(:show)
   end
 end

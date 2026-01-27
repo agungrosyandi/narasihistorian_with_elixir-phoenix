@@ -1,26 +1,29 @@
-<Layouts.app flash={@flash}>
+<Layouts.app flash={@flash} current_user={@current_user}>
+  
+<!-- Test live patching web socket -->
+
+  <%!-- <% IO.inspect(self(), label: "RENDER (HEEX)") %> --%>
+
   <div class="container mx-auto px-4">
-    
-<!-- header -->
+    <%!-- Admin Navigation --%>
+
+    <.admin_nav current_page={@current_page} current_user={@current_user} />
+
+    <%!-- Header --%>
 
     <div class="flex justify-between items-center mb-8">
       <.header>
         {@page_title}
       </.header>
-      <.link patch={~p"/admin/articles/new"} class="btn btn-primary">
+      <.link navigate={~p"/admin/articles/new"} class="btn btn-primary">
         New Article
       </.link>
     </div>
-    
-<!-- Search -->
+
+    <%!-- Search --%>
 
     <div class="relative mb-6 items-center">
-      <.form
-        class="flex flex-row gap-5"
-        for={@form}
-        id="filter-form"
-        phx-change="filter"
-      >
+      <.form class="flex flex-row gap-5" for={@form} id="filter-form" phx-change="filter">
         <.input
           field={@form[:q]}
           placeholder="Search ...."
@@ -33,20 +36,20 @@
           field={@form[:sort_by]}
           prompt="Sort By"
           options={[
-            Latest: "inserted_at_asc",
-            Oldest: "inserted_at_desc",
+            Latest: "inserted_at_desc",
+            Oldest: "inserted_at_asc",
             "A to Z": "article_name_asc",
             "Z to A": "article_name_desc"
           ]}
         />
 
-        <.link class=" px-3 py-2" patch={~p"/admin/articles"}>
+        <.link class="px-3 py-2 hover:underline" patch={~p"/admin/articles"}>
           Reset
         </.link>
       </.form>
     </div>
-    
-<!-- loading and table -->
+
+    <%!-- Loading and table --%>
 
     <%= cond do %>
       <% @searching -> %>
@@ -105,9 +108,7 @@
             </.link>
           </:action>
         </.table>
-        
-<!-- Pagination -->
-
+        <%!-- Pagination --%>
         <%= if @pagination do %>
           <.pagination_controls pagination={@pagination} params={@form.params} />
         <% end %>

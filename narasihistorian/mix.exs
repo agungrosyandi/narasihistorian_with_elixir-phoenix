@@ -40,13 +40,14 @@ defmodule Narasihistorian.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
       # main version original phoenix version
 
       {:phoenix, "~> 1.8.2"},
 
       # using phoenix source from github when using CRUD generator after finished used back main version original phoenix version
 
-      # {:phoenix, github: "phoenixframework/phoenix", override: true},
+      # {:phoenix, github: "phoenixframework/phoenix", ref: "bd589f1", override: true},
 
       # --------------------------------------------------------------
 
@@ -75,7 +76,12 @@ defmodule Narasihistorian.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:html_sanitize_ex, "~> 1.4"}
+      {:html_sanitize_ex, "~> 1.4"},
+      {:mime, "~> 2.0"},
+      {:ex_aws, "~> 2.5"},
+      {:ex_aws_s3, "~> 2.5"},
+      {:hackney, "~> 1.18"},
+      {:sweet_xml, "~> 0.7"}
     ]
   end
 

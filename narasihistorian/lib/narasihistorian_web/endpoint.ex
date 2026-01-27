@@ -23,7 +23,8 @@ defmodule NarasihistorianWeb.Endpoint do
   plug Plug.Static,
     at: "/",
     from: :narasihistorian,
-    gzip: not code_reloading?,
+    # gzip: not code_reloading?,
+    gzip: false,
     only: NarasihistorianWeb.static_paths(),
     raise_on_missing_only: code_reloading?
 

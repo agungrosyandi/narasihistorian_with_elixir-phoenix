@@ -25,77 +25,10 @@ import { LiveSocket } from "phoenix_live_view";
 import { hooks as colocatedHooks } from "phoenix-colocated/narasihistorian";
 import topbar from "../vendor/topbar";
 
-import Quill from "quill";
+import Hooks from "./hooks";
 
-// quil text editor -----------------------------------------------------
-
-let Hooks = {};
-
-Hooks.QuillEditor = {
-  mounted() {
-    console.log("QuillEditor hook mounted");
-    console.log("Element:", this.el);
-
-    const editorContainer = this.el.querySelector(".quill-editor");
-    console.log("Editor container:", editorContainer);
-
-    if (!editorContainer) {
-      console.error("Quill editor container not found");
-      return;
-    }
-
-    try {
-      const quill = new Quill(editorContainer, {
-        theme: "snow",
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ["bold", "italic", "underline", "strike"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            [{ align: [] }],
-            ["link", "image"],
-            ["clean"],
-          ],
-        },
-        placeholder: "Write your article content here...",
-      });
-
-      console.log("Quill initialized:", quill);
-
-      // Load content from data attribute
-
-      const initialContent = this.el.dataset.content;
-      console.log("Initial content:", initialContent);
-
-      if (initialContent && initialContent.trim() !== "") {
-        quill.root.innerHTML = initialContent;
-      }
-
-      // Update hidden input when content changes
-
-      quill.on("text-change", () => {
-        const content = quill.root.innerHTML;
-        const hiddenInput = this.el.querySelector('input[type="hidden"]');
-        if (hiddenInput) {
-          hiddenInput.value = content;
-        }
-      });
-
-      this.quill = quill;
-    } catch (error) {
-      console.error("Error initializing Quill:", error);
-    }
-  },
-
-  destroyed() {
-    console.log("QuillEditor hook destroyed");
-    if (this.quill) {
-      this.quill = null;
-    }
-  },
-};
-
-// -------------------------------------------------------------
+import Chart from "chart.js/auto";
+import { DashboardHooks } from "./dashboard_hooks";
 
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -103,8 +36,10 @@ const csrfToken = document
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
-  hooks: { ...colocatedHooks, ...Hooks },
+  hooks: { ...colocatedHooks, ...Hooks, ...DashboardHooks },
 });
+
+window.Chart = Chart;
 
 // Show progress bar on live navigation and form submits
 
@@ -158,10 +93,10 @@ if (process.env.NODE_ENV === "development") {
             reloader.openEditorAtDef(e.target);
           }
         },
-        true
+        true,
       );
 
       window.liveReloader = reloader;
-    }
+    },
   );
 }
