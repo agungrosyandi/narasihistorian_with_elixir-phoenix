@@ -4,26 +4,9 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Form do
   alias Narasihistorian.Categories
   alias Narasihistorian.Categories.Category
 
-  @impl true
-  def render(assigns) do
-    ~H"""
-    <Layouts.app flash={@flash} current_user={@current_user}>
-      <.header>
-        {@page_title}
-        <:subtitle>Use this form to manage category records in your database.</:subtitle>
-      </.header>
-
-      <.form for={@form} id="category-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:category_name]} type="text" label="Category name" />
-        <.input field={@form[:slug]} type="text" label="Slug" />
-        <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Category</.button>
-          <.button navigate={return_path(@return_to, @category)}>Cancel</.button>
-        </footer>
-      </.form>
-    </Layouts.app>
-    """
-  end
+  # ============================================================================
+  # MOUNT
+  # ============================================================================
 
   @impl true
   def mount(params, _session, socket) do
@@ -32,6 +15,66 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Form do
      |> assign(:return_to, return_to(params["return_to"]))
      |> apply_action(socket.assigns.live_action, params)}
   end
+
+  # ============================================================================
+  # RENDER
+  # ============================================================================
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash} current_user={@current_user}>
+      <div class="relative flex w-full flex-col gap-3 mb-10 lg:min-h-[70vh] lg:flex-row shadow-lg">
+        <div class=" w-[100%] lg:block flex-1">
+          <img
+            class="relative h-full w-full object-cover rounded-lg"
+            src="/images/new-bg-1.jpg"
+            alt="My Image"
+          />
+        </div>
+
+        <div class="flex flex-col flex-1 p-8 border border-gray-700 rounded-lg">
+          <.header>
+            {@page_title}
+          </.header>
+
+          <.form for={@form} id="category-form" phx-change="validate" phx-submit="save">
+            <.input field={@form[:category_name]} type="text" label="Nama Kategori" />
+            <.input field={@form[:slug]} type="text" label="Slug" />
+            <footer>
+              <div class="my-5 flex flex-row gap-3">
+                <.button_custom phx-disable-with="Saving..." variant="primary">
+                  <.icon name="hero-inbox-arrow-down" class="w-4 h-4" /> Simpan
+                </.button_custom>
+                <.button_custom variant="transparant" navigate={return_path(@return_to, @category)}>
+                  <.icon name="hero-arrow-left" class="w-4 h-4" /> Cancel
+                </.button_custom>
+              </div>
+            </footer>
+          </.form>
+        </div>
+      </div>
+    </Layouts.app>
+    """
+  end
+
+  # ============================================================================
+  # HANDLE EVENT
+  # ============================================================================
+
+  @impl true
+  def handle_event("validate", %{"category" => category_params}, socket) do
+    changeset = Categories.change_category(socket.assigns.category, category_params)
+    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+  end
+
+  def handle_event("save", %{"category" => category_params}, socket) do
+    save_category(socket, socket.assigns.live_action, category_params)
+  end
+
+  # ============================================================================
+  # PRIVATE HELPER
+  # ============================================================================
 
   defp return_to("show"), do: "show"
   defp return_to(_), do: "index"
@@ -49,19 +92,9 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Form do
     category = %Category{}
 
     socket
-    |> assign(:page_title, "New Category")
+    |> assign(:page_title, "Buat Kategori")
     |> assign(:category, category)
     |> assign(:form, to_form(Categories.change_category(category)))
-  end
-
-  @impl true
-  def handle_event("validate", %{"category" => category_params}, socket) do
-    changeset = Categories.change_category(socket.assigns.category, category_params)
-    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
-  end
-
-  def handle_event("save", %{"category" => category_params}, socket) do
-    save_category(socket, socket.assigns.live_action, category_params)
   end
 
   defp save_category(socket, :edit, category_params) do

@@ -4,11 +4,30 @@ defmodule NarasihistorianWeb.UserLive.Registration do
   alias Narasihistorian.Accounts
   alias Narasihistorian.Accounts.User
 
+  # ============================================================================
+  # MOUNT
+  # ============================================================================
+
+  def mount(_params, _session, socket) do
+    changeset = Accounts.change_user_registration(%User{})
+
+    socket =
+      socket
+      |> assign(trigger_submit: false, check_errors: false)
+      |> assign_form(changeset)
+
+    {:ok, socket, temporary_assigns: [form: nil]}
+  end
+
+  # ============================================================================
+  # RENDER
+  # ============================================================================
+
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <div class="relative flex w-full flex-col gap-3 lg:min-h-[70vh] lg:flex-row shadow-lg ">
-        <div class="w-[100%]">
+      <div class="relative flex w-full flex-col gap-3 mb-10 lg:min-h-[70vh] lg:flex-row shadow-lg">
+        <div class="hidden w-[100%] lg:block">
           <img
             class="relative h-full w-full object-cover"
             src="/images/40.jpg"
@@ -16,16 +35,24 @@ defmodule NarasihistorianWeb.UserLive.Registration do
           />
         </div>
 
-        <div class="mx-auto w-full h-full space-y-6 rounded-xl p-8 shadow-md">
+        <div class="mx-auto w-full h-full space-y-6 mb-10 rounded-xl p-3 lg:p-5">
           <.header class="text-center">
-            Register for an account
-            <:subtitle>
-              Already registered?
-              <.link navigate={~p"/users/log-in"} class="font-semibold text-brand hover:underline">
-                Log in
+            <div class="flex flex-row items-center py-5">
+              <div class="h-[0.1rem] w-full bg-gray-600"></div>
+              <p class="px-5 text-2xl">REGISTER</p>
+              <div class="h-[0.1rem] w-full bg-gray-600"></div>
+            </div>
+
+            <h3 class="flex flex-col items-center justify-center w-full text-center text-sm md:flex-row">
+              Already registered ?
+              <.link
+                navigate={~p"/users/log-in"}
+                class="font-semibold text-[#fedf16e0] text-brand hover:underline"
+              >
+                &nbsp  Log in &nbsp
               </.link>
               to your account now.
-            </:subtitle>
+            </h3>
           </.header>
 
           <.simple_form
@@ -71,9 +98,9 @@ defmodule NarasihistorianWeb.UserLive.Registration do
             />
 
             <:actions>
-              <.button phx-disable-with="Creating account..." class="btn w-full">
+              <.button_custom phx-disable-with="Creating account..." variant="full">
                 Create an account
-              </.button>
+              </.button_custom>
             </:actions>
           </.simple_form>
         </div>
@@ -82,16 +109,9 @@ defmodule NarasihistorianWeb.UserLive.Registration do
     """
   end
 
-  def mount(_params, _session, socket) do
-    changeset = Accounts.change_user_registration(%User{})
-
-    socket =
-      socket
-      |> assign(trigger_submit: false, check_errors: false)
-      |> assign_form(changeset)
-
-    {:ok, socket, temporary_assigns: [form: nil]}
-  end
+  # ============================================================================
+  # HANDLE EVENT
+  # ============================================================================
 
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
@@ -114,6 +134,10 @@ defmodule NarasihistorianWeb.UserLive.Registration do
     changeset = Accounts.change_user_registration(%User{}, user_params)
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
+
+  # ============================================================================
+  # PRIVATE HELPER
+  # ============================================================================
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     form = to_form(changeset, as: "user")

@@ -12,9 +12,12 @@ defmodule Narasihistorian.Application do
       Narasihistorian.Repo,
       {DNSCluster, query: Application.get_env(:narasihistorian, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Narasihistorian.PubSub},
+      {Cachex, name: :dashboard_cache, limit: 100},
+
       # Start a worker by calling: Narasihistorian.Worker.start_link(arg)
       # {Narasihistorian.Worker, arg},
       # Start to serve requests, typically the last entry
+      Narasihistorian.Scheduler,
       NarasihistorianWeb.Endpoint
     ]
 

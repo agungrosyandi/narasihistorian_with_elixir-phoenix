@@ -5,12 +5,12 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
 
   import NarasihistorianWeb.Admin.Components, only: [admin_nav: 1]
 
-  # MOUNT ---------------------------------------------------------------------------------
+  # ============================================================================
+  # MOUNT
+  # ============================================================================
 
   @impl true
   def mount(_params, _session, socket) do
-    # testing live patch web socket
-
     # IO.inspect(self(), label: "MOUNT")
 
     socket =
@@ -25,19 +25,21 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
     {:ok, socket}
   end
 
-  # PARAMS ------------------------------------------------------------------------------------
+  # ============================================================================
+  # HANDLE PARAMS
+  # ============================================================================
 
   @impl true
   def handle_params(params, _uri, socket) do
-    # testing live patch web socket
-
     # IO.inspect(self(), label: "HANDLE PARAMS")
+
+    current_user = socket.assigns.current_user
 
     if socket.assigns.searching do
       send(self(), {:load_articles, params})
       {:noreply, socket}
     else
-      pagination = Admin.filter_articles(params, per_page: 10)
+      pagination = Admin.filter_articles(params, [per_page: 10], current_user)
 
       socket =
         socket
@@ -49,15 +51,17 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
     end
   end
 
-  # HANDLE INFO ---------------------------------------------------------------------------
+  # ============================================================================
+  # HANDLE INFO
+  # ============================================================================
 
   @impl true
   def handle_info({:load_articles, params}, socket) do
-    # testing live patch web socket
-
     # IO.inspect(self(), label: "HANDLE INFO")
 
-    pagination = Admin.filter_articles(params, per_page: 10)
+    current_user = socket.assigns.current_user
+
+    pagination = Admin.filter_articles(params, [per_page: 10], current_user)
 
     socket =
       socket
@@ -69,7 +73,9 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
     {:noreply, socket}
   end
 
-  # HANDEL EVENT FILTER & DELETE ---------------------------------------------------------------
+  # ============================================================================
+  # HANDLE EVENT
+  # ============================================================================
 
   def handle_event("filter", params, socket) do
     params =
@@ -88,32 +94,39 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
+    current_user = socket.assigns.current_user
+
+    id = if is_binary(id), do: String.to_integer(id), else: id
+
     article = Admin.get_article!(id)
 
-    case Admin.delete_article(article) do
+    case Admin.delete_article(article, current_user) do
       {:ok, _} ->
-        socket =
-          socket
-          |> put_flash(:info, "Article and image deleted successfully from cloud!")
-          |> stream_delete(:articles, article)
+        {:noreply,
+         socket
+         |> put_flash(:info, "Article deleted successfully!")
+         |> stream_delete(:articles, article)}
 
-        {:noreply, socket}
+      {:error, :unauthorized} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "You don't have permission to delete this article")}
 
       {:error, _changeset} ->
-        socket =
-          socket
-          |> put_flash(:error, "Failed to delete article")
-
-        {:noreply, socket}
+        {:noreply,
+         socket
+         |> put_flash(:error, "Failed to delete article")}
     end
   end
 
-  # PAGINATION CONTROL -----------------------------------------------------------------
+  # ============================================================================
+  # PAGINATION CONTROL COMPONENT
+  # ============================================================================
 
   def pagination_controls(assigns) do
     ~H"""
     <div class="flex items-center justify-between mt-6">
-      <div class="text-sm text-gray-700">
+      <div class="text-sm text-gray-400">
         Showing {(@pagination.page - 1) * @pagination.per_page + 1} to {min(
           @pagination.page * @pagination.per_page,
           @pagination.total_count
@@ -157,7 +170,9 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
     """
   end
 
-  # QUILL RICH TEXT EDITOR -------------------------------------------
+  # ============================================================================
+  # QUILL TEXT EDITOR
+  # ============================================================================
 
   def quill_plain_text(nil), do: ""
 
@@ -170,16 +185,14 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
     |> String.trim()
   end
 
-  # PRIVATE HELPER --------------------------------------------------------
-
-  # Helper function to build pagination path with existing params
+  # ============================================================================
+  # PRIVATE HELPER
+  # ============================================================================
 
   defp build_pagination_path(params, page) do
     new_params = Map.put(params || %{}, "page", to_string(page))
     ~p"/admin/articles?#{new_params}"
   end
-
-  # Helper to generate page range for pagination
 
   defp pagination_range(pagination) do
     total_pages = pagination.total_pages
@@ -197,6 +210,13 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
 
       true ->
         (current_page - 3)..(current_page + 3)
+    end
+  end
+
+  defp display_author(article) do
+    case article.user do
+      %{username: username} -> username
+      _ -> "Unknown"
     end
   end
 end

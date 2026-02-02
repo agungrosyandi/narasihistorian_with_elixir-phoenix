@@ -3,6 +3,19 @@ defmodule NarasihistorianWeb.UserLive.Confirmation do
 
   alias Narasihistorian.Accounts
 
+  # ============================================================================
+  # MOUNT
+  # ============================================================================
+
+  def mount(%{"token" => token}, _session, socket) do
+    form = to_form(%{"token" => token}, as: "user")
+    {:ok, assign(socket, form: form), temporary_assigns: [form: nil]}
+  end
+
+  # ============================================================================
+  # RENDER
+  # ============================================================================
+
   def render(%{live_action: :edit} = assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_user={@current_user}>
@@ -25,13 +38,13 @@ defmodule NarasihistorianWeb.UserLive.Confirmation do
     """
   end
 
-  def mount(%{"token" => token}, _session, socket) do
-    form = to_form(%{"token" => token}, as: "user")
-    {:ok, assign(socket, form: form), temporary_assigns: [form: nil]}
-  end
+  # ============================================================================
+  # HANDLE EVENT
+  # ============================================================================
 
   # Do not log in the user after confirmation to avoid a
   # leaked token giving the user access to the account.
+
   def handle_event("confirm_account", %{"user" => %{"token" => token}}, socket) do
     case Accounts.confirm_user(token) do
       {:ok, _} ->

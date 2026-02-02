@@ -7,14 +7,17 @@ defmodule NarasihistorianWeb.Layouts do
 
   embed_templates "layouts/*"
 
-  @doc """
-  Renders your app layout with authentication support.
-  """
   attr :flash, :map, required: true, doc: "the map of flash messages"
   attr :current_user, :map, default: nil, doc: "the current authenticated user"
   attr :current_scope, :map, default: nil, doc: "the current scope"
 
   slot :inner_block, required: true
+
+  # Helper to return the correct dashboard path based on user role
+
+  defp dashboard_path(user) do
+    if user.role == :admin, do: "/admin/dashboard", else: "/user/dashboard"
+  end
 
   def app(assigns) do
     ~H"""
@@ -26,15 +29,13 @@ defmodule NarasihistorianWeb.Layouts do
           <div class="flex items-center justify-between">
             <%!-- Logo --%>
 
-            <div class="relative">
-              <.link href={~p"/"}>
-                <img
-                  class="h-[2rem] w-[12rem] md:h-[2rem] md:w-[15rem] lg:h-[5rem] lg:w-[13rem] object-cover"
-                  src="/images/logo-narasihistorian-1-02-1.png"
-                  alt="Narasi Historian"
-                />
-              </.link>
-            </div>
+            <.link href={~p"/"}>
+              <img
+                class="h-[2rem] w-[12rem] md:h-[2rem] md:w-[15rem] lg:h-[5rem] lg:w-[13rem] object-cover"
+                src="/images/logo-narasihistorian-1-02-1.png"
+                alt="Narasi Historian"
+              />
+            </.link>
 
             <%!-- Desktop Navigation & User Menu --%>
 
@@ -87,7 +88,7 @@ defmodule NarasihistorianWeb.Layouts do
 
                     <div class="py-2">
                       <.link
-                        href={~p"/admin/articles"}
+                        href={dashboard_path(@current_user)}
                         class="flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors duration-200"
                       >
                         <.icon name="hero-squares-plus" class="w-5 h-5" /> Dashboard
@@ -163,7 +164,7 @@ defmodule NarasihistorianWeb.Layouts do
 
               <%= if Map.get(assigns, :current_user) do %>
                 <.link
-                  href={~p"/admin/articles"}
+                  href={dashboard_path(@current_user)}
                   class="flex items-center gap-3 text-base text-white hover:text-[#fedf16e0] font-medium transition-colors duration-200 py-2 px-4"
                 >
                   <.icon name="hero-squares-plus" class="w-5 h-5" /> Dashboard

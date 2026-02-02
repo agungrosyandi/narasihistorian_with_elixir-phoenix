@@ -90,9 +90,13 @@ config :phoenix_live_view,
   enable_expensive_runtime_checks: true
 
 # Disable swoosh api client as it is only required for production adapters.
+
 config :swoosh, :api_client, false
 
-# R2/S3 Configuration
+# ============================================================================
+# R2/S3 CONFIGURATION
+# ============================================================================
+
 config :ex_aws,
   json_codec: Jason,
   access_key_id: System.get_env("R2_ACCESS_KEY_ID"),
@@ -104,9 +108,15 @@ config :ex_aws, :s3,
   host: System.get_env("R2_ACCOUNT_ID") <> ".r2.cloudflarestorage.com",
   region: "auto"
 
-# Your R2 bucket name
-
 config :narasihistorian,
   r2_bucket: "narasihistorian-uploads",
   r2_public_url:
     System.get_env("R2_PUBLIC_URL") || "https://pub-c1a9a52503974422b82e0ceb60305c18.r2.dev"
+
+# ============================================================================
+# OAUTH DEVELOPMENT
+# ============================================================================
+
+config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+  client_id: System.get_env("GOOGLE_CLIENT_ID"),
+  client_secret: System.get_env("GOOGLE_CLIENT_SECRET")

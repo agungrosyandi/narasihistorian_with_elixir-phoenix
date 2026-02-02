@@ -3,7 +3,9 @@ defmodule NarasihistorianWeb.ArticleHTML do
 
   import NarasihistorianWeb.CustomComponents
 
+  # ============================================================================
   # TRUNCATE TEXT / DESCRIPTION
+  # ============================================================================
 
   def truncate(text, length) when is_binary(text) do
     if String.length(text) > length do
@@ -25,7 +27,9 @@ defmodule NarasihistorianWeb.ArticleHTML do
 
   def reading_time(nil), do: 1
 
-  # QUILL RICH TEXT EDITOR  -------------------------------------------
+  # ============================================================================
+  # QUILL RICH TEXT EDITOR
+  # ============================================================================
 
   def quill_plain_text(nil), do: ""
 
@@ -40,9 +44,7 @@ defmodule NarasihistorianWeb.ArticleHTML do
 
   def safe_quill_html(nil), do: ""
 
-  def safe_quill_html(html) do
-    HtmlSanitizeEx.basic_html(html)
-  end
+  def safe_quill_html(html), do: HtmlSanitizeEx.basic_html(html)
 
   embed_templates "article_html/*"
 end

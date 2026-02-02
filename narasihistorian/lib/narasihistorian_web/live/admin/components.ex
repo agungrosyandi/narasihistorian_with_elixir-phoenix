@@ -5,9 +5,10 @@ defmodule NarasihistorianWeb.Admin.Components do
     endpoint: NarasihistorianWeb.Endpoint,
     router: NarasihistorianWeb.Router
 
-  @doc """
-  Renders admin navigation with active state
-  """
+  # ============================================================================
+  # admin nav
+  # ============================================================================
+
   attr :current_page, :atom, required: true
   attr :current_user, :map, required: true
 
@@ -31,6 +32,10 @@ defmodule NarasihistorianWeb.Admin.Components do
     """
   end
 
+  # ============================================================================
+  # NAV ITEM
+  # ============================================================================
+
   attr :path, :string, required: true
   attr :current, :atom, required: true
   attr :page, :atom, required: true
@@ -44,7 +49,7 @@ defmodule NarasihistorianWeb.Admin.Components do
         "px-4 py-2 rounded-lg font-medium transition-all duration-200",
         if(@current == @page,
           do: "bg-primary text-black shadow-md",
-          else: "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+          else: "text-gray-300 hover:bg-gray-100 hover:text-gray-900"
         )
       ]}
     >

@@ -531,4 +531,75 @@ defmodule NarasihistorianWeb.CoreComponents do
     </.form>
     """
   end
+
+  attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
+  attr :class, :any
+  attr :variant, :string, values: ~w(primary full transparant)
+  slot :inner_block, required: true
+
+  def button_custom(%{rest: rest} = assigns) do
+    variants = %{
+      "primary" =>
+        "text-black bg-white text-sm cursor-pointer rounded-lg border border-white/30 py-2 px-6 hover:text-white hover:bg-white/10 hover:border-[#fedf16e0] font-bold transition-all duration-500",
+      "full" =>
+        "text-black bg-white w-full text-sm cursor-pointer rounded-lg border border-white/30 py-2 px-6 hover:text-white hover:bg-white/10 hover:border-[#fedf16e0] font-bold transition-all duration-500",
+      "transparant" =>
+        "text-white text-sm border border-[#fedf16e0] py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200",
+      nil => "btn-primary btn-soft"
+    }
+
+    assigns =
+      assign_new(assigns, :class, fn ->
+        ["btn", Map.fetch!(variants, assigns[:variant])]
+      end)
+
+    if rest[:href] || rest[:navigate] || rest[:patch] do
+      ~H"""
+      <.link class={@class} {@rest}>
+        {render_slot(@inner_block)}
+      </.link>
+      """
+    else
+      ~H"""
+      <button class={@class} {@rest}>
+        {render_slot(@inner_block)}
+      </button>
+      """
+    end
+  end
+
+  slot :inner_block, required: true
+
+  attr :variant, :string, default: "primary"
+  attr :class, :string, default: ""
+  attr :rest, :global
+
+  def span_custom(assigns) do
+    ~H"""
+    <span
+      class={[
+        base_classes(),
+        variant_classes(@variant),
+        @class
+      ]}
+      {@rest}
+    >
+      {render_slot(@inner_block)}
+    </span>
+    """
+  end
+
+  defp base_classes do
+    ""
+  end
+
+  defp variant_classes("main") do
+    "text-white text-sm border border-white/30 py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200"
+  end
+
+  defp variant_classes("transparant") do
+    "text-white text-sm border border-[#fedf16e0] py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200"
+  end
+
+  defp variant_classes(_), do: ""
 end

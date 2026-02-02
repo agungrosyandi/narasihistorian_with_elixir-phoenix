@@ -2,6 +2,10 @@ defmodule Narasihistorian.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  # ============================================================================
+  # SCHEMA
+  # ============================================================================
+
   @valid_roles [:user, :admin]
 
   schema "users" do
@@ -13,34 +17,26 @@ defmodule Narasihistorian.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :role, Ecto.Enum, values: @valid_roles, default: :user
 
+    # OAuth fields
+
+    field :provider, :string
+    field :provider_uid, :string
+    field :provider_token, :string
+    field :provider_refresh_token, :string
+    field :provider_expires_at, :utc_datetime
+    field :avatar_url, :string
+
     has_many :comments, Narasihistorian.Comments.Comment
+    has_many :articles, Narasihistorian.Articles.Article
+    has_many :categories, Narasihistorian.Categories.Category
 
     timestamps(type: :utc_datetime)
   end
 
-  @doc """
-  A user changeset for registration.
+  # ============================================================================
+  # CHANGESET
+  # ============================================================================
 
-  It is important to validate the length of both email and password.
-  Otherwise databases may truncate the email without warnings, which
-  could lead to unpredictable or insecure behaviour. Long passwords may
-  also be very expensive to hash for certain algorithms.
-
-  ## Options
-
-    * `:hash_password` - Hashes the password so it can be stored securely
-      in the database and ensures the password field is cleared to prevent
-      leaks in the logs. If password hashing is not needed and clearing the
-      password field is not desired (like when using this changeset for
-      validations on a LiveView form), this option can be set to `false`.
-      Defaults to `true`.
-
-    * `:validate_email` - Validates the uniqueness of the email, in case
-      you don't want to validate the uniqueness of the email (like when
-      using this changeset for validations on a LiveView form before
-      submitting the form), this option can be set to `false`.
-      Defaults to `true`.
-  """
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :password, :username, :role])
@@ -51,6 +47,61 @@ defmodule Narasihistorian.Accounts.User do
     |> validate_role()
     |> validate_password(opts)
   end
+
+  def oauth_changeset(user, attrs) do
+    user
+    |> cast(attrs, [
+      :email,
+      :username,
+      :provider,
+      :provider_uid,
+      :provider_token,
+      :provider_refresh_token,
+      :provider_expires_at,
+      :avatar_url,
+      :confirmed_at
+    ])
+    |> validate_required([:email, :provider, :provider_uid])
+    |> validate_email(validate_email: true)
+    |> validate_username()
+    |> put_change(:role, :user)
+    |> unique_constraint([:provider, :provider_uid],
+      name: :users_provider_uid_index,
+      message: "has already been taken for this provider"
+    )
+  end
+
+  def link_oauth_changeset(user, attrs) do
+    user
+    |> cast(attrs, [
+      :provider,
+      :provider_uid,
+      :provider_token,
+      :provider_refresh_token,
+      :provider_expires_at,
+      :avatar_url
+    ])
+    |> validate_required([:provider, :provider_uid])
+    |> unique_constraint([:provider, :provider_uid],
+      name: :users_provider_uid_index,
+      message: "has already been linked to another account"
+    )
+  end
+
+  def update_oauth_token_changeset(user, token, refresh_token \\ nil, expires_at \\ nil) do
+    attrs = %{
+      provider_token: token,
+      provider_refresh_token: refresh_token,
+      provider_expires_at: expires_at
+    }
+
+    user
+    |> cast(attrs, [:provider_token, :provider_refresh_token, :provider_expires_at])
+  end
+
+  # ============================================================================
+  # VALIDATE
+  # ============================================================================
 
   defp validate_role(changeset) do
     changeset
@@ -87,6 +138,10 @@ defmodule Narasihistorian.Accounts.User do
     |> maybe_hash_password(opts)
   end
 
+  # ============================================================================
+  # MAYBE OPTIONAL
+  # ============================================================================
+
   defp maybe_hash_password(changeset, opts) do
     hash_password? = Keyword.get(opts, :hash_password, true)
     password = get_change(changeset, :password)
@@ -114,11 +169,10 @@ defmodule Narasihistorian.Accounts.User do
     end
   end
 
-  @doc """
-  A user changeset for changing the email.
+  # ============================================================================
+  # UPDATE CHANGESET
+  # ============================================================================
 
-  It requires the email to change otherwise an error is added.
-  """
   def email_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email])
@@ -129,18 +183,16 @@ defmodule Narasihistorian.Accounts.User do
     end
   end
 
-  @doc """
-  A user changeset for changing the password.
+  def username_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:username])
+    |> validate_username()
+    |> case do
+      %{changes: %{username: _}} = changeset -> changeset
+      %{} = changeset -> add_error(changeset, :username, "did not change")
+    end
+  end
 
-  ## Options
-
-    * `:hash_password` - Hashes the password so it can be stored securely
-      in the database and ensures the password field is cleared to prevent
-      leaks in the logs. If password hashing is not needed and clearing the
-      password field is not desired (like when using this changeset for
-      validations on a LiveView form), this option can be set to `false`.
-      Defaults to `true`.
-  """
   def password_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:password])
@@ -148,29 +200,17 @@ defmodule Narasihistorian.Accounts.User do
     |> validate_password(opts)
   end
 
-  @doc """
-  A changeset for updating user role (admin only).
-  """
   def role_changeset(user, attrs) do
     user
     |> cast(attrs, [:role])
     |> validate_required([:role])
   end
 
-  @doc """
-  Confirms the account by setting `confirmed_at`.
-  """
   def confirm_changeset(user) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
     change(user, confirmed_at: now)
   end
 
-  @doc """
-  Verifies the password.
-
-  If there is no user or the user doesn't have a password, we call
-  `Bcrypt.no_user_verify/0` to avoid timing attacks.
-  """
   def valid_password?(%Narasihistorian.Accounts.User{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Bcrypt.verify_pass(password, hashed_password)
@@ -180,10 +220,6 @@ defmodule Narasihistorian.Accounts.User do
     Bcrypt.no_user_verify()
     false
   end
-
-  @doc """
-  Validates the current password otherwise adds an error to the changeset.
-  """
 
   def validate_current_password(changeset, password) do
     changeset = cast(changeset, %{current_password: password}, [:current_password])
@@ -195,7 +231,9 @@ defmodule Narasihistorian.Accounts.User do
     end
   end
 
-  # Role checking helpers
+  # ============================================================================
+  # ROLE CHECKING HELPERS
+  # ============================================================================
 
   def admin?(%__MODULE__{role: :admin}), do: true
   def admin?(_), do: false
@@ -204,4 +242,34 @@ defmodule Narasihistorian.Accounts.User do
   def user?(_), do: false
 
   def valid_roles, do: @valid_roles
+
+  # ============================================================================
+  # OAUTH HELPERS
+  # ============================================================================
+
+  @doc """
+  Checks if user is an OAuth user (has provider set).
+  """
+
+  def oauth_user?(%__MODULE__{provider: provider}) when is_binary(provider), do: true
+  def oauth_user?(_), do: false
+
+  @doc """
+  Checks if user signed up with traditional email/password.
+  """
+
+  def traditional_user?(%__MODULE__{provider: nil, hashed_password: hashed_password})
+      when is_binary(hashed_password),
+      do: true
+
+  def traditional_user?(_), do: false
+
+  @doc """
+  Gets the display name for OAuth provider.
+  """
+
+  def provider_display_name("google"), do: "Google"
+  def provider_display_name("github"), do: "GitHub"
+  def provider_display_name("facebook"), do: "Facebook"
+  def provider_display_name(_), do: "OAuth"
 end

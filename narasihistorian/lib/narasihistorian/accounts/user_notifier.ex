@@ -4,6 +4,7 @@ defmodule Narasihistorian.Accounts.UserNotifier do
   alias Narasihistorian.Mailer
 
   # Delivers the email using the application mailer.
+
   defp deliver(recipient, subject, body) do
     email =
       new()

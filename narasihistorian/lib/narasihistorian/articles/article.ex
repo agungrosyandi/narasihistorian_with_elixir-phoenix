@@ -10,7 +10,9 @@ defmodule Narasihistorian.Articles.Article do
     field :status, :string, default: "published"
 
     belongs_to :category, Narasihistorian.Categories.Category
+    belongs_to :user, Narasihistorian.Accounts.User
     has_many :comments, Narasihistorian.Comments.Comment
+    has_many :views, Narasihistorian.Articles.ArticleView
 
     timestamps(type: :utc_datetime)
   end
@@ -27,13 +29,18 @@ defmodule Narasihistorian.Articles.Article do
     |> validate_required([:category_id], message: "Kategori wajib diisi")
     |> validate_inclusion(:status, ["draft", "published"])
     |> assoc_constraint(:category)
+    |> assoc_constraint(:user)
+  end
+
+  def creation_changeset(article, attrs, user) do
+    article
+    |> changeset(attrs)
+    |> put_assoc(:user, user)
   end
 
   defp normalize_quill_content(changeset) do
     update_change(changeset, :content, fn content ->
       content = content || ""
-
-      # Remove HTML tags and whitespace
 
       text =
         content

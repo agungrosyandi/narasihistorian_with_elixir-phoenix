@@ -3,49 +3,9 @@ defmodule NarasihistorianWeb.UserLive.ResetPassword do
 
   alias Narasihistorian.Accounts
 
-  def render(assigns) do
-    ~H"""
-    <Layouts.app flash={@flash} current_user={@current_user}>
-      <div class="mx-auto max-w-sm">
-        <.header class="text-center">Reset Password</.header>
-
-        <.simple_form
-          for={@form}
-          id="reset_password_form"
-          phx-submit="reset_password"
-          phx-change="validate"
-        >
-          <.error :if={@form.errors != []}>
-            Oops, something went wrong! Please check the errors below.
-          </.error>
-
-          <.input
-            field={@form[:password]}
-            type="password"
-            label="New password"
-            autocomplete="new-password"
-            required
-          />
-          <.input
-            field={@form[:password_confirmation]}
-            type="password"
-            label="Confirm new password"
-            autocomplete="new-password"
-            required
-          />
-          <:actions>
-            <.button phx-disable-with="Resetting..." class="w-full">Reset Password</.button>
-          </:actions>
-        </.simple_form>
-
-        <p class="text-center text-sm mt-4">
-          <.link href={~p"/users/register"}>Register</.link>
-          | <.link href={~p"/users/log-in"}>Log in</.link>
-        </p>
-      </div>
-    </Layouts.app>
-    """
-  end
+  # ============================================================================
+  # MOUNT
+  # ============================================================================
 
   def mount(params, _session, socket) do
     socket = assign_user_and_token(socket, params)
@@ -62,8 +22,86 @@ defmodule NarasihistorianWeb.UserLive.ResetPassword do
     {:ok, assign_form(socket, form_source), temporary_assigns: [form: nil]}
   end
 
+  # ============================================================================
+  # RENDER
+  # ============================================================================
+
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash} current_user={@current_user}>
+      <div class="relative flex w-full flex-col gap-3 mb-10 lg:min-h-[70vh] lg:flex-row shadow-lg">
+        <div class="hidden w-[100%] lg:block">
+          <img
+            class="relative h-full w-full object-cover"
+            src="/images/40.jpg"
+            alt="My Image"
+          />
+        </div>
+
+        <div class="mx-auto w-full h-full space-y-6 mb-10 rounded-xl p-3 lg:p-5">
+          <.header class="text-center">
+            <div class="flex flex-row items-center py-5">
+              <div class="h-[0.1rem] w-full bg-gray-600"></div>
+              <div class="flex flex-row px-5 text-2xl">
+                <p class="mr-3">Reset</p>
+                <p class="">Password</p>
+              </div>
+              <div class="h-[0.1rem] w-full bg-gray-600"></div>
+            </div>
+          </.header>
+
+          <.simple_form
+            for={@form}
+            id="reset_password_form"
+            phx-submit="reset_password"
+            phx-change="validate"
+          >
+            <.error :if={@form.errors != []}>
+              Oops, something went wrong! Please check the errors below.
+            </.error>
+
+            <.input
+              field={@form[:password]}
+              type="password"
+              label="New password"
+              autocomplete="new-password"
+              required
+            />
+            <.input
+              field={@form[:password_confirmation]}
+              type="password"
+              label="Confirm new password"
+              autocomplete="new-password"
+              required
+            />
+            <:actions>
+              <.button
+                phx-disable-with="Resetting..."
+                class="text-black bg-white w-full text-sm cursor-pointer rounded-lg border border-white/30 p-2 hover:text-white hover:bg-white/10 hover:border-[#fedf16e0] font-bold transition-all duration-500"
+              >
+                Reset Password
+              </.button>
+            </:actions>
+          </.simple_form>
+
+          <p class="text-center text-sm mt-4">
+            <.link class="hover:text-[#fedf16e0]" navigate={~p"/users/register"}>Register</.link>
+            &nbsp  | &nbsp
+            <.link class="hover:text-[#fedf16e0]" navigate={~p"/users/log-in"}>Log in</.link>
+          </p>
+        </div>
+      </div>
+    </Layouts.app>
+    """
+  end
+
+  # ============================================================================
+  # HANDLE EVENT
+  # ============================================================================
+
   # Do not log in the user after reset password to avoid a
   # leaked token giving the user access to the account.
+
   def handle_event("reset_password", %{"user" => user_params}, socket) do
     case Accounts.reset_user_password(socket.assigns.user, user_params) do
       {:ok, _} ->
@@ -79,8 +117,13 @@ defmodule NarasihistorianWeb.UserLive.ResetPassword do
 
   def handle_event("validate", %{"user" => user_params}, socket) do
     changeset = Accounts.change_user_password(socket.assigns.user, user_params)
+
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
+
+  # ============================================================================
+  # PRIVATE HELPER
+  # ============================================================================
 
   defp assign_user_and_token(socket, %{"token" => token}) do
     if user = Accounts.get_user_by_reset_password_token(token) do

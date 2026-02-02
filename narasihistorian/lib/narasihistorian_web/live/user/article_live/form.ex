@@ -1,4 +1,4 @@
-defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
+defmodule NarasihistorianWeb.User.ArticleLive.Form do
   use NarasihistorianWeb, :live_view
 
   alias Narasihistorian.Articles.Article
@@ -58,16 +58,18 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
 
   defp apply_action(socket, :new, _) do
     article = %Article{}
+
     changeset = Admin.change_article(article)
 
     socket
-    |> assign(:page_title, "Tulis Artikel")
+    |> assign(:page_title, "New Article")
     |> assign(:form, to_form(changeset))
     |> assign(:article, article)
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     article = Admin.get_article!(id)
+
     changeset = Admin.change_article(article)
 
     socket
@@ -88,7 +90,7 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
             socket =
               socket
               |> put_flash(:info, "Article created & uploaded to cloud successfully!")
-              |> push_navigate(to: ~p"/admin/articles")
+              |> push_navigate(to: ~p"/user/articles")
 
             {:noreply, socket}
 
@@ -128,6 +130,8 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
       {:ok, article_params_with_image} ->
         case Admin.update_article(socket.assigns.article, article_params_with_image, current_user) do
           {:ok, _article} ->
+            # Delete old image from R2 if new image was uploaded
+
             if Map.has_key?(article_params_with_image, "image") && old_image &&
                  old_image != article_params_with_image["image"] do
               delete_old_image(old_image)
@@ -135,8 +139,8 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
 
             socket =
               socket
-              |> put_flash(:info, "Article updated & uploaded to cloud successfully!")
-              |> push_navigate(to: ~p"/admin/articles")
+              |> put_flash(:info, "Artikel berhasil di updated")
+              |> push_navigate(to: ~p"/user/dashboard")
 
             {:noreply, socket}
 
@@ -184,10 +188,12 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
         case Uploader.upload_file(path, destination_key, entry.client_type) do
           {:ok, public_url} ->
             Logger.info("Successfully uploaded to R2: #{public_url}")
+            # ✅ Return just the URL, not {:ok, public_url}
             public_url
 
           {:error, reason} ->
             Logger.error("R2 upload failed: #{inspect(reason)}")
+            # ✅ Return error tuple
             {:error, reason}
         end
       end)

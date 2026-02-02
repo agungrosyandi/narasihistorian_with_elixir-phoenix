@@ -1,20 +1,10 @@
 defmodule Narasihistorian.Uploader do
-  @moduledoc """
-  Handles file uploads to Cloudflare R2 storage
-  """
-
   alias ExAws.S3
 
   @bucket Application.compile_env(:narasihistorian, :r2_bucket)
   @public_url Application.compile_env(:narasihistorian, :r2_public_url)
 
-  @doc """
-  Upload a file to R2 and return the public URL
-
-  ## Examples
-      iex> upload_file("/tmp/image.jpg", "uploads/abc123.jpg", "image/jpeg")
-      {:ok, "https://pub-xxxxx.r2.dev/uploads/abc123.jpg"}
-  """
+  # Upload a file to R2 and return the public URL
 
   def upload_file(source_path, destination_key, content_type) do
     require Logger
@@ -35,13 +25,7 @@ defmodule Narasihistorian.Uploader do
     end
   end
 
-  @doc """
-  Delete a file from R2
-
-  ## Examples
-      iex> delete_file("uploads/abc123.jpg")
-      {:ok, :deleted}
-  """
+  # Delete a file from R2
 
   def delete_file(key) do
     @bucket
@@ -53,13 +37,7 @@ defmodule Narasihistorian.Uploader do
     end
   end
 
-  @doc """
-  Extract the key from a full URL
-
-  ## Examples
-      iex> extract_key("https://pub-xxxxx.r2.dev/uploads/image.jpg")
-      "uploads/image.jpg"
-  """
+  # Extract the key from a full URL
 
   def extract_key(url) when is_binary(url) do
     String.replace(url, "#{@public_url}/", "")
@@ -91,13 +69,10 @@ defmodule Narasihistorian.Uploader do
     end
   end
 
-  defp build_public_url(key) do
-    "#{@public_url}/#{key}"
-  end
+  defp build_public_url(key), do: "#{@public_url}/#{key}"
 
-  @doc """
-  Generate a unique filename with extension
-  """
+  # Generate a unique filename with extension
+
   def generate_filename(original_filename) do
     ext = Path.extname(original_filename)
     uuid = Ecto.UUID.generate()

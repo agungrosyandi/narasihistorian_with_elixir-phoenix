@@ -3,26 +3,49 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Show do
 
   alias Narasihistorian.Categories
 
+  # ============================================================================
+  # MOUNT
+  # ============================================================================
+
+  @impl true
+  def mount(%{"id" => id}, _session, socket) do
+    {:ok,
+     socket
+     |> assign(:page_title, "Show Category")
+     |> assign(:category, Categories.get_category_with_articles!(id))}
+  end
+
+  # ============================================================================
+  # RENDER
+  # ============================================================================
+
   @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_user={@current_user}>
       <.header>
-        Category {@category.id}
-        <:subtitle>This is a category record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/admin/categories"}>
-            <.icon name="hero-arrow-left" />
-          </.button>
-          <.button variant="primary" navigate={~p"/admin/categories/#{@category}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit category
-          </.button>
+          <div class="my-5 flex flex-row gap-3">
+            <.button_custom variant="transparant" navigate={~p"/admin/categories"}>
+              <.icon name="hero-arrow-left" />
+            </.button_custom>
+            <.button_custom
+              variant="primary"
+              navigate={~p"/admin/categories/#{@category}/edit?return_to=show"}
+            >
+              <.icon name="hero-pencil-square" /> Edit category
+            </.button_custom>
+          </div>
         </:actions>
       </.header>
 
       <.list>
-        <:item title="Category name">{@category.category_name}</:item>
-        <:item title="Slug">{@category.slug}</:item>
+        <:item title="Kategori">
+          <p class="text-gray-400 mt-3">{@category.category_name}</p>
+        </:item>
+        <:item title="Slug">
+          <p class="text-gray-400 mt-3">{@category.slug}</p>
+        </:item>
       </.list>
       
     <!-- associate with articles -->
@@ -59,15 +82,9 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Show do
     """
   end
 
-  @impl true
-  def mount(%{"id" => id}, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:page_title, "Show Category")
-     |> assign(:category, Categories.get_category_with_articles!(id))}
-  end
-
-  # QUILL RICH TEXT EDITOR -------------------------------------------
+  # ============================================================================
+  # QUILL TEXT EDITOR
+  # ============================================================================
 
   def quill_plain_text(nil), do: ""
 

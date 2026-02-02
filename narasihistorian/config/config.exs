@@ -4,7 +4,10 @@
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
 
-# General application configuration
+# ============================================================================
+# GENERAL APPLICATION CONFIGURATION
+# ============================================================================
+
 import Config
 
 config :narasihistorian,
@@ -37,7 +40,9 @@ config :narasihistorian, NarasihistorianWeb.Endpoint,
 
 config :narasihistorian, Narasihistorian.Mailer, adapter: Swoosh.Adapters.Local
 
-# Configure esbuild (the version is required)
+# ============================================================================
+# CONFIGURE ESBUILD (THE VERSION IS REQUIRED)
+# ============================================================================
 
 config :esbuild,
   version: "0.25.4",
@@ -48,7 +53,9 @@ config :esbuild,
     env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
   ]
 
-# Configure tailwind (the version is required)
+# ============================================================================
+# CONFIGURE TAILWIND (THE VERSION IS REQUIRED)
+# ============================================================================
 
 config :tailwind,
   version: "4.1.12",
@@ -60,7 +67,9 @@ config :tailwind,
     cd: Path.expand("..", __DIR__)
   ]
 
-# Configure Elixir's Logger
+# ============================================================================
+# CONFIGURE ELIXIR LOGGER
+# ============================================================================
 
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
@@ -70,7 +79,27 @@ config :logger, :default_formatter,
 
 config :phoenix, :json_library, Jason
 
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
+# ============================================================================
+# OAUTH CONFIGURATION
+# ============================================================================
+
+config :ueberauth, Ueberauth,
+  providers: [
+    google:
+      {Ueberauth.Strategy.Google,
+       [
+         default_scope: "email profile",
+         prompt: "select_account"
+       ]}
+  ]
+
+config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+  client_id: System.get_env("GOOGLE_CLIENT_ID"),
+  client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+
+# ============================================================================
+# IMPORT ENVIRONMENT SPECIFIC CONFIG. THIS MUST REMAIN AT THE BOTTOM
+# OF THIS FILE SO IT OVERRIDES THE CONFIGURATION DEFINED ABOVE
+# ============================================================================
 
 import_config "#{config_env()}.exs"

@@ -3,6 +3,18 @@ defmodule NarasihistorianWeb.UserLive.ConfirmationInstructions do
 
   alias Narasihistorian.Accounts
 
+  # ============================================================================
+  # MOUNT
+  # ============================================================================
+
+  def mount(_params, _session, socket) do
+    {:ok, assign(socket, form: to_form(%{}, as: "user"))}
+  end
+
+  # ============================================================================
+  # RENDER
+  # ============================================================================
+
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_user={@current_user}>
@@ -36,9 +48,9 @@ defmodule NarasihistorianWeb.UserLive.ConfirmationInstructions do
     """
   end
 
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, form: to_form(%{}, as: "user"))}
-  end
+  # ============================================================================
+  # HANDLE EVENT
+  # ============================================================================
 
   def handle_event("send_instructions", %{"user" => %{"email" => email}}, socket) do
     if user = Accounts.get_user_by_email(email) do
