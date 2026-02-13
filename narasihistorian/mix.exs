@@ -84,7 +84,8 @@ defmodule Narasihistorian.MixProject do
       {:sweet_xml, "~> 0.7"},
       {:cachex, "~> 3.6"},
       {:ueberauth, "~> 0.10"},
-      {:ueberauth_google, "~> 0.12"}
+      {:ueberauth_google, "~> 0.12"},
+      {:slugify, "~> 1.3"}
     ]
   end
 

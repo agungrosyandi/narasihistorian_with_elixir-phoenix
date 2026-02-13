@@ -28,12 +28,22 @@ defmodule NarasihistorianWeb.Router do
   scope "/", NarasihistorianWeb do
     pipe_through :browser
 
+    # Article
+
     get "/", ArticleController, :index
     get "/articles", ArticleController, :index
+    get "/articles/more", ArticleController, :more
+    get "/articles/tags/:tag_slug", ArticleController, :by_tag
+    get "/articles/tags/:tag_slug/more", ArticleController, :by_tag_more
     get "/articles/:id", ArticleController, :show
 
     post "/articles/:id/comments", CommentController, :create
     delete "/articles/:id/comments/:comment_id", CommentController, :delete
+
+    # Category
+
+    get "/categories", CategoryController, :index
+    get "/categories/:id", CategoryController, :show
   end
 
   # ============================================================================
@@ -56,7 +66,7 @@ defmodule NarasihistorianWeb.Router do
 
     live_session :user_area,
       on_mount: [{NarasihistorianWeb.UserAuth, :ensure_authenticated}] do
-      live "/dashboard", User.DashboardLive, :index
+      live "/dashboard", User.DashboardLive.Index, :index
       live "/articles", User.ArticleLive.Index, :index
       live "/articles/new", User.ArticleLive.Form, :new
       live "/articles/:id/edit", User.ArticleLive.Form, :edit
@@ -137,6 +147,8 @@ defmodule NarasihistorianWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [{NarasihistorianWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
+      live "/users/settings/change-username", UserLive.Setting.SettingsChangeUsername, :edit
+      live "/users/settings/change-password", UserLive.Setting.SettingsChangePassword, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
     end
   end

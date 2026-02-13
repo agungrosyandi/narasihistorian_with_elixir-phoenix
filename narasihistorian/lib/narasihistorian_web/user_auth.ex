@@ -26,6 +26,7 @@ defmodule NarasihistorianWeb.UserAuth do
   disconnected on log out. The line can be safely removed
   if you are not using LiveView.
   """
+
   def log_in_user(conn, user, params \\ %{}) do
     token = Accounts.generate_user_session_token(user)
     user_return_to = get_session(conn, :user_return_to)
@@ -60,6 +61,7 @@ defmodule NarasihistorianWeb.UserAuth do
   #       |> put_session(:preferred_locale, preferred_locale)
   #     end
   #
+
   defp renew_session(conn) do
     delete_csrf_token()
 
@@ -73,6 +75,7 @@ defmodule NarasihistorianWeb.UserAuth do
 
   It clears all session data for safety. See renew_session.
   """
+
   def log_out_user(conn) do
     user_token = get_session(conn, :user_token)
     user_token && Accounts.delete_user_session_token(user_token)
@@ -91,6 +94,7 @@ defmodule NarasihistorianWeb.UserAuth do
   Authenticates the user by looking into the session
   and remember me token.
   """
+
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     user = user_token && Accounts.get_user_by_session_token(user_token)

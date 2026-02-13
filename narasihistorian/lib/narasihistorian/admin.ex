@@ -5,6 +5,9 @@ defmodule Narasihistorian.Admin do
   alias Narasihistorian.Repo
   alias Narasihistorian.Uploader
 
+  alias Ecto.Multi
+  alias Narasihistorian.Tags
+
   import Ecto.Query
 
   # ============================================================================
@@ -39,6 +42,15 @@ defmodule Narasihistorian.Admin do
     |> Repo.get!(id)
   end
 
+  def get_article_with_tags!(id) when is_binary(id),
+    do: get_article_with_tags!(String.to_integer(id))
+
+  def get_article_with_tags!(id) when is_integer(id) do
+    Article
+    |> Repo.get!(id)
+    |> Repo.preload([:tags, :user])
+  end
+
   # ============================================================================
   # CRUD
   # ============================================================================
@@ -59,6 +71,30 @@ defmodule Narasihistorian.Admin do
     end
   end
 
+  def create_article_with_tags(attrs, tag_names, user) do
+    attrs = Map.put(attrs, "user_id", user.id)
+
+    Multi.new()
+    |> Multi.run(:tags, fn _repo, _changes ->
+      tags = Tags.get_or_create_tags(tag_names)
+      {:ok, Enum.map(tags, fn {:ok, tag} -> tag end)}
+    end)
+    |> Multi.insert(:article, fn %{tags: tags} ->
+      %Article{}
+      |> Article.creation_changeset(attrs, user)
+      |> Ecto.Changeset.put_assoc(:tags, tags)
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{article: _article}} = result ->
+        Dashboard.notify_article_created()
+        result
+
+      error ->
+        error
+    end
+  end
+
   # UPDATE ARTICLE -- real time features WEBSOCKET
 
   def update_article(%Article{} = article, attrs, current_user) do
@@ -68,6 +104,35 @@ defmodule Narasihistorian.Admin do
       |> Repo.update()
       |> case do
         {:ok, _updated_article} = result ->
+          if Map.has_key?(attrs, "status") || Map.has_key?(attrs, :status) do
+            Dashboard.notify_article_status_changed()
+          end
+
+          result
+
+        error ->
+          error
+      end
+    else
+      {:error, :unauthorized}
+    end
+  end
+
+  def update_article_with_tags(%Article{} = article, attrs, tag_names, current_user) do
+    if Policy.can_edit?(current_user, article) do
+      Multi.new()
+      |> Multi.run(:tags, fn _repo, _changes ->
+        tags = Tags.get_or_create_tags(tag_names)
+        {:ok, Enum.map(tags, fn {:ok, tag} -> tag end)}
+      end)
+      |> Multi.update(:article, fn %{tags: tags} ->
+        article
+        |> Article.changeset(attrs)
+        |> Ecto.Changeset.put_assoc(:tags, tags)
+      end)
+      |> Repo.transaction()
+      |> case do
+        {:ok, %{article: _updated_article}} = result ->
           if Map.has_key?(attrs, "status") || Map.has_key?(attrs, :status) do
             Dashboard.notify_article_status_changed()
           end
@@ -179,9 +244,9 @@ defmodule Narasihistorian.Admin do
     |> order_by([a, u], desc: u.username)
   end
 
-  defp sort(query, "inserted_at_asc"), do: order_by(query, desc: :inserted_at)
+  defp sort(query, "inserted_at_asc"), do: order_by(query, asc: :inserted_at)
 
-  defp sort(query, "inserted_at_desc"), do: order_by(query, asc: :inserted_at)
+  defp sort(query, "inserted_at_desc"), do: order_by(query, desc: :inserted_at)
 
   defp sort(query, "article_name_desc"), do: order_by(query, desc: :article_name)
 

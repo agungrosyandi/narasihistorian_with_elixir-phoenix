@@ -1,270 +1,260 @@
 defmodule NarasihistorianWeb.CustomComponents do
   use NarasihistorianWeb, :html
 
-  alias NarasihistorianWeb.ArticleHTML
+  use Phoenix.Component
 
-  # HOME FOOTER --------------------------------------------------------------
+  use Phoenix.VerifiedRoutes,
+    endpoint: NarasihistorianWeb.Endpoint,
+    router: NarasihistorianWeb.Router
 
-  attr :class, :string, default: nil
+  # ============================================================================
+  # ADMIN & USER ROLE SELECTED NAVBAR
+  # ============================================================================
 
-  def footer_description(assigns) do
+  attr :current_page, :atom, required: true
+  attr :current_user, :map, required: true
+
+  def admin_user_nav(assigns) do
     ~H"""
-    <footer class="relative gap-2 flex flex-col justify-between items-center py-10">
-      <div class="relative flex flex-col justify-between items-center md:flex-row md:gap-10">
-        <div class="w-[100%] flex-1">
-          <img
-            class="relative h-[full] w-full object-cover"
-            src="/images/closng-background-cover.jpg"
-            alt="My Image"
-          />
-        </div>
+    <div class="flex flex-row gap-5 pb-5 mb-10 border-b border-gray-500">
+      <.nav_item path={~p"/admin/dashboard"} current={@current_page} page={:dashboard}>
+        Dashboard
+      </.nav_item>
 
-        <div class="py-10 gap-5 flex-1 flex flex-col  justify-center items-center md:px-5">
-          <div>
-            <span class="text-[#ffffffe0] font-bold text-xl">Tentang Narasi</span>
-            <span class="text-[#fedf16e0] font-bold text-xl">Historian</span>
-          </div>
-          <p class="text-center text-base-content/60">
-            Narasihistorian merupakan media konten yang berfokus pada sejarah
-            peradaban global dengan visualisasi yangyang simple dan interaktif
-            baik itu berupa konten artikel ataupun video infografik.
-          </p>
-        </div>
-      </div>
+      <.nav_item path={~p"/admin/articles"} current={@current_page} page={:articles}>
+        Artikel
+      </.nav_item>
 
-      <div class="flex flex-row gap-5 justify-between w-full items-center">
-        <small class="text-[#ffffffe0] font-bold text-xs">
-          <.icon name="hero-minus-circle" class="w-4 h-4 mb-1 mr-1" /> 2024
-        </small>
-        <div class="flex items-center gap-5 text-xs">
-          <.link
-            href="mailto:agungrosyandi@gmail.com"
-            class="text-white hover:text-[#fedf16e0] text-sm
-             font-medium text-center transition-all duration-200"
-          >
-            <.icon name="hero-chevron-right" class="w-4 h-4 mb-1" /> Email
-          </.link>
-
-          <.link
-            href="https://www.instagram.com/narasihistorian/"
-            class="text-white hover:text-[#fedf16e0] text-sm
-             font-medium text-center transition-all duration-200"
-          >
-            <.icon name="hero-chevron-right" class="w-4 h-4 mb-1" /> instagram
-          </.link>
-
-          <.link
-            href="https://www.youtube.com/channel/UCNoUf4xYawhvK6dD94oDEDg"
-            class="text-white hover:text-[#fedf16e0] text-sm
-             font-medium text-center transition-all duration-200"
-          >
-            <.icon name="hero-chevron-right" class="w-4 h-4 mb-1" /> youtube
-          </.link>
-        </div>
-      </div>
-    </footer>
-    """
-  end
-
-  # ARTICLE NOT FOUND --------------------------------------------------------------
-
-  attr :class, :string, default: nil
-
-  def content_article_not_found(assigns) do
-    ~H"""
-    <div class="max-w-2xl h-[15rem] mx-auto rounded-lg text-center shadow-xl flex gap-5 flex-col items-center justify-center">
-      <p>
-        Sorry, Artikel tidak ditemukan
-        <.link patch={~p"/"} class="text-[#fedf16e0] font-bold">
-          <.icon name="hero-arrows-right-left" class="w-4 h-4" />
-          <span class="border-b pb-2 text-white hover:text-[#fedf16e0]">
-            Kembali ke pencarian
-          </span>
-        </.link>
-      </p>
-
-      <.icon name="hero-no-symbol" class="w-10 h-10" />
+      <%= if @current_user.role == :admin do %>
+        <.nav_item path={~p"/admin/categories"} current={@current_page} page={:categories}>
+          Kategori
+        </.nav_item>
+      <% end %>
     </div>
     """
   end
 
-  # SEARCH QUERY --------------------------------------------------------------
+  attr :path, :string, required: true
+  attr :current, :atom, required: true
+  attr :page, :atom, required: true
+  slot :inner_block, required: true
 
-  attr :class, :string, default: nil
-  attr :search_query, :string, default: nil
-
-  def search_query(assigns) do
+  defp nav_item(assigns) do
     ~H"""
-    <div class="flex flex-row w-full gap-2">
-      <input
-        type="text"
-        name="q"
-        value={@search_query}
-        placeholder="Cari Artikel ......"
-        class="input input-bordered w-full input-lg"
-      />
+    <.link
+      navigate={@path}
+      class={[
+        "py-2 px-3 font-medium transition-all duration-200",
+        if(@current == @page,
+          do: "border-b border-[#fedf16e0] text-gray-100",
+          else: "text-gray-300 hover:text-[#fedf16e0]"
+        )
+      ]}
+    >
+      {render_slot(@inner_block)}
+    </.link>
+    """
+  end
 
-      <button class="btn btn-square btn-primary btn-lg">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 "
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+  # ============================================================================
+  # SETTINGS NAV SELECTED NAVBAR
+  # ============================================================================
+
+  attr :current_page, :atom, required: true
+  attr :current_user, :map, required: true
+
+  def settings_nav(assigns) do
+    ~H"""
+    <div>
+      <div class="flex flex-col gap-2 justify-center w-full text-center items-center mb-5">
+        <h1 class="text-xl sm:text-2xl font-bold">
+          Account Settings
+        </h1>
+        <p class="text-sm sm:text-base text-gray-400 px-4">
+          Manage your account email address and password settings
+        </p>
+      </div>
+      
+    <!-- Desktop Navigation - Horizontal tabs -->
+
+      <div class="hidden sm:flex flex-row gap-5 pb-5 mb-10 border-b border-gray-500">
+        <.desktop_nav_item path={~p"/users/settings"} current={@current_page} page={:settings}>
+          <.icon name="hero-envelope" class="w-4 h-4 mr-2" /> Email
+        </.desktop_nav_item>
+
+        <.desktop_nav_item
+          path={~p"/users/settings/change-username"}
+          current={@current_page}
+          page={:change_username}
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
+          <.icon name="hero-user" class="w-4 h-4 mr-2" /> Username
+        </.desktop_nav_item>
+
+        <.desktop_nav_item
+          path={~p"/users/settings/change-password"}
+          current={@current_page}
+          page={:change_password}
+        >
+          <.icon name="hero-lock-closed" class="w-4 h-4 mr-2" /> Password
+        </.desktop_nav_item>
+      </div>
+      
+    <!-- Mobile Navigation - Toggle/Segmented Control Style -->
+
+      <div class="sm:hidden mb-8">
+        <div class="bg-gray-800 rounded-lg p-1 flex gap-1">
+          <.mobile_nav_item path={~p"/users/settings"} current={@current_page} page={:settings}>
+            <.icon name="hero-envelope" class="w-4 h-4 sm:mr-2" />
+            <span class="hidden xs:inline">Email</span>
+          </.mobile_nav_item>
+
+          <.mobile_nav_item
+            path={~p"/users/settings/change-username"}
+            current={@current_page}
+            page={:change_username}
+          >
+            <.icon name="hero-user" class="w-4 h-4 sm:mr-2" />
+            <span class="hidden xs:inline">Username</span>
+          </.mobile_nav_item>
+
+          <.mobile_nav_item
+            path={~p"/users/settings/change-password"}
+            current={@current_page}
+            page={:change_password}
+          >
+            <.icon name="hero-lock-closed" class="w-4 h-4 sm:mr-2" />
+            <span class="hidden xs:inline">Password</span>
+          </.mobile_nav_item>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  attr :path, :string, required: true
+  attr :current, :atom, required: true
+  attr :page, :atom, required: true
+  slot :inner_block, required: true
+
+  defp desktop_nav_item(assigns) do
+    ~H"""
+    <.link
+      navigate={@path}
+      class={[
+        "flex items-center py-2 px-3 font-medium transition-all duration-200 whitespace-nowrap",
+        if(@current == @page,
+          do: "border-b-2 border-[#fedf16e0] text-gray-100",
+          else: "text-gray-300 hover:text-[#fedf16e0]"
+        )
+      ]}
+    >
+      {render_slot(@inner_block)}
+    </.link>
+    """
+  end
+
+  attr :path, :string, required: true
+  attr :current, :atom, required: true
+  attr :page, :atom, required: true
+  slot :inner_block, required: true
+
+  defp mobile_nav_item(assigns) do
+    ~H"""
+    <.link
+      navigate={@path}
+      class={[
+        "flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-md font-medium transition-all duration-200 text-sm",
+        if(@current == @page,
+          do: "bg-[#fedf16e0] text-gray-900 shadow-sm",
+          else: "text-gray-400 hover:text-gray-200"
+        )
+      ]}
+    >
+      {render_slot(@inner_block)}
+    </.link>
+    """
+  end
+
+  # ============================================================================
+  # CUSTOM BUTTON
+  # ============================================================================
+
+  attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
+  attr :class, :any
+  attr :variant, :string, values: ~w(primary full transparant)
+  slot :inner_block, required: true
+
+  def button_custom(%{rest: rest} = assigns) do
+    variants = %{
+      "primary" =>
+        "text-black bg-white text-sm cursor-pointer rounded-lg border border-white/30 py-2 px-6 hover:text-white hover:bg-white/10 hover:border-[#fedf16e0] font-bold transition-all duration-500",
+      "full" =>
+        "text-black bg-white w-full text-sm cursor-pointer rounded-lg border border-white/30 py-2 px-6 hover:text-white hover:bg-white/10 hover:border-[#fedf16e0] font-bold transition-all duration-500",
+      "transparant" =>
+        "text-white text-sm border border-[#fedf16e0] py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200",
+      nil => "btn-primary btn-soft"
+    }
+
+    assigns =
+      assign_new(assigns, :class, fn ->
+        ["btn", Map.fetch!(variants, assigns[:variant])]
+      end)
+
+    if rest[:href] || rest[:navigate] || rest[:patch] do
+      ~H"""
+      <.link class={@class} {@rest}>
+        {render_slot(@inner_block)}
+      </.link>
+      """
+    else
+      ~H"""
+      <button class={@class} {@rest}>
+        {render_slot(@inner_block)}
       </button>
-    </div>
-    """
+      """
+    end
   end
 
-  # PAGINATION --------------------------------------------------------------
+  # ============================================================================
+  # SPAN CUSTOM BUTTON
+  # ============================================================================
 
-  attr :current_page, :integer, required: true
-  attr :total_pages, :integer, required: true
-  attr :search_query, :string, default: nil
-  attr :selected_category, :string, default: nil
-  attr :base_path, :string, default: "/articles"
+  slot :inner_block, required: true
 
-  def pagination_home(assigns) do
+  attr :variant, :string, default: "primary"
+  attr :class, :string, default: ""
+  attr :rest, :global
+
+  def span_custom(assigns) do
     ~H"""
-    <div class="flex justify-center mt-12">
-      <div class="join">
-        <%= if @current_page > 1 do %>
-          <.link
-            href={
-              ~p"/articles?#{%{q: @search_query, category: @selected_category, page: @current_page - 1}}"
-            }
-            class="join-item btn"
-          >
-            «
-          </.link>
-        <% end %>
-
-        <%= for page <- 1..@total_pages do %>
-          <.link
-            href={~p"/articles?#{%{q: @search_query, category: @selected_category, page: page}}"}
-            class={"join-item btn #{if page == @current_page, do: "btn-active"}"}
-          >
-            {page}
-          </.link>
-        <% end %>
-
-        <%= if @current_page < @total_pages do %>
-          <.link
-            href={
-              ~p"/articles?#{%{q: @search_query, category: @selected_category, page: @current_page + 1}}"
-            }
-            class="join-item btn"
-          >
-            »
-          </.link>
-        <% end %>
-      </div>
-    </div>
+    <span
+      class={[
+        base_classes(),
+        variant_classes(@variant),
+        @class
+      ]}
+      {@rest}
+    >
+      {render_slot(@inner_block)}
+    </span>
     """
   end
 
-  # filter --------------------------------------------------------------
-
-  attr :category_options, :list, required: true
-  attr :selected_category, :string, default: nil
-
-  def category_select(assigns) do
-    ~H"""
-    <select name="category" class="select w-full" onchange="this.form.submit()">
-      <option value="">All Categories</option>
-
-      <%= for {category_name, category_slug} <- @category_options do %>
-        <option value={category_slug} selected={category_slug == @selected_category}>
-          {category_name}
-        </option>
-      <% end %>
-    </select>
-    """
+  defp base_classes do
+    ""
   end
 
-  # HEADER --------------------------------------------------------------
-
-  attr :class, :string, default: nil
-
-  def header_title(assigns) do
-    ~H"""
-    <div class="text-center mb-5">
-      <h1 class="text-3xl font-bold mb-4 lg:text-4xl">
-        Everything about <span class="text-[#fedf16e0]">history</span>
-      </h1>
-      <p class="text-base text-base-content/60">
-        Explore the pivotal moments that shaped our world
-      </p>
-    </div>
-    """
+  defp variant_classes("main") do
+    "text-white text-sm border border-white/30 py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200"
   end
 
-  # ARTICLE FOUND --------------------------------------------------------------
-
-  attr :articles, :list, required: true
-
-  def article_found(assigns) do
-    ~H"""
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <%= for article <- @articles do %>
-        <.link
-          href={~p"/articles/#{article.id}"}
-          class="group card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
-        >
-          <div class="flex justify-center p-5 text-base font-bold shadow-xl">
-            <.icon
-              name="hero-arrow-trending-down"
-              class="w-5 h-5 mb-1 mr-3 text-[#fedf16e0]"
-            />
-            {article.category.category_name}
-          </div>
-
-          <div class="flex flex-row md:flex-col">
-            <figure class="relative overflow-hidden h-64">
-              <img
-                src={article.image}
-                alt={article.article_name}
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </figure>
-
-            <div class="card-body">
-              <h2 class="card-title group-hover:text-primary transition-colors">
-                {article.article_name}
-              </h2>
-
-              <p class="text-base-content/70 line-clamp-3">
-                {article.content
-                |> ArticleHTML.quill_plain_text()
-                |> String.slice(0, 120)}...
-              </p>
-
-              <div class="card-actions justify-between items-center mt-4">
-                <span class="text-sm text-base-content/50">
-                  {ArticleHTML.reading_time(article.content)} min read
-                </span>
-
-                <span class="text-white text-sm font-semibold group-hover:gap-2 flex items-center transition-all">
-                  Read More
-                  <.icon
-                    name="hero-chevron-double-right"
-                    class="w-5 h-5 ml-1 text-[#fedf16e0]"
-                  />
-                </span>
-              </div>
-            </div>
-          </div>
-        </.link>
-      <% end %>
-    </div>
-    """
+  defp variant_classes("transparant") do
+    "text-white text-sm border border-[#fedf16e0] py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200"
   end
+
+  defp variant_classes("yellow") do
+    "text-white text-sm border border-[#fedf16e0] py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200"
+  end
+
+  defp variant_classes(_), do: ""
 end

@@ -23,7 +23,7 @@ defmodule NarasihistorianWeb.Layouts do
     ~H"""
     <%!-- NAVBAR --%>
 
-    <main class="relative w-[90%] mx-auto lg:w-[85%] xl:w-[75%]">
+    <main class="relative w-[90%] mx-auto lg:w-[85%] xl:w-[70%]">
       <.header>
         <nav class="py-5">
           <div class="flex items-center justify-between">
@@ -48,7 +48,7 @@ defmodule NarasihistorianWeb.Layouts do
               </.link>
 
               <.link
-                href={~p"/"}
+                href={~p"/categories"}
                 class="text-white hover:text-[#fedf16e0] font-normal text-base transition-colors duration-200"
               >
                 Kategori

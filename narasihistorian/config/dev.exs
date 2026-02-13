@@ -1,6 +1,11 @@
 import Config
 
-# Configure your database
+# Configure your local database
+
+# ============================================================================
+# CONFIGURE LOCAL DATABASE CONNECTION
+# ============================================================================
+
 config :narasihistorian, Narasihistorian.Repo,
   username: System.get_env("POSTGRES_USER", "postgres"),
   password: System.get_env("POSTGRES_PASSWORD", "postgres"),
@@ -17,6 +22,7 @@ config :narasihistorian, Narasihistorian.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
+
 config :narasihistorian, NarasihistorianWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
@@ -54,6 +60,7 @@ config :narasihistorian, NarasihistorianWeb.Endpoint,
 # different ports.
 
 # Reload browser tabs when matching files change.
+
 config :narasihistorian, NarasihistorianWeb.Endpoint,
   live_reload: [
     web_console_logger: true,

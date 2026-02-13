@@ -1,31 +1,25 @@
 defmodule Narasihistorian.Dashboard do
-  import Ecto.Query, warn: false
   alias Narasihistorian.Articles.ArticleView
   alias Narasihistorian.Repo
   alias Narasihistorian.Articles.Article
   alias Narasihistorian.Comments.Comment
 
-  # Cache TTL in milliseconds
+  import Ecto.Query, warn: false
 
+  # Cache TTL in milliseconds
   @cache_ttl :timer.seconds(10)
 
   # ============================================================================
   # PUBLIC API
   # ============================================================================
 
-  # Returns the total count of articles.
-
   def get_total_articles_count, do: Repo.aggregate(Article, :count)
-
-  # Returns the count of published articles.
 
   def get_published_articles_count do
     Article
     |> where([a], a.status == "published")
     |> Repo.aggregate(:count)
   end
-
-  # Returns the count of draft articles.
 
   def get_draft_articles_count do
     Article
@@ -34,6 +28,10 @@ defmodule Narasihistorian.Dashboard do
   end
 
   # Returns draft vs published ratio as a map with counts and percentages.
+
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
 
   def get_draft_vs_published_ratio do
     total = get_total_articles_count()
@@ -54,6 +52,10 @@ defmodule Narasihistorian.Dashboard do
 
   # get_draft_vs_published_ratio -- Cached version
 
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
+
   def get_draft_vs_published_ratio_cached do
     cache_get_or_compute("ratio", fn ->
       get_draft_vs_published_ratio()
@@ -61,6 +63,10 @@ defmodule Narasihistorian.Dashboard do
   end
 
   # Returns articles trend grouped by date for the specified number of days.
+
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
 
   def get_articles_trend(days \\ 30) do
     date_from = Date.utc_today() |> Date.add(-days)
@@ -81,6 +87,10 @@ defmodule Narasihistorian.Dashboard do
 
   # get_articles_trend Cached version
 
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
+
   def get_articles_trend_cached(days \\ 30) do
     cache_get_or_compute("trend:#{days}", fn ->
       get_articles_trend(days)
@@ -88,6 +98,10 @@ defmodule Narasihistorian.Dashboard do
   end
 
   # Returns top performing articles by view count.
+
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
 
   def get_top_articles_by_views(limit \\ 10) do
     Article
@@ -99,11 +113,19 @@ defmodule Narasihistorian.Dashboard do
 
   # get_top_articles_by_views Cached version
 
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
+
   def get_top_articles_by_views_cached(limit \\ 10) do
     cache_get_or_compute("top_articles:#{limit}", fn ->
       get_top_articles_by_views(limit)
     end)
   end
+
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
 
   # Returns articles with their comment counts.
 
@@ -123,6 +145,10 @@ defmodule Narasihistorian.Dashboard do
 
   # Cached version
 
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
+
   def get_articles_with_comment_count_cached(limit \\ 10) do
     cache_get_or_compute("comments:#{limit}", fn ->
       get_articles_with_comment_count(limit)
@@ -130,6 +156,10 @@ defmodule Narasihistorian.Dashboard do
   end
 
   # Returns publishing frequency statistics.
+
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
 
   def get_publishing_frequency(period \\ :weekly, days \\ 30) do
     date_from = Date.utc_today() |> Date.add(-days)
@@ -150,6 +180,10 @@ defmodule Narasihistorian.Dashboard do
 
   # get_publishing_frequency Cached version
 
+  # ============================================================================
+  # CREATE CATEGORY
+  # ============================================================================
+
   def get_publishing_frequency_cached(period \\ :daily, days \\ 30) do
     cache_get_or_compute("frequency:#{period}:#{days}", fn ->
       get_publishing_frequency(period, days)
@@ -159,6 +193,7 @@ defmodule Narasihistorian.Dashboard do
   @doc """
   Cleans up old article view records older than the specified number of days.
   """
+
   def cleanup_old_views(days_to_keep \\ 90) do
     cutoff_date = DateTime.utc_now() |> DateTime.add(-days_to_keep, :day)
 
@@ -177,10 +212,157 @@ defmodule Narasihistorian.Dashboard do
   end
 
   # ============================================================================
-  # VIEW TRACKING & NOTIFICATIONS
+  # VIEW TRACKING & ANALYTICS - NEW FUNCTIONS
   # ============================================================================
 
-  # Increments the view count for an article &  Uses async task to avoid blocking.
+  @doc """
+  Tracks a unique view for an article by IP address.
+  Only counts one view per IP per article per day.
+  Runs asynchronously to not block the request.
+  """
+
+  def track_article_view(article_id, ip_address, user_agent) do
+    Task.start(fn ->
+      now = DateTime.utc_now()
+
+      try do
+        result =
+          %ArticleView{}
+          |> ArticleView.changeset(%{
+            article_id: article_id,
+            ip_address: ip_address,
+            user_agent: user_agent,
+            viewed_at: now
+          })
+          |> Repo.insert()
+
+        # Sync view_count when a NEW unique view is recorded
+
+        case result do
+          {:ok, _view} ->
+            Article
+            |> where([a], a.id == ^article_id)
+            |> Repo.update_all(inc: [view_count: 1])
+
+          {:error, _} ->
+            :ok
+        end
+
+        Cachex.del(:dashboard_cache, "top_articles:10")
+        Cachex.del(:dashboard_cache, "article_views:#{article_id}")
+      rescue
+        _error -> :ok
+      end
+    end)
+  end
+
+  @doc """
+  Get total unique views for an article (all time).
+  """
+
+  def get_article_total_views(article_id) do
+    cache_get_or_compute("article_views:#{article_id}", fn ->
+      from(v in ArticleView,
+        where: v.article_id == ^article_id,
+        select: count(v.id)
+      )
+      |> Repo.one()
+    end)
+  end
+
+  @doc """
+  Get unique views for an article today.
+  """
+
+  def get_article_today_views(article_id) do
+    today = Date.utc_today()
+
+    from(v in ArticleView,
+      where: v.article_id == ^article_id,
+      where: fragment("DATE(?)", v.viewed_at) == ^today,
+      select: count(v.id)
+    )
+    |> Repo.one()
+  end
+
+  @doc """
+  Get unique views for an article in the last 7 days.
+  """
+
+  def get_article_week_views(article_id) do
+    seven_days_ago = DateTime.utc_now() |> DateTime.add(-7, :day)
+
+    from(v in ArticleView,
+      where: v.article_id == ^article_id,
+      where: v.viewed_at >= ^seven_days_ago,
+      select: count(v.id)
+    )
+    |> Repo.one()
+  end
+
+  @doc """
+  Get unique daily views for an article over the specified number of days.
+  Returns a list of {date, count} tuples.
+  """
+
+  def get_article_daily_views(article_id, days \\ 30) do
+    start_date = Date.utc_today() |> Date.add(-days)
+
+    from(v in ArticleView,
+      where: v.article_id == ^article_id,
+      where: fragment("DATE(?)", v.viewed_at) >= ^start_date,
+      group_by: fragment("DATE(?)", v.viewed_at),
+      select: {fragment("DATE(?)", v.viewed_at), count(v.id)},
+      order_by: [desc: fragment("DATE(?)", v.viewed_at)]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Get top articles by unique views (from ArticleView table).
+  """
+
+  def get_top_articles_by_unique_views(limit \\ 10) do
+    from(a in Article,
+      left_join: v in ArticleView,
+      on: v.article_id == a.id,
+      where: a.status == "published",
+      group_by: a.id,
+      select: %{
+        article: a,
+        view_count: count(v.id)
+      },
+      order_by: [desc: count(v.id)],
+      limit: ^limit
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Get views trend for all articles over time.
+  """
+
+  def get_views_trend(days \\ 30) do
+    date_from = Date.utc_today() |> Date.add(-days)
+
+    from(v in ArticleView,
+      where: fragment("DATE(?)", v.viewed_at) >= ^date_from,
+      group_by: fragment("DATE(?)", v.viewed_at),
+      select: {fragment("DATE(?)", v.viewed_at), count(v.id)},
+      order_by: [asc: fragment("DATE(?)", v.viewed_at)]
+    )
+    |> Repo.all()
+    |> fill_missing_dates(days)
+  end
+
+  # ============================================================================
+  # VIEW TRACKING & NOTIFICATIONS (LEGACY - kept for backward compatibility)
+  # ============================================================================
+
+  @doc """
+  DEPRECATED: Use track_article_view/3 instead.
+  This increments the view_count column directly (old method).
+  """
 
   def increment_article_views(article_id) do
     Task.start(fn ->
@@ -188,11 +370,7 @@ defmodule Narasihistorian.Dashboard do
       |> where([a], a.id == ^article_id)
       |> Repo.update_all(inc: [view_count: 1])
 
-      # Only clear top articles cache (selective invalidation)
-
       Cachex.del(:dashboard_cache, "top_articles:10")
-
-      # Broadcast to all dashboard viewers
 
       broadcast_dashboard_update(:article_viewed)
     end)
@@ -200,40 +378,15 @@ defmodule Narasihistorian.Dashboard do
     :ok
   end
 
-  def track_article_view(article_id, ip_address, user_agent \\ nil) do
-    Task.start(fn ->
-      now = DateTime.utc_now()
-      today = DateTime.to_date(now)
+  @doc """
+  DEPRECATED: Use track_article_view/3 instead.
+  """
 
-      changeset =
-        ArticleView.changeset(%ArticleView{}, %{
-          article_id: article_id,
-          ip_address: ip_address,
-          user_agent: user_agent,
-          viewed_at: now,
-          view_date: today
-        })
-
-      case Repo.insert(changeset) do
-        {:ok, _view} ->
-          Article
-          |> where([a], a.id == ^article_id)
-          |> Repo.update_all(inc: [view_count: 1])
-
-          Cachex.del(:dashboard_cache, "top_articles:10")
-          broadcast_dashboard_update(:article_viewed)
-          {:ok, :counted}
-
-        {:error, _} ->
-          {:ok, :already_counted}
-      end
-    end)
-
-    :ok
+  def increment_article_views_unique(article_id, ip_address) do
+    track_article_view(article_id, ip_address, nil)
   end
 
   # Clears all cache and broadcasts update.
-
   # ARTICLE
 
   def notify_article_created do
@@ -256,16 +409,6 @@ defmodule Narasihistorian.Dashboard do
   def notify_comment_created do
     Cachex.del(:dashboard_cache, "comments:10")
     broadcast_dashboard_update(:comment_created)
-  end
-
-  # Increments the view count for an article with IP deduplication & Only counts unique views per IP per article per day.
-
-  def increment_article_views_unique(article_id, _ip_address) do
-    # This requires a separate table to track views
-    # For now, we'll use simple increment
-    # You can implement IP tracking later if needed
-
-    increment_article_views(article_id)
   end
 
   # ============================================================================
@@ -344,19 +487,16 @@ defmodule Narasihistorian.Dashboard do
     case Cachex.get(:dashboard_cache, key) do
       {:ok, nil} ->
         # Cache miss
-
         value = fun.()
         Cachex.put(:dashboard_cache, key, value, ttl: @cache_ttl)
         value
 
       {:ok, value} ->
         # Cache hit
-
         value
 
       {:error, _reason} ->
         # Cache error
-
         fun.()
     end
   end

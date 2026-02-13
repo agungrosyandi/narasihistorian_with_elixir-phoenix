@@ -51,16 +51,21 @@ defmodule NarasihistorianWeb.AuthController do
     end
   end
 
-  # Generate username from OAuth data
+  # ============================================================================
+  # PRIVATE HELPER GENERATE USERNAME FROM OAUTH DATA
+  # ============================================================================
+
   defp generate_username(auth) do
     cond do
       # Use name if available
+
       auth.info.name && auth.info.name != "" ->
         auth.info.name
         |> String.replace(~r/[^a-zA-Z0-9_]/, "")
         |> String.slice(0..24)
 
       # Use email prefix
+
       auth.info.email ->
         auth.info.email
         |> String.split("@")
@@ -69,12 +74,15 @@ defmodule NarasihistorianWeb.AuthController do
         |> String.slice(0..24)
 
       # Fallback to google + uid
+
       true ->
         "google_user_#{String.slice(auth.uid, 0..10)}"
     end
   end
 
-  # Helper to convert OAuth expires_at to DateTime
+  # ============================================================================
+  # PRIVATE HELPER TO CONVERT OAUTH EXPIRES TO DATE TIME
+  # ============================================================================
 
   defp expires_at_from_oauth(nil), do: nil
 
@@ -86,7 +94,9 @@ defmodule NarasihistorianWeb.AuthController do
 
   defp expires_at_from_oauth(_), do: nil
 
-  # Helper to format changeset errors - FIXED VERSION
+  # ============================================================================
+  # HELPER TO FORMAT CHANGESET ERRORS
+  # ============================================================================
 
   defp format_changeset_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->

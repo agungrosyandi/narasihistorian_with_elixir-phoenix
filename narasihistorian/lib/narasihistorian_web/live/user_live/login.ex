@@ -20,8 +20,9 @@ defmodule NarasihistorianWeb.UserLive.Login do
     ~H"""
     <Layouts.app flash={@flash}>
       <div class="relative flex w-full flex-col gap-3 mb-10 lg:min-h-[70vh] lg:flex-row shadow-lg ">
-        
-    <!-- image ----------------->
+        <%!-------------------------%>
+        <%!-- IMAGE --%>
+        <%!-------------------------%>
 
         <div class="hidden w-[100%] lg:block">
           <img

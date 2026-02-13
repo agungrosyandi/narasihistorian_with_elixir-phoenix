@@ -2,6 +2,16 @@ defmodule Narasihistorian.Articles.Article do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Narasihistorian.Categories.Category
+  alias Narasihistorian.Accounts.User
+  alias Narasihistorian.Comments.Comment
+  alias Narasihistorian.Articles.ArticleView
+  alias Narasihistorian.Tags.Tag
+
+  # ============================================================================
+  # SCHEMA
+  # ============================================================================
+
   schema "articles" do
     field :article_name, :string
     field :content, :string
@@ -9,18 +19,28 @@ defmodule Narasihistorian.Articles.Article do
     field :view_count, :integer, default: 0
     field :status, :string, default: "published"
 
-    belongs_to :category, Narasihistorian.Categories.Category
-    belongs_to :user, Narasihistorian.Accounts.User
-    has_many :comments, Narasihistorian.Comments.Comment
-    has_many :views, Narasihistorian.Articles.ArticleView
+    belongs_to :category, Category
+    belongs_to :user, User
+    has_many :comments, Comment
+    has_many :views, ArticleView
+
+    many_to_many :tags, Tag,
+      join_through: "articles_tags",
+      on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
 
+  # ============================================================================
+  # ATTRIBUTE & VALIDATE
+  # ============================================================================
+
   @doc false
   def changeset(article, attrs) do
+    fields = [:article_name, :image, :category_id, :content, :view_count, :status]
+
     article
-    |> cast(attrs, [:article_name, :image, :category_id, :content, :view_count, :status])
+    |> cast(attrs, fields)
     |> normalize_quill_content()
     |> validate_required([:image])
     |> validate_required([:article_name], message: "Judul artikel wajib diisi")
@@ -30,13 +50,18 @@ defmodule Narasihistorian.Articles.Article do
     |> validate_inclusion(:status, ["draft", "published"])
     |> assoc_constraint(:category)
     |> assoc_constraint(:user)
+    |> cast_assoc(:tags)
   end
 
   def creation_changeset(article, attrs, user) do
     article
     |> changeset(attrs)
-    |> put_assoc(:user, user)
+    |> put_change(:user_id, user.id)
   end
+
+  # ============================================================================
+  # PRIVATE HELPER
+  # ============================================================================
 
   defp normalize_quill_content(changeset) do
     update_change(changeset, :content, fn content ->

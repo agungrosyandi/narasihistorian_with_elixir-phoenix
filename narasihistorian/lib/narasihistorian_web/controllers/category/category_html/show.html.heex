@@ -1,0 +1,43 @@
+<Layouts.app flash={@flash} current_user={@current_user}>
+  <section class="mb-14">
+    <.main_title_div>
+      <.back_link
+        navigate={~p"/categories"}
+        icon="hero-arrow-left"
+      />
+      <.span_custom variant="main-title">{@categories.category_name}</.span_custom>
+    </.main_title_div>
+
+    <%= if @categories.articles == [] do %>
+      <div class="h-[35rem] mx-auto rounded-lg text-center shadow-xl flex gap-5 flex-col items-center justify-center">
+        Kategori tidak ditemukan atau tidak tersedia. Cari di kategori lainnya !!
+        <.icon name="hero-no-symbol" class="w-10 h-10" />
+      </div>
+    <% else %>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <%= for article <- @categories.articles do %>
+          <.link
+            href={~p"/articles/#{article.id}"}
+            class="group card bg-base-200 hover:bg-base-300 transition-all duration-300 hover:shadow-xl"
+          >
+            <figure class="relative overflow-hidden h-48">
+              <img
+                src={article.image}
+                alt={article.article_name}
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+              />
+            </figure>
+            <div class="card-body">
+              <h3 class="card-title text-lg group-hover:text-primary transition-colors">
+                {article.article_name}
+              </h3>
+              <p class="text-sm text-base-content/70 line-clamp-2">
+                {article.content |> quill_plain_text() |> String.slice(0, 120)}...
+              </p>
+            </div>
+          </.link>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+</Layouts.app>

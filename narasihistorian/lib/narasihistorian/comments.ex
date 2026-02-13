@@ -11,11 +11,17 @@ defmodule Narasihistorian.Comments do
 
   alias Narasihistorian.Comments.Comment
 
-  # ALL LIST COMMENT
+  # ============================================================================
+  # GET ALL AND COMMENT BY ID
+  # ============================================================================
 
   def list_comments, do: Repo.all(Comment)
 
   def get_comment!(id), do: Repo.get!(Comment, id)
+
+  # ============================================================================
+  # CREATE COMMENT
+  # ============================================================================
 
   def create_comment(attrs) do
     %Comment{}
@@ -31,11 +37,19 @@ defmodule Narasihistorian.Comments do
     end
   end
 
+  # ============================================================================
+  # UPDATE COMMENT
+  # ============================================================================
+
   def update_comment(%Comment{} = comment, attrs) do
     comment
     |> Comment.changeset(attrs)
     |> Repo.update()
   end
+
+  # ============================================================================
+  # DELETE COMMENT
+  # ============================================================================
 
   def delete_comment(%Comment{} = comment, %User{} = user) do
     if can_delete?(comment, user) do

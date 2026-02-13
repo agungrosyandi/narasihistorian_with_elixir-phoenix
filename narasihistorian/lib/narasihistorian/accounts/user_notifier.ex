@@ -3,7 +3,9 @@ defmodule Narasihistorian.Accounts.UserNotifier do
 
   alias Narasihistorian.Mailer
 
+  # ============================================================================
   # Delivers the email using the application mailer.
+  # ============================================================================
 
   defp deliver(recipient, subject, body) do
     email =
@@ -18,9 +20,10 @@ defmodule Narasihistorian.Accounts.UserNotifier do
     end
   end
 
-  @doc """
-  Deliver instructions to confirm account.
-  """
+  # ============================================================================
+  #  Deliver instructions to confirm account.
+  # ============================================================================
+
   def deliver_confirmation_instructions(user, url) do
     deliver(user.email, "Confirmation instructions", """
 
@@ -38,9 +41,10 @@ defmodule Narasihistorian.Accounts.UserNotifier do
     """)
   end
 
-  @doc """
-  Deliver instructions to reset a user password.
-  """
+  # ============================================================================
+  # Deliver instructions to reset a user password.
+  # ============================================================================
+
   def deliver_reset_password_instructions(user, url) do
     deliver(user.email, "Reset password instructions", """
 
@@ -58,9 +62,10 @@ defmodule Narasihistorian.Accounts.UserNotifier do
     """)
   end
 
-  @doc """
-  Deliver instructions to update a user email.
-  """
+  # ============================================================================
+  #  Deliver instructions to update a user email.
+  # ============================================================================
+
   def deliver_update_email_instructions(user, url) do
     deliver(user.email, "Update email instructions", """
 

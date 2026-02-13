@@ -3,6 +3,8 @@ defmodule Narasihistorian.Accounts.UserToken do
   import Ecto.Query
   alias Narasihistorian.Accounts.UserToken
 
+  alias Narasihistorian.Accounts.User
+
   @hash_algorithm :sha256
   @rand_size 32
 
@@ -18,7 +20,8 @@ defmodule Narasihistorian.Accounts.UserToken do
     field :token, :binary
     field :context, :string
     field :sent_to, :string
-    belongs_to :user, Narasihistorian.Accounts.User
+
+    belongs_to :user, User
 
     timestamps(type: :utc_datetime, updated_at: false)
   end

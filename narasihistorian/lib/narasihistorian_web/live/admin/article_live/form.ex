@@ -17,6 +17,8 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
     socket =
       socket
       |> assign(:category_options, Categories.category_name_and_ids())
+      |> assign(:tag_input, "")
+      |> assign(:selected_tags, [])
       |> allow_upload(:image,
         accept: ~w(.jpg .jpeg .png .gif .webp),
         max_entries: 1,
@@ -29,8 +31,217 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
   end
 
   # ============================================================================
+  # RENDER
+  # ============================================================================
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash} current_user={@current_user}>
+      <%!-- <% IO.inspect(self(), label: "FORM RENDER") %> --%>
+
+      <%!-------------------------%>
+      <%!-- HEADER --%>
+      <%!-------------------------%>
+
+      <div class="relative p-6 mb-14 flex-1 rounded-xl border border-gray-600 shadow-sm">
+        <.main_title_div>
+          <.back_link
+            navigate={~p"/admin/articles"}
+            icon="hero-arrow-left"
+          />
+          <.span_custom variant="main-title">{@page_title}</.span_custom>
+        </.main_title_div>
+
+        <%!-------------------------%>
+        <%!-- FORM --%>
+        <%!-------------------------%>
+
+        <.form
+          for={@form}
+          phx-submit="save"
+          phx-change="validate"
+          class="space-y-5"
+        >
+          <%!-------------------------%>
+          <%!-- TITLE --%>
+          <%!-------------------------%>
+
+          <.input
+            field={@form[:article_name]}
+            label="Title"
+            class="input w-full border p-3 shadow-sm"
+            phx-debounce="blur"
+          />
+
+          <%!-------------------------%>
+          <%!-- WRITE CONTENT --%>
+          <%!-------------------------%>
+
+          <div class="form-field mt-5">
+            <label class="block text-xs font-medium mb-1 text-gray-400">Content</label>
+            <div
+              id={"quill-wrapper-#{@article.id || "new"}"}
+              phx-hook="QuillEditor"
+              phx-update="ignore"
+              data-content={@form[:content].value || ""}
+            >
+              <div class="quill-editor" style="height: 300px;"></div>
+
+              <input
+                type="hidden"
+                name="article[content]"
+                id="article_content"
+                value={@form[:content].value || ""}
+              />
+            </div>
+
+            <%= for {msg, _opts} <- @form[:content].errors do %>
+              <p class="mt-2 text-sm text-rose-600 phx-no-feedback:hidden">
+                {msg}
+              </p>
+            <% end %>
+          </div>
+
+          <%!-------------------------%>
+          <%!-- CATEGORY --%>
+          <%!-------------------------%>
+
+          <.input
+            field={@form[:category_id]}
+            type="select"
+            label="Category"
+            prompt="Pilih Kategori"
+            options={@category_options}
+            class="select w-full border shadow-sm"
+          />
+
+          <%!-------------------------%>
+          <%!-- TAGS INPUT --%>
+          <%!-------------------------%>
+
+          <div class="form-field my-5">
+            <label class="block text-sm font-medium mb-1 text-gray-400">Tags</label>
+
+            <input
+              type="text"
+              id="tag-input"
+              phx-hook="TagInput"
+              value={@tag_input}
+              placeholder="Type tag and press Enter"
+              class="input w-full border p-3 shadow-sm rounded"
+              autocomplete="off"
+            />
+
+            <div class="flex flex-wrap gap-2 mt-3">
+              <%= for tag <- @selected_tags do %>
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-[#fedf16e0] text-gray-800 font-bold rounded-full text-sm">
+                  {tag}
+                  <button
+                    type="button"
+                    phx-click="remove_tag"
+                    phx-value-tag={tag}
+                    class="hover:text-red-600 ml-1 font-bold cursor-pointer"
+                  >
+                    ×
+                  </button>
+                </span>
+              <% end %>
+            </div>
+          </div>
+
+          <%!-------------------------%>
+          <%!-- IMAGE UPLOAD --%>
+          <%!-------------------------%>
+
+          <div class="form-field my-5">
+            <label class="block text-sm font-medium mb-1 text-gray-400">
+              Image
+            </label>
+
+            <div class="space-y-5">
+              <.live_file_input
+                upload={@uploads.image}
+                class="block text-sm text-zinc-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-zinc-100 file:text-zinc-700
+                    hover:file:bg-zinc-200
+                    cursor-pointer"
+              />
+
+              <p class="text-xs text-zinc-400">
+                Accepted: JPG, PNG, GIF, WebP (max 5MB)
+              </p>
+            </div>
+
+            <%= for entry <- @uploads.image.entries do %>
+              <div class="my-5 p-5 border border-gray-500 rounded">
+                <div class="flex items-center gap-5 mb-2">
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-[#fedf16e0]">
+                      {entry.client_name}
+                      <span class="text-xs text-[#fedf16e0]">
+                        ({format_bytes(entry.client_size)})
+                      </span>
+                    </p>
+                    <div class="h-2 bg-blue-200 rounded overflow-hidden mt-3">
+                      <div
+                        class="h-full bg-green-400 transition-all"
+                        style={"width: #{entry.progress}%"}
+                      >
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    phx-click="cancel-upload"
+                    phx-value-ref={entry.ref}
+                    class="cursor-pointer"
+                  >
+                    <.icon name="hero-x-circle" class="text-red-600 hover:text-red-800  w-8 h-8" />
+                  </button>
+                </div>
+
+                <.live_img_preview entry={entry} class="max-w-xs rounded mt-5" />
+              </div>
+            <% end %>
+
+            <%= for err <- upload_errors(@uploads.image) do %>
+              <p class="mt-2 text-sm text-rose-600 bg-rose-50 p-2 rounded">
+                {error_to_string(err)}
+              </p>
+            <% end %>
+          </div>
+
+          <%!-------------------------%>
+          <%!-- SUBMIT BUTTON --%>
+          <%!-------------------------%>
+
+          <footer>
+            <div class="my-5 flex flex-row gap-3">
+              <.button_custom
+                phx-disable-with="Saving...."
+                variant="primary"
+              >
+                <.icon name="hero-inbox-arrow-down" class="w-4 h-4" /> Simpan
+              </.button_custom>
+            </div>
+          </footer>
+        </.form>
+      </div>
+    </Layouts.app>
+    """
+  end
+
+  # ============================================================================
   # HANDLE EVENT
   # ============================================================================
+
+  # ==================
+  # validate & save
+  # ===================
 
   @impl true
   def handle_event("validate", %{"article" => article_params}, socket) do
@@ -46,15 +257,45 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
     save_article(socket, socket.assigns.live_action, article_params)
   end
 
+  # ==================
+  # cancel upload
+  # ===================
+
   def handle_event("cancel-upload", %{"ref" => ref}, socket) do
     {:noreply, cancel_upload(socket, :image, ref)}
+  end
+
+  # ==================
+  # add & remove tag
+  # ===================
+
+  @impl true
+  def handle_event("add_tag", %{"tag" => tag_name}, socket) do
+    tag_name = String.trim(tag_name)
+
+    socket =
+      if tag_name != "" and tag_name not in socket.assigns.selected_tags do
+        assign(socket, :selected_tags, socket.assigns.selected_tags ++ [tag_name])
+      else
+        socket
+      end
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("remove_tag", %{"tag" => tag}, socket) do
+    selected_tags = Enum.reject(socket.assigns.selected_tags, &(&1 == tag))
+    {:noreply, assign(socket, :selected_tags, selected_tags)}
   end
 
   # ============================================================================
   # PRIVATE HELPER
   # ============================================================================
 
+  # ====================================
   # apply action
+  # ====================================
 
   defp apply_action(socket, :new, _) do
     article = %Article{}
@@ -67,32 +308,37 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    article = Admin.get_article!(id)
+    article = Admin.get_article_with_tags!(id)
     changeset = Admin.change_article(article)
+    existing_tags = Enum.map(article.tags || [], & &1.name)
 
     socket
     |> assign(:page_title, "Edit Article")
     |> assign(:form, to_form(changeset))
     |> assign(:article, article)
+    |> assign(:selected_tags, existing_tags)
   end
 
+  # ====================================
   # save article
+  # ====================================
 
   defp save_article(socket, :new, article_params) do
     current_user = socket.assigns.current_user
+    tags = socket.assigns.selected_tags
 
     case upload_to_r2(socket, article_params) do
       {:ok, article_params_with_image} ->
-        case Admin.create_article(article_params_with_image, current_user) do
-          {:ok, _article} ->
+        case Admin.create_article_with_tags(article_params_with_image, tags, current_user) do
+          {:ok, %{article: _article}} ->
             socket =
               socket
               |> put_flash(:info, "Article created & uploaded to cloud successfully!")
-              |> push_navigate(to: ~p"/admin/articles")
+              |> push_navigate(to: ~p"/user/articles")
 
             {:noreply, socket}
 
-          {:error, %Ecto.Changeset{} = changeset} ->
+          {:error, :article, %Ecto.Changeset{} = changeset, _} ->
             require Logger
             Logger.error("Failed to create article: #{inspect(changeset.errors)}")
 
@@ -121,13 +367,18 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
 
   defp save_article(socket, :edit, article_params) do
     old_image = socket.assigns.article.image
-
     current_user = socket.assigns.current_user
+    tags = socket.assigns.selected_tags
 
     case upload_to_r2(socket, article_params) do
       {:ok, article_params_with_image} ->
-        case Admin.update_article(socket.assigns.article, article_params_with_image, current_user) do
-          {:ok, _article} ->
+        case Admin.update_article_with_tags(
+               socket.assigns.article,
+               article_params_with_image,
+               tags,
+               current_user
+             ) do
+          {:ok, %{article: _article}} ->
             if Map.has_key?(article_params_with_image, "image") && old_image &&
                  old_image != article_params_with_image["image"] do
               delete_old_image(old_image)
@@ -135,8 +386,8 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
 
             socket =
               socket
-              |> put_flash(:info, "Article updated & uploaded to cloud successfully!")
-              |> push_navigate(to: ~p"/admin/articles")
+              |> put_flash(:info, "Artikel berhasil di updated")
+              |> push_navigate(to: ~p"/user/dashboard")
 
             {:noreply, socket}
 
@@ -167,7 +418,9 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
     end
   end
 
+  # ====================================
   # r2 upload
+  # ====================================
 
   defp upload_to_r2(socket, article_params) do
     uploaded_results =
@@ -184,10 +437,12 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
         case Uploader.upload_file(path, destination_key, entry.client_type) do
           {:ok, public_url} ->
             Logger.info("Successfully uploaded to R2: #{public_url}")
+            # ✅ Return just the URL, not {:ok, public_url}
             public_url
 
           {:error, reason} ->
             Logger.error("R2 upload failed: #{inspect(reason)}")
+            # ✅ Return error tuple
             {:error, reason}
         end
       end)
@@ -215,7 +470,9 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
     end
   end
 
-  # UI HELPER FUNCTIONS --------------------------------------------
+  # ====================================
+  # UI HELPER FUNCTIONS
+  # ====================================
 
   defp format_changeset_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->

@@ -497,6 +497,10 @@ defmodule NarasihistorianWeb.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
+  # ============================================================================
+  # SIMPLE FORM
+  # ============================================================================
+
   @doc """
   Renders a simple form.
 
@@ -532,6 +536,10 @@ defmodule NarasihistorianWeb.CoreComponents do
     """
   end
 
+  # ============================================================================
+  # CUSTOM BUTTON
+  # ============================================================================
+
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :any
   attr :variant, :string, values: ~w(primary full transparant)
@@ -540,9 +548,9 @@ defmodule NarasihistorianWeb.CoreComponents do
   def button_custom(%{rest: rest} = assigns) do
     variants = %{
       "primary" =>
-        "text-black bg-white text-sm cursor-pointer rounded-lg border border-white/30 py-2 px-6 hover:text-white hover:bg-white/10 hover:border-[#fedf16e0] font-bold transition-all duration-500",
+        "btn btn-outline border-[#fedf16e0] text-xs text-gray-100 hover:bg-[#fedf16e0] hover:text-black hover:border-[#fedf16e0] px-10",
       "full" =>
-        "text-black bg-white w-full text-sm cursor-pointer rounded-lg border border-white/30 py-2 px-6 hover:text-white hover:bg-white/10 hover:border-[#fedf16e0] font-bold transition-all duration-500",
+        "btn btn-outline w-full border-[#fedf16e0] text-xs text-gray-100 hover:bg-[#fedf16e0] hover:text-black hover:border-[#fedf16e0] px-10",
       "transparant" =>
         "text-white text-sm border border-[#fedf16e0] py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200",
       nil => "btn-primary btn-soft"
@@ -567,6 +575,10 @@ defmodule NarasihistorianWeb.CoreComponents do
       """
     end
   end
+
+  # ============================================================================
+  # CUSTOM SPAN
+  # ============================================================================
 
   slot :inner_block, required: true
 
@@ -601,5 +613,58 @@ defmodule NarasihistorianWeb.CoreComponents do
     "text-white text-sm border border-[#fedf16e0] py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200"
   end
 
+  defp variant_classes("yellow") do
+    "text-white text-sm border border-[#fedf16e0] py-2 px-6 rounded-lg hover:bg-white/10 hover:border-[#fedf16e0] font-normal transition-all duration-200"
+  end
+
+  defp variant_classes("main-title") do
+    "text-xl font-bold"
+  end
+
   defp variant_classes(_), do: ""
+
+  # ============================================================================
+  # BACK LINK COMPONENT
+  # ============================================================================
+
+  attr :navigate, :string, required: true
+  attr :icon, :string, default: "hero-arrow-left"
+  attr :class, :string, default: ""
+  attr :icon_class, :string, default: "w-6 h-6 mr-3"
+
+  slot :inner_block
+
+  def back_link(assigns) do
+    ~H"""
+    <.link
+      navigate={@navigate}
+      class={[
+        "text-gray-400 hover:text-white inline-flex items-center",
+        @class
+      ]}
+    >
+      <.icon name={@icon} class={@icon_class} />
+      {render_slot(@inner_block)}
+    </.link>
+    """
+  end
+
+  # ============================================================================
+  # DIV MAIN TITLE BORDER
+  # ============================================================================
+
+  attr :class, :string, default: ""
+
+  slot :inner_block
+
+  def main_title_div(assigns) do
+    ~H"""
+    <div class={[
+      "flex flex-row items-center mb-10 border-b pb-5 border-gray-500",
+      @class
+    ]}>
+      {render_slot(@inner_block)}
+    </div>
+    """
+  end
 end

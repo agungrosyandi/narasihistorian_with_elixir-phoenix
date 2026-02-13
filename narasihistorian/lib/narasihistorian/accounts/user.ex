@@ -2,6 +2,10 @@ defmodule Narasihistorian.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Narasihistorian.Comments.Comment
+  alias Narasihistorian.Articles.Article
+  alias Narasihistorian.Categories.Category
+
   # ============================================================================
   # SCHEMA
   # ============================================================================
@@ -26,9 +30,9 @@ defmodule Narasihistorian.Accounts.User do
     field :provider_expires_at, :utc_datetime
     field :avatar_url, :string
 
-    has_many :comments, Narasihistorian.Comments.Comment
-    has_many :articles, Narasihistorian.Articles.Article
-    has_many :categories, Narasihistorian.Categories.Category
+    has_many :comments, Comment
+    has_many :articles, Article
+    has_many :categories, Category
 
     timestamps(type: :utc_datetime)
   end
@@ -38,10 +42,10 @@ defmodule Narasihistorian.Accounts.User do
   # ============================================================================
 
   def registration_changeset(user, attrs, opts \\ []) do
+    fields = [:email, :password, :username, :role]
+
     user
-    |> cast(attrs, [:email, :password, :username, :role])
-    # Always set role to :user on registration
-    # |> put_change(:role, :user)
+    |> cast(attrs, fields)
     |> validate_email(opts)
     |> validate_username()
     |> validate_role()
@@ -49,19 +53,20 @@ defmodule Narasihistorian.Accounts.User do
   end
 
   def oauth_changeset(user, attrs) do
-    user
-    |> cast(attrs, [
-      :email,
+    required_fields = [:email, :provider, :provider_uid]
+
+    optional_fields = [
       :username,
-      :provider,
-      :provider_uid,
       :provider_token,
       :provider_refresh_token,
       :provider_expires_at,
       :avatar_url,
       :confirmed_at
-    ])
-    |> validate_required([:email, :provider, :provider_uid])
+    ]
+
+    user
+    |> cast(attrs, required_fields ++ optional_fields)
+    |> validate_required(required_fields)
     |> validate_email(validate_email: true)
     |> validate_username()
     |> put_change(:role, :user)
@@ -72,16 +77,18 @@ defmodule Narasihistorian.Accounts.User do
   end
 
   def link_oauth_changeset(user, attrs) do
-    user
-    |> cast(attrs, [
-      :provider,
-      :provider_uid,
+    required_fields = [:provider, :provider_uid]
+
+    optional_fields = [
       :provider_token,
       :provider_refresh_token,
       :provider_expires_at,
       :avatar_url
-    ])
-    |> validate_required([:provider, :provider_uid])
+    ]
+
+    user
+    |> cast(attrs, required_fields ++ optional_fields)
+    |> validate_required(required_fields)
     |> unique_constraint([:provider, :provider_uid],
       name: :users_provider_uid_index,
       message: "has already been linked to another account"

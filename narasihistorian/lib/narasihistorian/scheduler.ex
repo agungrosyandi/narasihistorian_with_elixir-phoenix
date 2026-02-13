@@ -2,7 +2,9 @@ defmodule Narasihistorian.Scheduler do
   use GenServer
   require Logger
 
-  # Starts the scheduler GenServer.
+  # ============================================================================
+  # START THE SCHEDULER GENSERVER
+  # ============================================================================
 
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
@@ -10,13 +12,13 @@ defmodule Narasihistorian.Scheduler do
 
   def trigger_cleanup, do: GenServer.cast(__MODULE__, :cleanup)
 
-  # Server Callbacks
+  # ============================================================================
+  # SERVER CALLBACK
+  # ============================================================================
 
   @impl true
   def init(_opts) do
     Logger.info("Scheduler started - scheduling cleanup tasks")
-
-    # Schedule first cleanup
 
     schedule_cleanup()
 
@@ -31,10 +33,10 @@ defmodule Narasihistorian.Scheduler do
 
     case Narasihistorian.Dashboard.cleanup_old_views(90) do
       {:ok, count} ->
-        Logger.info("✅ Successfully cleaned up #{count} old view records")
+        Logger.info("Successfully cleaned up #{count} old view records")
 
       {:error, reason} ->
-        Logger.error("❌ Cleanup failed: #{inspect(reason)}")
+        Logger.error("Cleanup failed: #{inspect(reason)}")
     end
 
     # Schedule next cleanup

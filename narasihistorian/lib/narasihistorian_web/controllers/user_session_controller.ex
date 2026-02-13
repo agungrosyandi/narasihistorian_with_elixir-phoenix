@@ -4,6 +4,10 @@ defmodule NarasihistorianWeb.UserSessionController do
   alias Narasihistorian.Accounts
   alias NarasihistorianWeb.UserAuth
 
+  # ============================================================================
+  # CREATE
+  # ============================================================================
+
   def create(conn, %{"_action" => "registered"} = params) do
     create(conn, params, "Account created successfully!")
   end
@@ -33,6 +37,10 @@ defmodule NarasihistorianWeb.UserSessionController do
       |> redirect(to: ~p"/users/log-in")
     end
   end
+
+  # ============================================================================
+  # DELETE
+  # ============================================================================
 
   def delete(conn, _params) do
     conn

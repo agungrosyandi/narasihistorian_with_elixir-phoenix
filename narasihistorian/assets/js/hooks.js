@@ -1,8 +1,10 @@
 import Quill from "quill";
 
-// quil text editor -----------------------------------------------------
-
 let Hooks = {};
+
+//===================================================================
+// QUILL EDITOR
+//===================================================================
 
 Hooks.QuillEditor = {
   mounted() {
@@ -65,6 +67,26 @@ Hooks.QuillEditor = {
     if (this.quill) {
       this.quill = null;
     }
+  },
+};
+
+//===================================================================
+// TAG INPUT
+//===================================================================
+
+Hooks.TagInput = {
+  mounted() {
+    this.el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const tag = this.el.value.trim();
+
+        if (tag) {
+          this.pushEvent("add_tag", { tag: tag });
+          this.el.value = ""; // Clear input immediately
+        }
+      }
+    });
   },
 };
 

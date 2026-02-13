@@ -4,7 +4,9 @@ defmodule Narasihistorian.Uploader do
   @bucket Application.compile_env(:narasihistorian, :r2_bucket)
   @public_url Application.compile_env(:narasihistorian, :r2_public_url)
 
+  # ============================================================================
   # Upload a file to R2 and return the public URL
+  # ============================================================================
 
   def upload_file(source_path, destination_key, content_type) do
     require Logger
@@ -25,7 +27,9 @@ defmodule Narasihistorian.Uploader do
     end
   end
 
+  # ============================================================================
   # Delete a file from R2
+  # ============================================================================
 
   def delete_file(key) do
     @bucket
@@ -37,7 +41,9 @@ defmodule Narasihistorian.Uploader do
     end
   end
 
-  # Extract the key from a full URL
+  # ============================================================================
+  # # Extract the key from a full URL
+  # ============================================================================
 
   def extract_key(url) when is_binary(url) do
     String.replace(url, "#{@public_url}/", "")
@@ -45,7 +51,9 @@ defmodule Narasihistorian.Uploader do
 
   def extract_key(_), do: nil
 
+  # ============================================================================
   # Private functions
+  # ============================================================================
 
   defp do_upload(file_binary, key, content_type) do
     require Logger
@@ -71,7 +79,9 @@ defmodule Narasihistorian.Uploader do
 
   defp build_public_url(key), do: "#{@public_url}/#{key}"
 
+  # ============================================================================
   # Generate a unique filename with extension
+  # ============================================================================
 
   def generate_filename(original_filename) do
     ext = Path.extname(original_filename)

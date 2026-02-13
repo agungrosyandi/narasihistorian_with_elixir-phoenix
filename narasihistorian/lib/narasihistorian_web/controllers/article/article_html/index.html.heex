@@ -1,11 +1,21 @@
 <Layouts.app flash={@flash} current_user={@current_user}>
   <div class="relative pb-5">
-    
-<!-- HEADER TITLE -->
+    <%!-- ------------------------------------ --%>
+    <%!-- HEADER TITLE --%>
+    <%!-- ------------------------------------ --%>
 
-    <.header_title />
-    
-<!-- FILTER -->
+    <div class="text-center mb-5">
+      <h1 class="text-3xl font-bold mb-4 lg:text-4xl">
+        Everything about <span class="text-[#fedf16e0]">history</span>
+      </h1>
+      <p class="text-base-content/60">
+        Explore the pivotal moments that shaped our world
+      </p>
+    </div>
+
+    <%!-- ------------------------------------ --%>
+    <%!-- FILTER --%>
+    <%!-- ------------------------------------ --%>
 
     <form
       method="get"
@@ -14,37 +24,166 @@
     >
       <div class="form-control">
         <div class="input-group flex flex-col items-center gap-3 md:flex-row">
-          <.category_select
-            category_options={@category_options}
-            selected_category={@selected_category}
-          />
-
-          <.search_query />
+          <select name="category" class="select w-full" onchange="this.form.submit()">
+            <option value="">Semua Kategori</option>
+            <%= for {category_name, category_slug} <- @category_options do %>
+              <option value={category_slug} selected={category_slug == @selected_category}>
+                {category_name}
+              </option>
+            <% end %>
+          </select>
+          <div class="w-full">
+            <input
+              type="text"
+              name="q"
+              value={@search_query}
+              placeholder="Cari artikel ......"
+              class="input text-base input-bordered w-full input-lg"
+            />
+          </div>
         </div>
       </div>
     </form>
-    
-<!-- ARTICLE GRID -->
+
+    <%!-- ------------------------------------ --%>
+    <%!-- ARTICLE GRID --%>
+    <%!-- ------------------------------------ --%>
 
     <%= if @articles == [] do %>
-      <.content_article_not_found />
+      <div class="h-[25rem] mx-auto rounded-lg text-center shadow-xl flex gap-5 flex-col items-center justify-center">
+        <p>
+          Sorry, Artikel tidak ditemukan
+          <.link patch={~p"/"} class="text-[#fedf16e0] font-bold">
+            <.icon name="hero-arrows-right-left" class="w-4 h-4" />
+            <span class="border-b pb-2 text-white hover:text-[#fedf16e0]">
+              Kembali ke pencarian
+            </span>
+          </.link>
+        </p>
+        <.icon name="hero-no-symbol" class="w-10 h-10" />
+      </div>
     <% else %>
-      <.article_found articles={@articles} />
+      <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <%= for article <- @articles do %>
+          <.link
+            href={~p"/articles/#{article.id}"}
+            class="group card shadow-2xl hover:bg-base-300 transition-all duration-300"
+          >
+            <div class="flex justify-start p-5 text-base font-bold">
+              <.icon name="hero-list-bullet" class="w-5 h-5 mt-1 mr-2 text-[#fedf16e0]" />
+              {article.category.category_name}
+            </div>
+            <div class="flex flex-row md:flex-col">
+              <figure class="relative overflow-hidden h-64 flex-1 md:flex-auto">
+                <img
+                  src={article.image}
+                  alt={article.article_name}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </figure>
+              <div class="card-body flex-1 md:flex-auto">
+                <h2 class="card-title group-hover:text-primary transition-colors">
+                  {truncate(article.article_name, 30)}
+                </h2>
+                <p class="text-base-content/70 line-clamp-3">
+                  {article.content |> quill_plain_text() |> String.slice(0, 30)}...
+                </p>
 
-      <%= if @total_pages > 1 do %>
-        <.pagination_home
-          current_page={@current_page}
-          total_pages={@total_pages}
-          search_query={@search_query}
-          selected_category={@selected_category}
-        />
-      <% end %>
+                <p class="text-xs text-gray-300 mt-4">
+                  Penulis:&nbsp <span class="text-white font-bold">{article.user.username}</span>
+                </p>
+                <div class="flex flex-row flex-wrap justify-between items-center mt-2">
+                  <time class="text-xs pb-2">
+                    {time_ago_short(article.inserted_at)}
+                  </time>
+                  <div>
+                    <p class="text-xs text-gray-300 pb-2">
+                      <.icon name="hero-eye" class="w-4 h-4 mr-1" />
+                      {article.view_count}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </.link>
+        <% end %>
+      </div>
+
+      <%!-- ------------------------------------ --%>
+      <%!-- LOAD MORE BUTTON --%>
+      <%!-- ------------------------------------ --%>
+
+      <div id="load-more-container" class="flex flex-col items-center mt-12 gap-3">
+        <%= if @next_cursor do %>
+          <button
+            id="load-more-btn"
+            class="btn btn-outline border-[#fedf16e0] text-xs text-gray-100 hover:bg-[#fedf16e0] hover:text-black hover:border-[#fedf16e0] px-10"
+            data-next-cursor={@next_cursor}
+            data-search={@search_query}
+            data-category={@selected_category}
+            data-url="/articles/more"
+            data-target="articles-grid"
+            onclick="loadMore(this)"
+          >
+            Muat Lebih Banyak
+          </button>
+        <% else %>
+          <p class="text-sm text-base-content/40 py-4">Semua artikel telah dimuat</p>
+        <% end %>
+      </div>
     <% end %>
-    
-<!-- FOOTER -->
+
+    <%!-------------------------%>
+    <%!-- FOOTER --%>
+    <%!-------------------------%>
 
     <div class="border-t border-gray-500 mt-10"></div>
-
-    <.footer_description class="bg-neutral" />
+    <footer class="relative gap-2 flex flex-col justify-between items-center py-10">
+      <div class="relative flex flex-col justify-between items-center md:flex-row md:gap-10">
+        <div class="w-[100%] flex-1">
+          <img
+            class="relative h-[full] w-full object-cover"
+            src="/images/closng-background-cover.jpg"
+            alt="My Image"
+          />
+        </div>
+        <div class="py-10 gap-5 flex-1 flex flex-col justify-center items-center md:px-5">
+          <div>
+            <span class="text-[#ffffffe0] font-bold text-xl">Tentang Narasi</span>
+            <span class="text-[#fedf16e0] font-bold text-xl">Historian</span>
+          </div>
+          <p class="text-center text-base-content/60">
+            Narasihistorian merupakan media konten yang berfokus pada sejarah
+            peradaban global dengan visualisasi yangyang simple dan interaktif
+            baik itu berupa konten artikel ataupun video infografik.
+          </p>
+        </div>
+      </div>
+      <div class="flex flex-row gap-5 justify-between w-full items-center">
+        <small class="text-[#ffffffe0] font-bold text-xs">
+          <.icon name="hero-minus-circle" class="w-4 h-4 mb-1 mr-1" /> 2024
+        </small>
+        <div class="flex items-center gap-5 text-xs">
+          <.link
+            href="mailto:agungrosyandi@gmail.com"
+            class="text-white hover:text-[#fedf16e0] text-sm font-medium text-center transition-all duration-200"
+          >
+            <.icon name="hero-chevron-right" class="w-4 h-4 mb-1" /> Email
+          </.link>
+          <.link
+            href="https://www.instagram.com/narasihistorian/"
+            class="text-white hover:text-[#fedf16e0] text-sm font-medium text-center transition-all duration-200"
+          >
+            <.icon name="hero-chevron-right" class="w-4 h-4 mb-1" /> instagram
+          </.link>
+          <.link
+            href="https://www.youtube.com/channel/UCNoUf4xYawhvK6dD94oDEDg"
+            class="text-white hover:text-[#fedf16e0] text-sm font-medium text-center transition-all duration-200"
+          >
+            <.icon name="hero-chevron-right" class="w-4 h-4 mb-1" /> youtube
+          </.link>
+        </div>
+      </div>
+    </footer>
   </div>
 </Layouts.app>

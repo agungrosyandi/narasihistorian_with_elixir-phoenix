@@ -3,7 +3,7 @@ defmodule NarasihistorianWeb.Admin.DashboardLive.Index do
 
   alias Narasihistorian.Dashboard
 
-  import NarasihistorianWeb.Admin.Components, only: [admin_nav: 1]
+  import NarasihistorianWeb.CustomComponents, only: [admin_user_nav: 1]
 
   # ============================================================================
   # MOUNT
@@ -16,7 +16,6 @@ defmodule NarasihistorianWeb.Admin.DashboardLive.Index do
 
       if connected?(socket) do
         Phoenix.PubSub.subscribe(Narasihistorian.PubSub, "dashboard:updates")
-
         :timer.send_interval(:timer.minutes(5), self(), :periodic_refresh)
       end
 
@@ -34,6 +33,260 @@ defmodule NarasihistorianWeb.Admin.DashboardLive.Index do
        |> put_flash(:error, "Akses Dashboard Hanya Berlaku Untuk Admin")
        |> redirect(to: ~p"/admin/articles")}
     end
+  end
+
+  # ============================================================================
+  # RENDER
+  # ============================================================================0
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash} current_user={@current_user}>
+      <div class="container mx-auto mb-14">
+        <%!-------------------------%>
+        <%!-- ADMIN NAV --%>
+        <%!-------------------------%>
+
+        <.admin_user_nav current_page={@current_page} current_user={@current_user} />
+
+        <div>
+          <%!-------------------------%>
+          <%!-- CONTROL --%>
+          <%!-------------------------%>
+
+          <div class="mb-6 flex items-center justify-between">
+            <select
+              id="period"
+              phx-change="change_period"
+              name="period"
+              class="block rounded-md border bg-black border-gray-500 shadow-sm py-2 px-3 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            >
+              <option value="7" selected={@period == 7}>Last 7 days</option>
+              <option value="30" selected={@period == 30}>Last 30 days</option>
+              <option value="90" selected={@period == 90}>Last 90 days</option>
+            </select>
+
+            <.span_custom phx-click="refresh" variant="transparant" class="cursor-pointer">
+              <.icon name="hero-arrow-path" class="w-4 h-4 mb-1 mr-2" /> Refresh
+            </.span_custom>
+          </div>
+
+          <%!-------------------------%>
+          <%!-- STATS CARDS --%>
+          <%!-------------------------%>
+
+          <div class="grid grid-cols-2 gap-5 lg:grid-cols-4 mb-8">
+            <%!-------------------------%>
+            <%!-- TOTAL ARTICLE --%>
+            <%!-------------------------%>
+
+            <div class="border border-gray-500 overflow-hidden shadow rounded-lg">
+              <div class="flex items-center p-5">
+                <.icon name="hero-document-text" class="w-5 h-5" />
+
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-base text-gray-300 truncate">Total Articles</dt>
+                    <dd class="text-3xl font-semibold">{@total_articles}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+
+            <%!-------------------------%>
+            <%!-- PUBLISHED --%>
+            <%!-------------------------%>
+
+            <div class="border border-gray-500 overflow-hidden shadow rounded-lg">
+              <div class="flex items-center p-5">
+                <.icon name="hero-check-circle" class="w-6 h-6 text-green-400" />
+
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-base text-gray-300 truncate">Published</dt>
+                    <dd class="flex items-baseline">
+                      <div class="text-3xl font-semibold">{@published_count}</div>
+                      <div class="ml-2 text-sm text-green-600">{@published_percentage}%</div>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+
+            <%!-------------------------%>
+            <%!-- DRAFT --%>
+            <%!-------------------------%>
+
+            <div class="border border-gray-500 overflow-hidden shadow rounded-lg">
+              <div class="flex items-center p-5">
+                <.icon name="hero-pencil-square" class="w-6 h-6 text-yellow-400" />
+
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-base text-gray-300 truncate">Drafts</dt>
+                    <dd class="flex items-baseline">
+                      <div class="text-3xl font-semibold">{@draft_count}</div>
+                      <div class="ml-2 text-sm text-yellow-600">{@draft_percentage}%</div>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+
+            <%!-------------------------%>
+            <%!-- TOTAL VIEWS --%>
+            <%!-------------------------%>
+
+            <div class="border border-gray-500 overflow-hidden shadow rounded-lg">
+              <div class="flex items-center p-5">
+                <.icon name="hero-eye" class="w-6 h-6 text-blue-400" />
+
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-base text-gray-300 truncate">Total Views</dt>
+                    <dd class="text-3xl font-semibold">
+                      {@top_articles |> Enum.map(& &1.view_count) |> Enum.sum()}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <%!-------------------------%>
+          <%!-- CHARTS SECTIONS --%>
+          <%!-------------------------%>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="border border-gray-500 shadow rounded-lg p-6">
+              <h2 class="text-base text-gray-300 mb-4">Publishing Trend</h2>
+              <div
+                id="trend-chart"
+                phx-hook="TrendChart"
+                data-trend={Jason.encode!(@articles_trend)}
+              >
+                <canvas id="trend-canvas" width="400" height="200"></canvas>
+              </div>
+            </div>
+
+            <%!-------------------------%>
+            <%!-- DRAFT VS PUBLISHED CHART --%>
+            <%!-------------------------%>
+
+            <div class="border border-gray-500 shadow rounded-lg p-6">
+              <h2 class="text-base text-gray-300 mb-4">Draft vs Published</h2>
+              <div
+                id="ratio-chart"
+                phx-hook="RatioChart"
+                data-published={@published_count}
+                data-draft={@draft_count}
+              >
+                <canvas id="ratio-canvas" width="400" height="200"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <%!-------------------------%>
+          <%!-- TABLES SECTION --%>
+          <%!-------------------------%>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <%!-------------------------%>
+            <%!-- TOP ARTICLES BY VIEWS --%>
+            <%!-------------------------%>
+
+            <div class="border border-gray-500 rounded-lg overflow-hidden">
+              <div class="px-6 py-4 border-b border-gray-500">
+                <h2 class="text-base text-gray-300">Top Performing Articles</h2>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-500">
+                  <thead class="text-[#fedf16e0] text-sm uppercase tracking-wider text-left ">
+                    <tr>
+                      <th class="px-6 py-3">
+                        Title
+                      </th>
+                      <th class="px-6 py-3">
+                        Views
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class=" divide-y divide-gray-500">
+                    <%= for article <- @top_articles do %>
+                      <tr>
+                        <td class="px-6 py-4 text-sm">
+                          {truncate(article.article_name, 50)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <span class="inline-flex items-center px-2.5 py-0.5 text-sm font-bold text-white">
+                            {Dashboard.get_article_total_views(article.id)}
+                          </span>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <%!-------------------------%>
+            <%!-- ARTICLES BY COMMENTS --%>
+            <%!-------------------------%>
+
+            <div class="border border-gray-500 shadow rounded-lg overflow-hidden">
+              <div class="px-6 py-4 border-b border-gray-500">
+                <h2 class="text-base text-gray-300">Most Commented Articles</h2>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-500">
+                  <thead class="text-[#fedf16e0] text-sm uppercase tracking-wider text-left">
+                    <tr>
+                      <th class="px-6 py-3">
+                        Title
+                      </th>
+                      <th class="px-6 py-3">
+                        Comments
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-500">
+                    <%= for item <- @articles_with_comments do %>
+                      <tr>
+                        <td class="px-6 py-4 text-sm">
+                          {truncate(item.article.article_name, 50)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <span class="inline-flex items-center px-2.5 py-0.5 text-sm font-bold text-white">
+                            {item.comment_count}
+                          </span>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <%!-------------------------%>
+          <%!-- PUBLISHING FREQUENCY --%>
+          <%!-------------------------%>
+
+          <div class="mt-8 border border-gray-500  shadow rounded-lg p-6">
+            <h2 class="text-base text-gray-300 mb-4">Publishing Frequency (Daily)</h2>
+            <div
+              id="frequency-chart"
+              phx-hook="FrequencyChart"
+              data-frequency={Jason.encode!(@publishing_frequency)}
+            >
+              <canvas id="frequency-canvas" width="800" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layouts.app>
+    """
   end
 
   # ============================================================================
@@ -135,6 +388,18 @@ defmodule NarasihistorianWeb.Admin.DashboardLive.Index do
     |> assign(:articles_with_comments, articles_with_comments)
     |> assign(:publishing_frequency, freq_json)
   end
+
+  # truncate
+
+  defp truncate(text, length) when is_binary(text) do
+    if String.length(text) > length do
+      String.slice(text, 0, length) <> "..."
+    else
+      text
+    end
+  end
+
+  defp truncate(nil, _length), do: ""
 
   # Optional: Show subtle flash message on real-time updates
 

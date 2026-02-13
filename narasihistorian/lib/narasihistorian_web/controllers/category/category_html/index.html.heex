@@ -1,0 +1,39 @@
+<Layouts.app flash={@flash} current_user={@current_user}>
+  <section class="mb-14">
+    <.main_title_div>
+      <.span_custom variant="main-title">{@page_title}</.span_custom>
+    </.main_title_div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+      <%= for category <- @categories do %>
+        <div class="flex flex-col gap-5 md:flex-row lg:flex-row">
+          <div class="w-[100%] flex-1">
+            <img
+              class="relative h-[25rem] w-full object-cover"
+              src={category.image_category}
+              alt={category.category_name}
+            />
+          </div>
+
+          <div class="flex-1 shadow-2xl pb-14">
+            <.list>
+              <:item title="Kategori">
+                <p class="text-gray-400 mt-3">{category.category_name}</p>
+              </:item>
+
+              <:item title="Deskripsi">
+                <p class="text-gray-400 mt-3 pr-5">{truncate(category.description, 50)}</p>
+              </:item>
+            </.list>
+
+            <div class="mt-5 pl-4">
+              <.link href={~p"/categories/#{category.id}"} class="mt-5 mb-14">
+                <.span_custom variant="transparant">Explore</.span_custom>
+              </.link>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+</Layouts.app>

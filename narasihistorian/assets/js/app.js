@@ -30,6 +30,9 @@ import Hooks from "./hooks";
 import Chart from "chart.js/auto";
 import { DashboardHooks } from "./dashboard_hooks";
 
+import Swiper from "swiper/bundle";
+import "swiper/css/bundle";
+
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
@@ -100,3 +103,69 @@ if (process.env.NODE_ENV === "development") {
     },
   );
 }
+
+// ======================================
+// CURSOR BASED WITH INFINITY SCROOL UI
+// ======================================
+
+async function loadMore(btn) {
+  const nextCursor = btn.dataset.nextCursor;
+  const url = btn.dataset.url;
+  const targetId = btn.dataset.target || "articles-grid";
+  const search = btn.dataset.search || "";
+  const category = btn.dataset.category || "";
+
+  // Show loading state on the button
+
+  btn.disabled = true;
+  btn.innerHTML =
+    '<span class="loading loading-spinner loading-sm"></span> Memuat...';
+
+  try {
+    // Build the fetch URL
+    const params = new URLSearchParams({ cursor: nextCursor });
+    if (search) params.set("q", search);
+    if (category) params.set("category", category);
+
+    const res = await fetch(`${url}?${params.toString()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const html = await res.text();
+
+    // Parse the returned HTML fragment
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const batch = doc.getElementById("new-articles-batch");
+    const newBtnContainer = doc.getElementById("new-load-more-container");
+
+    // Append new cards into the grid
+
+    const grid = document.getElementById(targetId);
+    if (grid && batch) {
+      // Move each card child into the grid (skip the wrapper div)
+
+      while (batch.firstChild) {
+        grid.appendChild(batch.firstChild);
+      }
+    }
+
+    // Replace the old load-more-container with the new one
+    const oldContainer = document.getElementById("load-more-container");
+    if (oldContainer && newBtnContainer) {
+      // Copy classes from old container
+      newBtnContainer.id = "load-more-container";
+      newBtnContainer.className = oldContainer.className;
+      oldContainer.replaceWith(newBtnContainer);
+    }
+  } catch (err) {
+    console.error("Load more failed:", err);
+    // Restore button on error so user can retry
+    btn.disabled = false;
+    btn.innerHTML = "Muat Lebih Banyak";
+  }
+}
+
+window.loadMore = loadMore;
+
+window.Swiper = Swiper;

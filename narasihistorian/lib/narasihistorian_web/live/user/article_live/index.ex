@@ -3,6 +3,8 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
 
   alias Narasihistorian.Admin
 
+  alias Narasihistorian.Dashboard
+
   # ============================================================================
   # MOUNT
   # ============================================================================
@@ -11,7 +13,7 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
   def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign(:page_title, "Manage Artikel")
+      |> assign(:page_title, "List Artikel")
       |> assign(:form, to_form(%{}))
       |> assign(:pagination, nil)
       |> assign(:searching, false)
@@ -114,58 +116,59 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_user={@current_user}>
       <div class="container mx-auto mb-14">
-        <%!-- Header --%>
+        <%!-------------------------%>
+        <%!-- HEADER --%>
+        <%!-------------------------%>
 
-        <div class="flex justify-end items-start mb-8">
-          <div class="flex gap-2">
-            <.link navigate={~p"/user/dashboard"} class="btn btn-ghost">
-              <.icon name="hero-arrow-uturn-left" class="w-4 h-4 mr-1 text-gray-400" />Main Dashboard
-            </.link>
-            <.link navigate={~p"/user/articles/new"} class="btn btn-primary">
-              <.icon name="hero-plus" class="w-4 h-4 mr-1 text-gray-800" /> New Article
-            </.link>
-          </div>
-        </div>
+        <.main_title_div>
+          <.back_link
+            navigate={~p"/user/dashboard"}
+            icon="hero-arrow-left"
+          />
+          <.span_custom variant="main-title">{@page_title}</.span_custom>
+        </.main_title_div>
 
-        <%!-- Search & Filter --%>
+        <%!-------------------------%>
+        <%!-- SEARCH & FILTER--%>
+        <%!-------------------------%>
 
-        <div class="mb-6 flex flex-row">
+        <div class="flex flex-col justify-between mb-5 items-start gap-5 md:flex-row md:items-center">
+          <.link navigate={~p"/user/articles/new"}>
+            <.span_custom variant="yellow">
+              <.icon name="hero-plus" class="w-4 h-4 mr-1 text-gray-100" /> Buat Artikel
+            </.span_custom>
+          </.link>
+
           <.form
-            class="flex flex-col md:flex-row gap-4 w-full justify-between"
+            class="flex flex-col md:flex-row gap-1 w-full md:w-auto"
             for={@form}
             id="filter-form"
             phx-change="filter"
           >
-            <div class="w-full">
-              <.input
-                field={@form[:q]}
-                placeholder="Search your articles..."
-                autocomplete="off"
-                phx-debounce="500"
-              />
-            </div>
+            <.input
+              field={@form[:q]}
+              placeholder="Search your articles..."
+              autocomplete="off"
+              phx-debounce="500"
+            />
 
-            <div class="flex flex-row items-center gap-3 justify-start">
-              <.input
-                type="select"
-                field={@form[:sort_by]}
-                prompt="Sort By"
-                options={[
-                  Latest: "inserted_at_asc",
-                  Oldest: "inserted_at_desc",
-                  "A to Z": "article_name_asc",
-                  "Z to A": "article_name_desc"
-                ]}
-              />
-
-              <.link class="hover:text-[#fedf16e0]" patch={~p"/user/articles"}>
-                Reset
-              </.link>
-            </div>
+            <.input
+              type="select"
+              field={@form[:sort_by]}
+              prompt="Sort By"
+              options={[
+                Latest: "inserted_at_desc",
+                Oldest: "inserted_at_asc",
+                "A to Z": "article_name_asc",
+                "Z to A": "article_name_desc"
+              ]}
+            />
           </.form>
         </div>
 
-        <%!-- Loading States & Table --%>
+        <%!-------------------------%>
+        <%!-- LOADING STATES & TABLE --%>
+        <%!-------------------------%>
 
         <%= cond do %>
           <% @searching -> %>
@@ -191,6 +194,10 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
               </div>
             </div>
           <% true -> %>
+            <%!-------------------------%>
+            <%!-- TABLE FOUND --%>
+            <%!-------------------------%>
+
             <div class="border border-gray-600 p-3 rounded-lg overflow-x-auto">
               <.table id="articles" rows={@streams.articles}>
                 <:col :let={{_id, article}} label="Title">
@@ -200,17 +207,17 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
                         navigate={~p"/articles/#{article.id}"}
                         class="font-semibold hover:text-primary transition-colors"
                       >
-                        {article.article_name}
+                        {truncate(article.article_name, 30)}
                       </.link>
                       <div class="text-sm text-gray-400 mt-3">
-                        {article.content |> quill_plain_text() |> String.slice(0, 80)}...
+                        {article.content |> quill_plain_text() |> String.slice(0, 30)}...
                       </div>
                     </div>
                   </div>
                 </:col>
 
                 <:col :let={{_id, article}} label="Status">
-                  <div class={"badge p-4 font-bold " <> status_badge_class(article.status)}>
+                  <div class={"badge p-4 font-bold text-sm " <> status_badge_class(article.status)}>
                     {article.status}
                   </div>
                 </:col>
@@ -218,11 +225,15 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
                 <:col :let={{_id, article}} label="Views">
                   <div class="flex items-center gap-1 text-gray-200">
                     <.icon name="hero-eye" class="w-4 h-4 mr-1 text-gray-400" />
-                    {article.view_count}
+                    {Dashboard.get_article_total_views(article.id)}
                   </div>
                 </:col>
 
-                <:col :let={{_id, article}} label="Last Updated">
+                <:col :let={{_id, article}} label="Created">
+                  {Calendar.strftime(article.inserted_at, "%b %d, %Y")}
+                </:col>
+
+                <:col :let={{_id, article}} label="Updated">
                   {Calendar.strftime(article.updated_at, "%b %d, %Y")}
                 </:col>
 
@@ -244,7 +255,9 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
               </.table>
             </div>
 
-            <%!-- Pagination --%>
+            <%!-------------------------%>
+            <%!-- PAGINATION --%>
+            <%!-------------------------%>
 
             <%= if @pagination do %>
               <.pagination_controls pagination={@pagination} params={@form.params} />
@@ -309,6 +322,16 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
   # ============================================================================
   # PRIVATE HELPER
   # ============================================================================
+
+  defp truncate(text, length) when is_binary(text) do
+    if String.length(text) > length do
+      String.slice(text, 0, length) <> "..."
+    else
+      text
+    end
+  end
+
+  defp truncate(nil, _length), do: ""
 
   defp build_pagination_path(params, page) do
     new_params = Map.put(params || %{}, "page", to_string(page))

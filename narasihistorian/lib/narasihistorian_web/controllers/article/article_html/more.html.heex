@@ -1,0 +1,70 @@
+<%!-- ------ --%>
+<%!-- CARDS --%>
+<%!-- ------ --%>
+
+<div id="new-articles-batch">
+  <%= for article <- @articles do %>
+    <.link
+      href={~p"/articles/#{article.id}"}
+      class="group card shadow-2xl hover:bg-base-300 transition-all duration-300"
+    >
+      <div class="flex justify-start p-5 text-base font-bold">
+        <.icon name="hero-list-bullet" class="w-5 h-5 mt-1 mr-2 text-[#fedf16e0]" />
+        {article.category.category_name}
+      </div>
+      <div class="flex flex-row md:flex-col">
+        <figure class="relative overflow-hidden h-64 flex-1 md:flex-auto">
+          <img
+            src={article.image}
+            alt={article.article_name}
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </figure>
+        <div class="card-body flex-1 md:flex-auto">
+          <h2 class="card-title group-hover:text-primary transition-colors">
+            {truncate(article.article_name, 30)}
+          </h2>
+          <p class="text-base-content/70 line-clamp-3">
+            {article.content |> quill_plain_text() |> String.slice(0, 30)}...
+          </p>
+
+          <p class="text-xs text-gray-300 mt-4">
+            Penulis:&nbsp <span class="text-white font-bold">{article.user.username}</span>
+          </p>
+          <div class="flex flex-row flex-wrap justify-between items-center mt-2">
+            <time class="text-xs pb-2">
+              {time_ago_short(article.inserted_at)}
+            </time>
+            <div>
+              <p class="text-xs text-gray-300 pb-2">
+                <.icon name="hero-eye" class="w-4 h-4 mr-1" />
+                {article.view_count}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </.link>
+  <% end %>
+</div>
+
+<%!-- UPDATED LOAD MORE BUTTON --%>
+
+<div id="new-load-more-container">
+  <%= if @next_cursor do %>
+    <button
+      id="load-more-btn"
+      class="btn btn-outline border-[#fedf16e0] text-[#fedf16e0] hover:bg-[#fedf16e0] hover:text-black hover:border-[#fedf16e0] px-10"
+      data-next-cursor={@next_cursor}
+      data-search={@search_query}
+      data-category={@selected_category}
+      data-url="/articles/more"
+      data-target="articles-grid"
+      onclick="loadMore(this)"
+    >
+      Muat Lebih Banyak
+    </button>
+  <% else %>
+    <p class="text-sm text-base-content/40 py-4">Semua artikel telah dimuat</p>
+  <% end %>
+</div>

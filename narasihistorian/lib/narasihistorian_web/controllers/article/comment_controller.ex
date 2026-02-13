@@ -3,7 +3,9 @@ defmodule NarasihistorianWeb.CommentController do
 
   alias Narasihistorian.Comments
 
+  # ============================================================================
   # CREATE COMMENT
+  # ============================================================================
 
   def create(conn, %{"id" => article_id, "comment" => comment_params}) do
     comment_params =
@@ -29,7 +31,9 @@ defmodule NarasihistorianWeb.CommentController do
     end
   end
 
+  # ============================================================================
   # DELETE COMMENT
+  # ============================================================================
 
   def delete(conn, %{"id" => article_id, "comment_id" => comment_id}) do
     user = conn.assigns.current_user
