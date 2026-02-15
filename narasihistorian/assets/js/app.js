@@ -32,6 +32,9 @@ import { DashboardHooks } from "./dashboard_hooks";
 
 import Swiper from "swiper/bundle";
 import "swiper/css/bundle";
+window.Swiper = Swiper;
+
+import "./home_swiper";
 
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -122,7 +125,6 @@ async function loadMore(btn) {
     '<span class="loading loading-spinner loading-sm"></span> Memuat...';
 
   try {
-    // Build the fetch URL
     const params = new URLSearchParams({ cursor: nextCursor });
     if (search) params.set("q", search);
     if (category) params.set("category", category);
@@ -143,29 +145,24 @@ async function loadMore(btn) {
 
     const grid = document.getElementById(targetId);
     if (grid && batch) {
-      // Move each card child into the grid (skip the wrapper div)
-
       while (batch.firstChild) {
         grid.appendChild(batch.firstChild);
       }
     }
 
     // Replace the old load-more-container with the new one
+
     const oldContainer = document.getElementById("load-more-container");
     if (oldContainer && newBtnContainer) {
-      // Copy classes from old container
       newBtnContainer.id = "load-more-container";
       newBtnContainer.className = oldContainer.className;
       oldContainer.replaceWith(newBtnContainer);
     }
   } catch (err) {
     console.error("Load more failed:", err);
-    // Restore button on error so user can retry
     btn.disabled = false;
     btn.innerHTML = "Muat Lebih Banyak";
   }
 }
 
 window.loadMore = loadMore;
-
-window.Swiper = Swiper;

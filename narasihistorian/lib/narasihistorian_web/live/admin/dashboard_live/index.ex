@@ -31,7 +31,7 @@ defmodule NarasihistorianWeb.Admin.DashboardLive.Index do
       {:ok,
        socket
        |> put_flash(:error, "Akses Dashboard Hanya Berlaku Untuk Admin")
-       |> redirect(to: ~p"/admin/articles")}
+       |> redirect(to: ~p"/")}
     end
   end
 

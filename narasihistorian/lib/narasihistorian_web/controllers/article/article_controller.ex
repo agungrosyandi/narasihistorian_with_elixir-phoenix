@@ -18,12 +18,17 @@ defmodule NarasihistorianWeb.ArticleController do
 
     filter_by_categories = Categories.category_name_and_slugs()
 
+    recent_articles = Articles.list_recent_articles(6)
+    popular_articles = Articles.list_popular_articles(6)
+
     conn
     |> assign(:articles, articles)
     |> assign(:search_query, params["q"] || "")
     |> assign(:selected_category, params["category"] || "")
     |> assign(:category_options, filter_by_categories)
     |> assign(:next_cursor, next_cursor)
+    |> assign(:recent_articles, recent_articles)
+    |> assign(:popular_articles, popular_articles)
     |> render(:index)
   end
 
@@ -117,7 +122,7 @@ defmodule NarasihistorianWeb.ArticleController do
   end
 
   # ============================================================================
-  # PRIVATE
+  # PRIVATE HELPER
   # ============================================================================
 
   defp get_client_ip(conn) do
@@ -133,4 +138,18 @@ defmodule NarasihistorianWeb.ArticleController do
       [] -> nil
     end
   end
+
+  # ============================================================================
+  # PRIVATE HELPER LOAD MORE FOR COMMENT INFINITE SCROOL
+  # ============================================================================
+
+  # defp load_categories(socket) do
+  #   %{page: page, per_page: per_page} = socket.assigns
+
+  #   categories = Categories.list_categories(page: page, per_page: per_page)
+
+  #   socket
+  #   |> stream(:categories, categories)
+  #   |> assign(:end_of_list?, length(categories) < per_page)
+  # end
 end

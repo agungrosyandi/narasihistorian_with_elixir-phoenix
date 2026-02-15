@@ -252,4 +252,29 @@ defmodule Narasihistorian.Articles do
 
     %{articles: articles, next_cursor: next_cursor}
   end
+
+  # ============================================================================
+  # RECENT ARTICLES — for homepage swiper (latest 8 by inserted_at)
+  # ============================================================================
+
+  def list_recent_articles(limit \\ 8) do
+    Article
+    |> order_by([a], desc: a.inserted_at)
+    |> limit(^limit)
+    |> preload([:category, :user])
+    |> Repo.all()
+  end
+
+  # ============================================================================
+  # POPULAR ARTICLES — for homepage swiper (top by view_count)
+  # ============================================================================
+
+  def list_popular_articles(limit \\ 6) do
+    Article
+    |> where([a], not is_nil(a.image))
+    |> order_by([a], desc: a.view_count, desc: a.inserted_at)
+    |> limit(^limit)
+    |> preload([:category, :user])
+    |> Repo.all()
+  end
 end
