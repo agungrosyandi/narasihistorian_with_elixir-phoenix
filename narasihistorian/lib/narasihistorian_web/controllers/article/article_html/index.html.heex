@@ -284,20 +284,33 @@
         <%= for article <- @articles do %>
           <.link
             href={~p"/articles/#{article.id}"}
-            class="group card shadow-2xl hover:bg-base-300 transition-all duration-300"
+            class="group card  shadow-2xl hover:bg-base-300 transition-all duration-300"
           >
+            <%!-- ------------- --%>
+            <%!-- CATEGORY NAME --%>
+            <%!-- ------------- --%>
+
             <div class="flex justify-start p-5 text-base font-bold">
               <.icon name="hero-list-bullet" class="w-5 h-5 mt-1 mr-2 text-[#fedf16e0]" />
               {article.category.category_name}
             </div>
             <div class="flex flex-row md:flex-col">
-              <figure class="relative overflow-hidden h-64 flex-1 md:flex-auto">
+              <%!-- ------------- --%>
+              <%!-- IMAGE --%>
+              <%!-- ------------- --%>
+
+              <figure class="relative overflow-hidden rounded-xl h-64 flex-1 md:flex-auto">
                 <img
                   src={article.image}
                   alt={article.article_name}
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </figure>
+
+              <%!-- ------------- --%>
+              <%!-- META --%>
+              <%!-- ------------- --%>
+
               <div class="card-body flex-1 md:flex-auto">
                 <h2 class="card-title group-hover:text-primary transition-colors">
                   {truncate(article.article_name, 30)}
@@ -356,13 +369,22 @@
     <div class="border-t border-gray-500 mt-10"></div>
     <footer class="relative gap-2 flex flex-col justify-between items-center py-10">
       <div class="relative flex flex-col justify-between items-center md:flex-row md:gap-10">
+        <%!-- ------------- --%>
+        <%!-- IMAGE --%>
+        <%!-- ------------- --%>
+
         <div class="w-[100%] flex-1">
           <img
-            class="relative h-[full] w-full object-cover"
+            class="relative h-[full] w-full object-cover rounded-xl"
             src="/images/closng-background-cover.jpg"
             alt="My Image"
           />
         </div>
+
+        <%!-- ------------- --%>
+        <%!-- DESCRIPTION --%>
+        <%!-- ------------- --%>
+
         <div class="py-10 gap-5 flex-1 flex flex-col justify-center items-center md:px-5">
           <div>
             <span class="text-[#ffffffe0] font-bold text-xl">Tentang Narasi</span>

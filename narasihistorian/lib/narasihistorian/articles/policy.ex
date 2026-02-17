@@ -1,9 +1,4 @@
 defmodule Narasihistorian.Articles.Policy do
-  @moduledoc """
-  Authorization policy for articles.
-  Defines what users can do with articles.
-  """
-
   alias Narasihistorian.Accounts.User
   alias Narasihistorian.Articles.Article
 

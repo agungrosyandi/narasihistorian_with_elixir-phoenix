@@ -1,4 +1,4 @@
-defmodule NarasihistorianWeb.UserLive.ResetPassword do
+defmodule NarasihistorianWeb.Auth.ResetPassword do
   use NarasihistorianWeb, :live_view
 
   alias Narasihistorian.Accounts

@@ -1,4 +1,4 @@
-defmodule NarasihistorianWeb.UserLive.ForgotPassword do
+defmodule NarasihistorianWeb.Auth.ForgotPassword do
   use NarasihistorianWeb, :live_view
 
   alias Narasihistorian.Accounts

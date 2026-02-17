@@ -18,8 +18,6 @@ defmodule NarasihistorianWeb.CategoryHTML do
   def reading_time(text) when is_binary(text) do
     word_count = text |> String.split() |> length()
 
-    # Average reading speed: 200 words per minute
-
     max(1, div(word_count, 200))
   end
 

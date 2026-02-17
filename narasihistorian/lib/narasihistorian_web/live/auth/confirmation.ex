@@ -1,4 +1,4 @@
-defmodule NarasihistorianWeb.UserLive.Confirmation do
+defmodule NarasihistorianWeb.Auth.Confirmation do
   use NarasihistorianWeb, :live_view
 
   alias Narasihistorian.Accounts

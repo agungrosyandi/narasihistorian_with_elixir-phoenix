@@ -1,40 +1,18 @@
-// If you want to use Phoenix channels, run `mix help phx.gen.channel`
-// to get started and then uncomment the line below.
-// import "./user_socket.js"
-
-// You can include dependencies in two ways.
-//
-// The simplest option is to put them in assets/vendor and
-// import them using relative paths:
-//
-//     import "../vendor/some-package.js"
-//
-// Alternatively, you can `npm install some-package --prefix assets` and import
-// them using a path starting with the package name:
-//
-//     import "some-package"
-//
-// If you have dependencies that try to import CSS, esbuild will generate a separate `app.css` file.
-// To load it, simply add a second `<link>` to your `root.html.heex` file.
-
-// Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html";
-// Establish Phoenix Socket and LiveView configuration.
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import { hooks as colocatedHooks } from "phoenix-colocated/narasihistorian";
 import topbar from "../vendor/topbar";
 
 import Hooks from "./hooks";
-
 import Chart from "chart.js/auto";
 import { DashboardHooks } from "./dashboard_hooks";
 
 import Swiper from "swiper/bundle";
 import "swiper/css/bundle";
-window.Swiper = Swiper;
 
 import "./home_swiper";
+import "./loadmore";
 
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -46,6 +24,7 @@ const liveSocket = new LiveSocket("/live", Socket, {
 });
 
 window.Chart = Chart;
+window.Swiper = Swiper;
 
 // Show progress bar on live navigation and form submits
 
@@ -106,63 +85,3 @@ if (process.env.NODE_ENV === "development") {
     },
   );
 }
-
-// ======================================
-// CURSOR BASED WITH INFINITY SCROOL UI
-// ======================================
-
-async function loadMore(btn) {
-  const nextCursor = btn.dataset.nextCursor;
-  const url = btn.dataset.url;
-  const targetId = btn.dataset.target || "articles-grid";
-  const search = btn.dataset.search || "";
-  const category = btn.dataset.category || "";
-
-  // Show loading state on the button
-
-  btn.disabled = true;
-  btn.innerHTML =
-    '<span class="loading loading-spinner loading-sm"></span> Memuat...';
-
-  try {
-    const params = new URLSearchParams({ cursor: nextCursor });
-    if (search) params.set("q", search);
-    if (category) params.set("category", category);
-
-    const res = await fetch(`${url}?${params.toString()}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const html = await res.text();
-
-    // Parse the returned HTML fragment
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const batch = doc.getElementById("new-articles-batch");
-    const newBtnContainer = doc.getElementById("new-load-more-container");
-
-    // Append new cards into the grid
-
-    const grid = document.getElementById(targetId);
-    if (grid && batch) {
-      while (batch.firstChild) {
-        grid.appendChild(batch.firstChild);
-      }
-    }
-
-    // Replace the old load-more-container with the new one
-
-    const oldContainer = document.getElementById("load-more-container");
-    if (oldContainer && newBtnContainer) {
-      newBtnContainer.id = "load-more-container";
-      newBtnContainer.className = oldContainer.className;
-      oldContainer.replaceWith(newBtnContainer);
-    }
-  } catch (err) {
-    console.error("Load more failed:", err);
-    btn.disabled = false;
-    btn.innerHTML = "Muat Lebih Banyak";
-  }
-}
-
-window.loadMore = loadMore;

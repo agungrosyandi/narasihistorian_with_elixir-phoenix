@@ -5,6 +5,8 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
 
   import NarasihistorianWeb.CustomComponents, only: [admin_user_nav: 1]
 
+  @take_article_per_page 10
+
   # ============================================================================
   # MOUNT
   # ============================================================================
@@ -177,16 +179,14 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
   # ============================================================================
 
   @impl true
-  def handle_params(params, _uri, socket) do
+  def handle_params(params, _uri, %{assigns: %{current_user: current_user}} = socket) do
     # IO.inspect(self(), label: "HANDLE PARAMS")
-
-    current_user = socket.assigns.current_user
 
     if socket.assigns.searching do
       send(self(), {:load_articles, params})
       {:noreply, socket}
     else
-      pagination = Admin.filter_articles(params, [per_page: 10], current_user)
+      pagination = Admin.filter_articles(params, [per_page: @take_article_per_page], current_user)
 
       socket =
         socket
@@ -203,12 +203,10 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
   # ============================================================================
 
   @impl true
-  def handle_info({:load_articles, params}, socket) do
+  def handle_info({:load_articles, params}, %{assigns: %{current_user: current_user}} = socket) do
     # IO.inspect(self(), label: "HANDLE INFO")
 
-    current_user = socket.assigns.current_user
-
-    pagination = Admin.filter_articles(params, [per_page: 10], current_user)
+    pagination = Admin.filter_articles(params, [per_page: @take_article_per_page], current_user)
 
     socket =
       socket
@@ -240,11 +238,8 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    current_user = socket.assigns.current_user
-
+  def handle_event("delete", %{"id" => id}, %{assigns: %{current_user: current_user}} = socket) do
     id = if is_binary(id), do: String.to_integer(id), else: id
-
     article = Admin.get_article!(id)
 
     case Admin.delete_article(article, current_user) do
@@ -333,7 +328,7 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
   end
 
   # ============================================================================
-  # PRIVATE HELPER
+  # PRIVATE HELPER PAGINATION
   # ============================================================================
 
   defp build_pagination_path(params, page) do
@@ -360,6 +355,10 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
     end
   end
 
+  # ============================================================================
+  # PRIVATE HELPER DISPLAY AUTHOR
+  # ============================================================================
+
   defp display_author(article) do
     case article.user do
       %{username: username} -> username
@@ -367,7 +366,9 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Index do
     end
   end
 
-  # truncate
+  # ============================================================================
+  # PRIVATE HELPER TRUNCATE TEXT
+  # ============================================================================
 
   defp truncate(text, length) when is_binary(text) do
     if String.length(text) > length do

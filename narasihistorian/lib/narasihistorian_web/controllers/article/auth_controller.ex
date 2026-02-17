@@ -16,12 +16,10 @@ defmodule NarasihistorianWeb.AuthController do
 
     conn
     |> put_flash(:error, "Failed to authenticate with Google. Please try again.")
-    |> redirect(to: ~p"/users/log_in")
+    |> redirect(to: ~p"/users/log-in")
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
-    # Extract user info from OAuth response
-
     user_attrs = %{
       email: auth.info.email,
       username: generate_username(auth),
@@ -47,7 +45,7 @@ defmodule NarasihistorianWeb.AuthController do
 
         conn
         |> put_flash(:error, "Failed to sign in: #{errors}")
-        |> redirect(to: ~p"/users/log_in")
+        |> redirect(to: ~p"/users/log-in")
     end
   end
 
@@ -57,14 +55,14 @@ defmodule NarasihistorianWeb.AuthController do
 
   defp generate_username(auth) do
     cond do
-      # Use name if available
+      # name if available
 
       auth.info.name && auth.info.name != "" ->
         auth.info.name
         |> String.replace(~r/[^a-zA-Z0-9_]/, "")
         |> String.slice(0..24)
 
-      # Use email prefix
+      # email prefix
 
       auth.info.email ->
         auth.info.email
@@ -105,8 +103,6 @@ defmodule NarasihistorianWeb.AuthController do
       end)
     end)
     |> Enum.map(fn {field, errors} ->
-      # Convert errors list to string properly
-
       error_messages =
         errors
         |> List.flatten()

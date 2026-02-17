@@ -5,6 +5,8 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
 
   alias Narasihistorian.Dashboard
 
+  @number_per_page_pagination_offset 5
+
   # ============================================================================
   # MOUNT
   # ============================================================================
@@ -26,18 +28,23 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
   # ============================================================================
 
   @impl true
-  def handle_params(params, _uri, socket) do
-    current_user = socket.assigns.current_user
-
+  def handle_params(params, _uri, %{assigns: %{current_user: current_user}} = socket) do
     if socket.assigns.searching do
       send(self(), {:load_articles, params})
       {:noreply, socket}
     else
-      pagination = Admin.filter_articles(params, [per_page: 10], current_user)
+      pagination =
+        Admin.filter_articles(
+          params,
+          [per_page: @number_per_page_pagination_offset],
+          current_user
+        )
+
+      pagination_entries = pagination.entries
 
       socket =
         socket
-        |> stream(:articles, pagination.entries, reset: true)
+        |> stream(:articles, pagination_entries, reset: true)
         |> assign(:form, to_form(params))
         |> assign(:pagination, pagination)
 
@@ -50,13 +57,15 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
   # ============================================================================
 
   @impl true
-  def handle_info({:load_articles, params}, socket) do
-    current_user = socket.assigns.current_user
-    pagination = Admin.filter_articles(params, [per_page: 10], current_user)
+  def handle_info({:load_articles, params}, %{assigns: %{current_user: current_user}} = socket) do
+    pagination =
+      Admin.filter_articles(params, [per_page: @number_per_page_pagination_offset], current_user)
+
+    pagination_entries = pagination.entries
 
     socket =
       socket
-      |> stream(:articles, pagination.entries, reset: true)
+      |> stream(:articles, pagination_entries, reset: true)
       |> assign(:form, to_form(params))
       |> assign(:pagination, pagination)
       |> assign(:searching, false)
@@ -85,8 +94,7 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    current_user = socket.assigns.current_user
+  def handle_event("delete", %{"id" => id}, %{assigns: %{current_user: current_user}} = socket) do
     id = if is_binary(id), do: String.to_integer(id), else: id
     article = Admin.get_article!(id)
 
@@ -185,7 +193,7 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
             <div class="card bg-base-200">
               <div class="card-body text-center py-12">
                 <.icon name="hero-clipboard-document" class="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <h3 class="text-xl font-semibold mb-2">No articles found</h3>
+                <h3 class="text-xl font-semibold mb-2">Artikel tidak ditemukan</h3>
                 <p class="text-gray-400 mb-4">
                   <%= if @form.params["q"] do %>
                     Pencarianmu Tidak Ditemukan

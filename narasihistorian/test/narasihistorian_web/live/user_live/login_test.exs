@@ -26,7 +26,7 @@ defmodule NarasihistorianWeb.UserLive.LoginTest do
 
   describe "user login" do
     test "redirects if user login with valid credentials", %{conn: conn} do
-      password = "123456789abcd"
+      password = valid_user_password()
       user = user_fixture(%{password: password})
 
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")

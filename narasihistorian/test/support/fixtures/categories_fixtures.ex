@@ -1,30 +1,16 @@
 defmodule Narasihistorian.CategoriesFixtures do
-  @moduledoc """
-  This module defines test helpers for creating
-  entities via the `Narasihistorian.Categories` context.
-  """
+  import Narasihistorian.AccountsFixtures
 
-  @doc """
-  Generate a unique category category_name.
-  """
-  def unique_category_category_name, do: "some category_name#{System.unique_integer([:positive])}"
+  def category_fixture(attrs \\ %{}, user \\ nil) do
+    user = user || user_fixture()
 
-  @doc """
-  Generate a unique category slug.
-  """
-  def unique_category_slug, do: "some slug#{System.unique_integer([:positive])}"
-
-  @doc """
-  Generate a category.
-  """
-  def category_fixture(attrs \\ %{}) do
     {:ok, category} =
       attrs
       |> Enum.into(%{
-        category_name: unique_category_category_name(),
-        slug: unique_category_slug()
+        category_name: "category #{System.unique_integer([:positive])}",
+        slug: "category-slug-#{System.unique_integer([:positive])}"
       })
-      |> Narasihistorian.Categories.create_category()
+      |> Narasihistorian.Categories.create_category(user)
 
     category
   end

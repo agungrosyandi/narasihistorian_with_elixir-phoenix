@@ -17,6 +17,32 @@ defmodule Narasihistorian.Comments do
 
   def list_comments, do: Repo.all(Comment)
 
+  def list_comments_paginated(article_id, opts \\ []) do
+    page = Keyword.get(opts, :page, 1)
+    per_page = Keyword.get(opts, :per_page, 5)
+    offset = (page - 1) * per_page
+
+    total_count =
+      from(c in Comment, where: c.article_id == ^article_id)
+      |> Repo.aggregate(:count, :id)
+
+    comments =
+      from(c in Comment,
+        where: c.article_id == ^article_id,
+        order_by: [desc: c.inserted_at],
+        limit: ^per_page,
+        offset: ^offset,
+        preload: [:user]
+      )
+      |> Repo.all()
+
+    %{
+      comments: comments,
+      total_count: total_count,
+      has_more: offset + per_page < total_count
+    }
+  end
+
   def get_comment!(id), do: Repo.get!(Comment, id)
 
   # ============================================================================

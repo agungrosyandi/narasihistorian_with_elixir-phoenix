@@ -1,4 +1,4 @@
-defmodule NarasihistorianWeb.UserLive.Registration do
+defmodule NarasihistorianWeb.Auth.Registration do
   use NarasihistorianWeb, :live_view
 
   alias Narasihistorian.Accounts

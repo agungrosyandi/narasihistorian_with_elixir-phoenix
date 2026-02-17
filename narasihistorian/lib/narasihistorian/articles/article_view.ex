@@ -24,7 +24,7 @@ defmodule Narasihistorian.Articles.ArticleView do
 
   def changeset(article_view, attrs) do
     required_fields = [:article_id, :ip_address, :viewed_at]
-    optional_fields = [:article_id, :ip_address, :user_agent, :viewed_at]
+    optional_fields = [:user_agent]
 
     article_view
     |> cast(attrs, required_fields ++ optional_fields)

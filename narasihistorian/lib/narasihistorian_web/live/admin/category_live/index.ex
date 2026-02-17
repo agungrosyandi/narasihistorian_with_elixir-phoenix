@@ -2,7 +2,11 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Index do
   use NarasihistorianWeb, :live_view
 
   alias Narasihistorian.Categories
+
   import NarasihistorianWeb.CustomComponents, only: [admin_user_nav: 1]
+
+  @take_page 1
+  @take_per_page 5
 
   # ============================================================================
   # MOUNT
@@ -15,7 +19,7 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Index do
         socket
         |> assign(:page_title, "Kategori")
         |> assign(:current_page, :categories)
-        |> assign(page: 1, per_page: 3)
+        |> assign(page: @take_page, per_page: @take_per_page)
         |> assign(:end_of_list?, false)
         |> stream(:categories, [])
         |> load_categories()
@@ -104,7 +108,7 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Index do
             phx-click="load-more"
             phx-disable-with="Loading..."
           >
-            Load More
+            Muat Lebih Banyak
           </.button_custom>
 
           <p :if={@end_of_list?} class="text-gray-500 text-sm">
@@ -139,25 +143,25 @@ defmodule NarasihistorianWeb.Admin.CategoryLive.Index do
         {:noreply,
          socket
          |> stream_delete(:categories, category)
-         |> put_flash(:info, "Category deleted successfully")}
+         |> put_flash(:info, "Kategori berhasil dihapus")}
 
       {:error, :has_articles} ->
         {:noreply,
          socket
          |> put_flash(
            :error,
-           "Cannot delete category that has articles. Please delete or move the articles first."
+           "Untuk menghapus kategori, hapus terlebh dahulu artikel yang berkaitan dengan kategori yang ingin dihapus "
          )}
 
       {:error, _changeset} ->
         {:noreply,
          socket
-         |> put_flash(:error, "Failed to delete category")}
+         |> put_flash(:error, "Gagal menghapus kategori")}
     end
   end
 
   # ============================================================================
-  # PRIVATE HELPER
+  # PRIVATE HELPER LOAD CATEGORIES
   # ============================================================================
 
   defp load_categories(socket) do

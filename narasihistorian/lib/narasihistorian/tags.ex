@@ -48,13 +48,9 @@ defmodule Narasihistorian.Tags do
 
   # Add function to get tag by slug
 
-  def get_tag_by_slug(slug) do
-    Repo.get_by(Tag, slug: slug)
-  end
+  def get_tag_by_slug(slug), do: Repo.get_by(Tag, slug: slug)
 
   # Add function to get tag by name
 
-  def get_tag_by_name(name) do
-    Repo.get_by(Tag, name: name)
-  end
+  def get_tag_by_name(name), do: Repo.get_by(Tag, name: name)
 end

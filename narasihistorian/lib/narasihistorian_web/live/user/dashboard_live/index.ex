@@ -12,19 +12,22 @@ defmodule NarasihistorianWeb.User.DashboardLive.Index do
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
 
+    page_title = "Dashboard"
+
     user_articles = Admin.filter_articles(%{}, [per_page: 1000], current_user)
-    recent_articles = Enum.take(user_articles.entries, 5)
+    user_articles_total_count = user_articles.total_count
+    user_articles_entries = user_articles.entries
 
-    # Calculate total views from ArticleView table
+    recent_articles = Enum.take(user_articles_entries, 5)
 
-    total_views = calculate_total_views(user_articles.entries)
+    total_views = calculate_total_views(user_articles_entries)
 
     socket =
       socket
-      |> assign(:page_title, "My Dashboard")
-      |> assign(:total_articles, user_articles.total_count)
-      |> assign(:published_count, count_published(user_articles.entries))
-      |> assign(:draft_count, count_drafts(user_articles.entries))
+      |> assign(:page_title, page_title)
+      |> assign(:total_articles, user_articles_total_count)
+      |> assign(:published_count, count_published(user_articles_entries))
+      |> assign(:draft_count, count_drafts(user_articles_entries))
       |> assign(:total_views, total_views)
       |> assign(:recent_articles, recent_articles)
 
@@ -143,8 +146,8 @@ defmodule NarasihistorianWeb.User.DashboardLive.Index do
               <p class="text-gray-300 mb-4">Start creating your first article!</p>
 
               <div class="flex justify-center">
-                <.link navigate={~p"/user/articles/new"} class="btn btn-primary">
-                  Buat Artikel
+                <.link navigate={~p"/user/articles/new"}>
+                  <.span_custom variant="yellow">Buat Artikel</.span_custom>
                 </.link>
               </div>
             </div>
@@ -197,6 +200,10 @@ defmodule NarasihistorianWeb.User.DashboardLive.Index do
   # PRIVATE HELPER
   # ============================================================================
 
+  # =================================
+  # PRIVATE HELPER TEXT TRUNCATE
+  # =================================
+
   defp truncate(text, length) when is_binary(text) do
     if String.length(text) > length do
       String.slice(text, 0, length) <> "..."
@@ -207,10 +214,12 @@ defmodule NarasihistorianWeb.User.DashboardLive.Index do
 
   defp truncate(nil, _length), do: ""
 
+  # =================================
+  # PRIVATE HELPER METRIC ARTICLES
+  # =================================
+
   defp count_published(articles), do: Enum.count(articles, &(&1.status == "published"))
   defp count_drafts(articles), do: Enum.count(articles, &(&1.status == "draft"))
-
-  # NEW: Calculate total views from ArticleView table
 
   defp calculate_total_views(articles) do
     articles

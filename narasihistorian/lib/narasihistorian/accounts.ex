@@ -37,7 +37,9 @@ defmodule Narasihistorian.Accounts do
   # SETTINGS
   # ============================================================================
 
+  # ==============
   # EMAIL
+  # ==============
 
   def change_user_email(user, attrs \\ %{}) do
     User.email_changeset(user, attrs, validate_email: false)
@@ -81,7 +83,9 @@ defmodule Narasihistorian.Accounts do
     UserNotifier.deliver_update_email_instructions(user, update_email_url_fun.(encoded_token))
   end
 
+  # ==============
   # USERNAME
+  # ==============
 
   def change_user_username(user, attrs \\ %{}) do
     User.username_changeset(user, attrs)
@@ -93,7 +97,9 @@ defmodule Narasihistorian.Accounts do
     Repo.update(changeset)
   end
 
+  # ==============
   # PASSWORD
+  # ==============
 
   def change_user_password(user, attrs \\ %{}) do
     User.password_changeset(user, attrs, hash_password: false)

@@ -7,13 +7,21 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
       <%= for category <- @categories do %>
         <div class="flex flex-col gap-5 md:flex-row lg:flex-row">
+          <%!-- ------------- --%>
+          <%!-- IMAGE --%>
+          <%!-- ------------- --%>
+
           <div class="w-[100%] flex-1">
             <img
-              class="relative h-[25rem] w-full object-cover"
+              class="relative h-[25rem] w-full object-cover rounded-xl"
               src={category.image_category}
               alt={category.category_name}
             />
           </div>
+
+          <%!-- ------------- --%>
+          <%!-- META --%>
+          <%!-- ------------- --%>
 
           <div class="flex-1 shadow-2xl pb-14">
             <.list>

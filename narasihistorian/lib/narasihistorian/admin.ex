@@ -42,8 +42,9 @@ defmodule Narasihistorian.Admin do
     |> Repo.get!(id)
   end
 
-  def get_article_with_tags!(id) when is_binary(id),
-    do: get_article_with_tags!(String.to_integer(id))
+  def get_article_with_tags!(id) when is_binary(id) do
+    get_article_with_tags!(String.to_integer(id))
+  end
 
   def get_article_with_tags!(id) when is_integer(id) do
     Article

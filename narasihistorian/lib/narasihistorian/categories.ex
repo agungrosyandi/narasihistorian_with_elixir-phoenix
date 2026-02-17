@@ -14,8 +14,6 @@ defmodule Narasihistorian.Categories do
   # LIST CATEGORY
   # ============================================================================
 
-  # def list_categories, do: Repo.all(Category)
-
   def list_categories(opts \\ []) do
     page = Keyword.get(opts, :page, 1)
     per_page = Keyword.get(opts, :per_page, 10)

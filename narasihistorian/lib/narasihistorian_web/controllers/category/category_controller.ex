@@ -40,20 +40,20 @@ defmodule NarasihistorianWeb.CategoryController do
   # PRIVATE HELPER
   # ============================================================================
 
-  defp get_client_ip(conn) do
-    case Plug.Conn.get_req_header(conn, "x-forwarded-for") do
-      [ip | _] ->
-        ip |> String.split(",") |> List.first() |> String.trim()
+  # defp get_client_ip(conn) do
+  #   case Plug.Conn.get_req_header(conn, "x-forwarded-for") do
+  #     [ip | _] ->
+  #       ip |> String.split(",") |> List.first() |> String.trim()
 
-      [] ->
-        conn.remote_ip |> :inet.ntoa() |> to_string()
-    end
-  end
+  #     [] ->
+  #       conn.remote_ip |> :inet.ntoa() |> to_string()
+  #   end
+  # end
 
-  defp get_user_agent(conn) do
-    case Plug.Conn.get_req_header(conn, "user-agent") do
-      [user_agent | _] -> user_agent
-      [] -> nil
-    end
-  end
+  # defp get_user_agent(conn) do
+  #   case Plug.Conn.get_req_header(conn, "user-agent") do
+  #     [user_agent | _] -> user_agent
+  #     [] -> nil
+  #   end
+  # end
 end

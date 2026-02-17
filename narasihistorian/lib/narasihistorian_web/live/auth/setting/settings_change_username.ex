@@ -1,4 +1,4 @@
-defmodule NarasihistorianWeb.UserLive.Setting.SettingsChangeUsername do
+defmodule NarasihistorianWeb.Auth.Setting.SettingsChangeUsername do
   use NarasihistorianWeb, :live_view
 
   alias Narasihistorian.Accounts

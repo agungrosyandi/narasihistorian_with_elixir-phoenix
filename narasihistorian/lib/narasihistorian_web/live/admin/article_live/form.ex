@@ -273,9 +273,11 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
   def handle_event("add_tag", %{"tag" => tag_name}, socket) do
     tag_name = String.trim(tag_name)
 
+    selected_tags = socket.assigns.selected_tags
+
     socket =
-      if tag_name != "" and tag_name not in socket.assigns.selected_tags do
-        assign(socket, :selected_tags, socket.assigns.selected_tags ++ [tag_name])
+      if tag_name != "" and tag_name not in selected_tags do
+        assign(socket, :selected_tags, selected_tags ++ [tag_name])
       else
         socket
       end
@@ -286,6 +288,7 @@ defmodule NarasihistorianWeb.Admin.ArticleLive.Form do
   @impl true
   def handle_event("remove_tag", %{"tag" => tag}, socket) do
     selected_tags = Enum.reject(socket.assigns.selected_tags, &(&1 == tag))
+
     {:noreply, assign(socket, :selected_tags, selected_tags)}
   end
 

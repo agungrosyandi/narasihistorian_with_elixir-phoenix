@@ -7,13 +7,12 @@ defmodule NarasihistorianWeb.UserLive.ConfirmationInstructionsTest do
   alias Narasihistorian.Accounts
   alias Narasihistorian.Repo
 
-  setup do
-    %{user: user_fixture()}
-  end
+  setup do: %{user: user_fixture()}
 
   describe "Resend confirmation" do
     test "renders the resend confirmation page", %{conn: conn} do
       {:ok, _lv, html} = live(conn, ~p"/users/confirm")
+
       assert html =~ "Resend confirmation instructions"
     end
 

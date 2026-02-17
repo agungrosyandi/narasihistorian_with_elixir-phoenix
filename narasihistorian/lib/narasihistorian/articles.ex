@@ -38,7 +38,7 @@ defmodule Narasihistorian.Articles do
   end
 
   # ============================================================================
-  # filter articles (with search + category)
+  # filter articles (all, search + category)
   # ============================================================================
 
   def filter_articles(filter, cursor_param \\ nil) do

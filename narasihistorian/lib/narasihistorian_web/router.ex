@@ -36,6 +36,7 @@ defmodule NarasihistorianWeb.Router do
     get "/articles/tags/:tag_slug", ArticleController, :by_tag
     get "/articles/tags/:tag_slug/more", ArticleController, :by_tag_more
     get "/articles/:id", ArticleController, :show
+    get "/articles/:id/comments/more", ArticleController, :comments_more
 
     post "/articles/:id/comments", CommentController, :create
     delete "/articles/:id/comments/:comment_id", CommentController, :delete
@@ -132,10 +133,10 @@ defmodule NarasihistorianWeb.Router do
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{NarasihistorianWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      live "/users/register", UserLive.Registration, :new
-      live "/users/log-in", UserLive.Login, :new
-      live "/users/reset-password", UserLive.ForgotPassword, :new
-      live "/users/reset-password/:token", UserLive.ResetPassword, :edit
+      live "/users/register", Auth.Registration, :new
+      live "/users/log-in", Auth.Login, :new
+      live "/users/reset-password", Auth.ForgotPassword, :new
+      live "/users/reset-password/:token", Auth.ResetPassword, :edit
     end
 
     post "/users/log-in", UserSessionController, :create
@@ -146,10 +147,10 @@ defmodule NarasihistorianWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{NarasihistorianWeb.UserAuth, :ensure_authenticated}] do
-      live "/users/settings", UserLive.Settings, :edit
-      live "/users/settings/change-username", UserLive.Setting.SettingsChangeUsername, :edit
-      live "/users/settings/change-password", UserLive.Setting.SettingsChangePassword, :edit
-      live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      live "/users/settings", Auth.Settings, :edit
+      live "/users/settings/change-username", Auth.Setting.SettingsChangeUsername, :edit
+      live "/users/settings/change-password", Auth.Setting.SettingsChangePassword, :edit
+      live "/users/settings/confirm-email/:token", Auth.Settings, :confirm_email
     end
   end
 
@@ -160,8 +161,8 @@ defmodule NarasihistorianWeb.Router do
 
     live_session :current_user,
       on_mount: [{NarasihistorianWeb.UserAuth, :mount_current_user}] do
-      live "/users/confirm/:token", UserLive.Confirmation, :edit
-      live "/users/confirm", UserLive.ConfirmationInstructions, :new
+      live "/users/confirm/:token", Auth.Confirmation, :edit
+      live "/users/confirm", Auth.ConfirmationInstructions, :new
     end
   end
 end

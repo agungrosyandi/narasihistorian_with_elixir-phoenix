@@ -8,6 +8,10 @@ defmodule NarasihistorianWeb.ArticleController do
   alias Narasihistorian.Comments.Comment
   alias Narasihistorian.Tags
 
+  @take_articles 6
+  @take_comments 1
+  @comments_per_page 5
+
   # ============================================================================
   # INDEX — first page
   # ============================================================================
@@ -17,9 +21,8 @@ defmodule NarasihistorianWeb.ArticleController do
       Articles.filter_articles(params, nil)
 
     filter_by_categories = Categories.category_name_and_slugs()
-
-    recent_articles = Articles.list_recent_articles(6)
-    popular_articles = Articles.list_popular_articles(6)
+    recent_articles = Articles.list_recent_articles(@take_articles)
+    popular_articles = Articles.list_popular_articles(@take_articles)
 
     conn
     |> assign(:articles, articles)
@@ -33,7 +36,7 @@ defmodule NarasihistorianWeb.ArticleController do
   end
 
   # ============================================================================
-  # MORE — HTML fragment appended by JS when Load More is clicked
+  # MORE — HTML fragment appended by JS
   # ============================================================================
 
   def more(conn, params) do
@@ -55,22 +58,77 @@ defmodule NarasihistorianWeb.ArticleController do
   # ============================================================================
 
   def show(conn, %{"id" => id}) do
+    # ========================================
+    # ARTICLES
+    # ========================================
+
     article = Articles.get_articles!(id)
-    featured_articles = Articles.featured_article(article)
+    page_title = article.article_name
+
+    # ========================================
+    # COMMENTS
+    # ========================================
+
     changeset = Comments.change_comment(%Comment{})
     form_comment = Phoenix.Component.to_form(changeset, as: :comment)
+
+    # ========================================
+    # FEATURED ARTICLES
+    # ========================================
+
+    featured_articles = Articles.featured_article(article)
+
+    # ========================================
+    # cursor based pagination for comment
+    # ========================================
+
+    %{comments: comments, total_count: total_count, has_more: has_more} =
+      Comments.list_comments_paginated(article.id,
+        page: @take_comments,
+        per_page: @comments_per_page
+      )
+
+    # ===================
+    # IP VIEWS
+    # ===================
 
     ip_address = get_client_ip(conn)
     user_agent = get_user_agent(conn)
     Dashboard.track_article_view(article.id, ip_address, user_agent)
 
+    # ========================================
+    # RENDER
+    # ========================================
+
     conn
     |> assign(:article, article)
-    |> assign(:page_title, article.article_name)
+    |> assign(:page_title, page_title)
     |> assign(:featured_articles, featured_articles)
-    |> assign(:comments, article.comments)
+    |> assign(:comments, comments)
+    |> assign(:comments_total, total_count)
+    |> assign(:comments_has_more, has_more)
+    |> assign(:comments_next_page, 2)
     |> assign(:form, form_comment)
     |> render(:show)
+  end
+
+  # ============================================================================
+  # COMMENTS MORE — HTML fragment infinite scroll
+  # ============================================================================
+
+  def comments_more(conn, %{"id" => id} = params) do
+    page = params["page"] |> String.to_integer()
+    article = Articles.get_articles!(id)
+
+    %{comments: comments, has_more: has_more} =
+      Comments.list_comments_paginated(id, page: page, per_page: @comments_per_page)
+
+    conn
+    |> assign(:comments, comments)
+    |> assign(:article, article)
+    |> assign(:has_more, has_more)
+    |> assign(:next_page, page + 1)
+    |> render(:comments_more)
   end
 
   # ============================================================================
@@ -138,18 +196,4 @@ defmodule NarasihistorianWeb.ArticleController do
       [] -> nil
     end
   end
-
-  # ============================================================================
-  # PRIVATE HELPER LOAD MORE FOR COMMENT INFINITE SCROOL
-  # ============================================================================
-
-  # defp load_categories(socket) do
-  #   %{page: page, per_page: per_page} = socket.assigns
-
-  #   categories = Categories.list_categories(page: page, per_page: per_page)
-
-  #   socket
-  #   |> stream(:categories, categories)
-  #   |> assign(:end_of_list?, length(categories) < per_page)
-  # end
 end

@@ -1,4 +1,4 @@
-defmodule NarasihistorianWeb.UserLive.Login do
+defmodule NarasihistorianWeb.Auth.Login do
   use NarasihistorianWeb, :live_view
 
   # ============================================================================

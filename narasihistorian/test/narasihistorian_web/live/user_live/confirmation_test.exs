@@ -7,9 +7,7 @@ defmodule NarasihistorianWeb.UserLive.ConfirmationTest do
   alias Narasihistorian.Accounts
   alias Narasihistorian.Repo
 
-  setup do
-    %{user: user_fixture()}
-  end
+  setup do: %{user: user_fixture()}
 
   describe "Confirm user" do
     test "renders confirmation page", %{conn: conn} do

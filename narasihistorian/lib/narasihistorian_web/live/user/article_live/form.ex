@@ -14,9 +14,11 @@ defmodule NarasihistorianWeb.User.ArticleLive.Form do
   def mount(params, _, socket) do
     # IO.inspect(self(), label: "FORM MOUNT")
 
+    categories_options = Categories.category_name_and_ids()
+
     socket =
       socket
-      |> assign(:category_options, Categories.category_name_and_ids())
+      |> assign(:category_options, categories_options)
       |> assign(:tag_input, "")
       |> assign(:selected_tags, [])
       |> allow_upload(:image,
@@ -286,6 +288,7 @@ defmodule NarasihistorianWeb.User.ArticleLive.Form do
   @impl true
   def handle_event("remove_tag", %{"tag" => tag}, socket) do
     selected_tags = Enum.reject(socket.assigns.selected_tags, &(&1 == tag))
+
     {:noreply, assign(socket, :selected_tags, selected_tags)}
   end
 
@@ -299,6 +302,7 @@ defmodule NarasihistorianWeb.User.ArticleLive.Form do
 
   defp apply_action(socket, :new, _) do
     article = %Article{}
+
     changeset = Admin.change_article(article)
 
     socket
@@ -323,8 +327,7 @@ defmodule NarasihistorianWeb.User.ArticleLive.Form do
   # save article
   # ====================================
 
-  defp save_article(socket, :new, article_params) do
-    current_user = socket.assigns.current_user
+  defp save_article(%{assigns: %{current_user: current_user}} = socket, :new, article_params) do
     tags = socket.assigns.selected_tags
 
     case upload_to_r2(socket, article_params) do
@@ -365,9 +368,8 @@ defmodule NarasihistorianWeb.User.ArticleLive.Form do
     end
   end
 
-  defp save_article(socket, :edit, article_params) do
+  defp save_article(%{assigns: %{current_user: current_user}} = socket, :edit, article_params) do
     old_image = socket.assigns.article.image
-    current_user = socket.assigns.current_user
     tags = socket.assigns.selected_tags
 
     case upload_to_r2(socket, article_params) do
@@ -437,12 +439,10 @@ defmodule NarasihistorianWeb.User.ArticleLive.Form do
         case Uploader.upload_file(path, destination_key, entry.client_type) do
           {:ok, public_url} ->
             Logger.info("Successfully uploaded to R2: #{public_url}")
-            # ✅ Return just the URL, not {:ok, public_url}
             public_url
 
           {:error, reason} ->
             Logger.error("R2 upload failed: #{inspect(reason)}")
-            # ✅ Return error tuple
             {:error, reason}
         end
       end)
@@ -492,8 +492,8 @@ defmodule NarasihistorianWeb.User.ArticleLive.Form do
     end
   end
 
-  defp error_to_string(:too_large), do: "File is too large (max 5MB)"
-  defp error_to_string(:not_accepted), do: "File type not accepted (JPG, PNG, GIF, WebP only)"
-  defp error_to_string(:too_many_files), do: "Too many files selected (max 1)"
+  defp error_to_string(:too_large), do: "File terlalu besar (max 5MB)"
+  defp error_to_string(:not_accepted), do: "Format file tidak sesuai (JPG, PNG, GIF, WebP only)"
+  defp error_to_string(:too_many_files), do: "Terlalu banyak file (max 1)"
   defp error_to_string(err), do: "Upload error: #{inspect(err)}"
 end
