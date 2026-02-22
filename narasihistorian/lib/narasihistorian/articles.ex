@@ -2,40 +2,11 @@ defmodule Narasihistorian.Articles do
   alias Narasihistorian.Comments.Comment
   alias Narasihistorian.Articles.Article
   alias Narasihistorian.Repo
-  alias Ecto.Multi
   alias Narasihistorian.Tags
 
   import Ecto.Query
 
   @articles_per_page 6
-
-  # ============================================================================
-  # list articles (simple, no filter)
-  # ============================================================================
-
-  def list_articles(cursor_param \\ nil) do
-    decoded = decode_cursor(cursor_param)
-    limit = @articles_per_page
-
-    base =
-      from a in Article,
-        order_by: [desc: a.inserted_at, desc: a.id],
-        limit: ^(limit + 1)
-
-    query =
-      if decoded do
-        {cursor_time, cursor_id} = decoded
-
-        from a in base,
-          where:
-            a.inserted_at < ^cursor_time or
-              (a.inserted_at == ^cursor_time and a.id < ^cursor_id)
-      else
-        base
-      end
-
-    build_page(query, limit)
-  end
 
   # ============================================================================
   # filter articles (all, search + category)
@@ -69,39 +40,29 @@ defmodule Narasihistorian.Articles do
   end
 
   # ============================================================================
-  # search query
+  # RECENT ARTICLES — for homepage swiper (latest 8 by inserted_at)
   # ============================================================================
 
-  defp search_by(query, q) when q in ["", nil], do: query
-
-  defp search_by(query, q) do
-    search_term = "%#{q}%"
-
-    where(
-      query,
-      [a],
-      ilike(a.article_name, ^search_term) or
-        ilike(a.content, ^search_term)
-    )
+  def list_recent_articles(limit \\ 8) do
+    Article
+    |> order_by([a], desc: a.inserted_at)
+    |> limit(^limit)
+    |> preload([:category, :user])
+    |> Repo.all()
   end
 
   # ============================================================================
-  # filter by category
+  # POPULAR ARTICLES — for homepage swiper (top by view_count)
   # ============================================================================
 
-  defp filter_by_category(query, category_slug) when category_slug in ["", nil], do: query
-
-  defp filter_by_category(query, category_slug) do
-    query
-    |> join(:inner, [a], c in assoc(a, :category))
-    |> where([a, c], c.slug == ^category_slug)
+  def list_popular_articles(limit \\ 6) do
+    Article
+    |> where([a], not is_nil(a.image))
+    |> order_by([a], desc: a.view_count, desc: a.inserted_at)
+    |> limit(^limit)
+    |> preload([:category, :user])
+    |> Repo.all()
   end
-
-  # For better performance with 1000+ articles, add this migration:
-  # CREATE INDEX articles_name_trgm_idx ON articles USING gin(article_name gin_trgm_ops);
-  # CREATE INDEX articles_content_trgm_idx ON articles USING gin(content gin_trgm_ops);
-  # CREATE INDEX articles_cursor_idx ON articles (inserted_at DESC, id DESC);
-  # (Requires PostgreSQL pg_trgm extension for text search indexes)
 
   # ============================================================================
   # get single article
@@ -194,19 +155,6 @@ defmodule Narasihistorian.Articles do
   # tags
   # ============================================================================
 
-  def create_article_with_tags(attrs, tag_names) do
-    Multi.new()
-    |> Multi.run(:tags, fn _repo, _changes ->
-      {:ok, Tags.get_or_create_tags(tag_names) |> Enum.map(fn {:ok, tag} -> tag end)}
-    end)
-    |> Multi.insert(:article, fn %{tags: tags} ->
-      %Article{}
-      |> Article.changeset(attrs)
-      |> Ecto.Changeset.put_assoc(:tags, tags)
-    end)
-    |> Repo.transaction()
-  end
-
   def get_article_with_tags(id) do
     Article
     |> Repo.get(id)
@@ -254,27 +202,31 @@ defmodule Narasihistorian.Articles do
   end
 
   # ============================================================================
-  # RECENT ARTICLES — for homepage swiper (latest 8 by inserted_at)
+  # PRIVATE HELPER SEARCH QUERY
   # ============================================================================
 
-  def list_recent_articles(limit \\ 8) do
-    Article
-    |> order_by([a], desc: a.inserted_at)
-    |> limit(^limit)
-    |> preload([:category, :user])
-    |> Repo.all()
+  defp search_by(query, q) when q in ["", nil], do: query
+
+  defp search_by(query, q) do
+    search_term = "%#{q}%"
+
+    where(
+      query,
+      [a],
+      ilike(a.article_name, ^search_term) or
+        ilike(a.search_content, ^search_term)
+    )
   end
 
   # ============================================================================
-  # POPULAR ARTICLES — for homepage swiper (top by view_count)
+  # PRIVATE HELPER FILTER BY CATEGORY
   # ============================================================================
 
-  def list_popular_articles(limit \\ 6) do
-    Article
-    |> where([a], not is_nil(a.image))
-    |> order_by([a], desc: a.view_count, desc: a.inserted_at)
-    |> limit(^limit)
-    |> preload([:category, :user])
-    |> Repo.all()
+  defp filter_by_category(query, category_slug) when category_slug in ["", nil], do: query
+
+  defp filter_by_category(query, category_slug) do
+    query
+    |> join(:inner, [a], c in assoc(a, :category))
+    |> where([a, c], c.slug == ^category_slug)
   end
 end

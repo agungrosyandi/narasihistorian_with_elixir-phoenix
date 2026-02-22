@@ -1,8 +1,4 @@
 defmodule Narasihistorian.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
-  @moduledoc false
-
   use Application
 
   @impl true
@@ -12,7 +8,8 @@ defmodule Narasihistorian.Application do
       Narasihistorian.Repo,
       {DNSCluster, query: Application.get_env(:narasihistorian, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Narasihistorian.PubSub},
-      {Cachex, name: :dashboard_cache, limit: 100},
+      Supervisor.child_spec({Cachex, name: :dashboard_cache, limit: 100}, id: :dashboard_cache),
+      Supervisor.child_spec({Cachex, name: :sidebar_cache}, id: :sidebar_cache),
 
       # Start a worker by calling: Narasihistorian.Worker.start_link(arg)
       # {Narasihistorian.Worker, arg},

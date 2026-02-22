@@ -18,6 +18,7 @@ defmodule Narasihistorian.Articles.Article do
     field :image, :string, default: "/images/ancient-rome.jpg"
     field :view_count, :integer, default: 0
     field :status, :string, default: "published"
+    field :search_content, :string
 
     belongs_to :category, Category
     belongs_to :user, User
@@ -44,8 +45,6 @@ defmodule Narasihistorian.Articles.Article do
     |> normalize_quill_content()
     |> validate_required([:image])
     |> validate_required([:article_name], message: "Judul artikel wajib diisi")
-    |> validate_required([:content], message: "konten wajib diisi")
-    |> validate_length(:content, min: 10, message: "Konten minimal 10 karakter")
     |> validate_required([:category_id], message: "Kategori wajib diisi")
     |> validate_inclusion(:status, ["draft", "published"])
     |> assoc_constraint(:category)
@@ -64,19 +63,16 @@ defmodule Narasihistorian.Articles.Article do
   # ============================================================================
 
   defp normalize_quill_content(changeset) do
-    update_change(changeset, :content, fn content ->
-      content = content || ""
+    case get_change(changeset, :content) do
+      nil ->
+        changeset
 
-      text =
-        content
-        |> String.replace(~r/<[^>]*>/, "")
-        |> String.trim()
+      "<p><br></p>" ->
+        put_change(changeset, :content, "")
 
-      if text == "" do
-        ""
-      else
-        content
-      end
-    end)
+      content ->
+        cleaned = String.trim(content)
+        put_change(changeset, :content, cleaned)
+    end
   end
 end

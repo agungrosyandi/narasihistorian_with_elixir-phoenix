@@ -1,15 +1,15 @@
 <div id="new-articles-batch">
   <%= for article <- @articles do %>
-    <.article_card article={article} />
+    <div class="article-card">
+      <.article_card article={article} />
+    </div>
   <% end %>
 </div>
 
 <div id="new-load-more-container">
   <.load_more
     next_cursor={@next_cursor}
-    url="/articles/more"
-    target="articles-grid"
-    search_query={@search_query}
-    category={@selected_category}
+    url={~p"/categories/#{@category.id}/more"}
+    target="articles-container"
   />
 </div>

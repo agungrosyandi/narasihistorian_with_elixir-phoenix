@@ -17,43 +17,42 @@ defmodule NarasihistorianWeb.CategoryController do
   end
 
   # ============================================================================
-  # INDEX
+  # SHOW
   # ============================================================================
 
   def show(conn, %{"id" => id}) do
-    categories = Categories.get_category_with_articles!(id)
-    page_title = categories.category_name
+    category = Categories.get_category!(id)
+    page_title = category.category_name
 
-    # Track unique view
+    %{articles: articles, next_cursor: next_cursor} =
+      Categories.list_articles_by_category(id, nil)
 
-    # ip_address = get_client_ip(conn)
-    # user_agent = get_user_agent(conn)
-    # Dashboard.track_article_view(article.id, ip_address, user_agent)
+    total_articles = Categories.count_articles_by_category(id)
 
     conn
     |> assign(:page_title, page_title)
-    |> assign(:categories, categories)
+    |> assign(:category, category)
+    |> assign(:articles, articles)
+    |> assign(:next_cursor, next_cursor)
+    |> assign(:total_articles, total_articles)
     |> render(:show)
   end
 
   # ============================================================================
-  # PRIVATE HELPER
+  # MORE — HTML fragment appended by JS
   # ============================================================================
 
-  # defp get_client_ip(conn) do
-  #   case Plug.Conn.get_req_header(conn, "x-forwarded-for") do
-  #     [ip | _] ->
-  #       ip |> String.split(",") |> List.first() |> String.trim()
+  def more(conn, %{"id" => id} = params) do
+    cursor = params["cursor"]
+    category = Categories.get_category!(id)
 
-  #     [] ->
-  #       conn.remote_ip |> :inet.ntoa() |> to_string()
-  #   end
-  # end
+    %{articles: articles, next_cursor: next_cursor} =
+      Categories.list_articles_by_category(id, cursor)
 
-  # defp get_user_agent(conn) do
-  #   case Plug.Conn.get_req_header(conn, "user-agent") do
-  #     [user_agent | _] -> user_agent
-  #     [] -> nil
-  #   end
-  # end
+    conn
+    |> assign(:category, category)
+    |> assign(:articles, articles)
+    |> assign(:next_cursor, next_cursor)
+    |> render(:more)
+  end
 end

@@ -224,9 +224,6 @@
                     <h3 class="card-title text-lg group-hover:text-primary transition-colors line-clamp-2">
                       {article.article_name}
                     </h3>
-                    <p class="text-sm text-base-content/70 line-clamp-2">
-                      {article.content |> quill_plain_text() |> String.slice(0, 120)}...
-                    </p>
 
                     <%= if article.tags && @article.tags do %>
                       <% shared_tags =

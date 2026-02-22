@@ -8,65 +8,46 @@ let Hooks = {};
 
 Hooks.QuillEditor = {
   mounted() {
-    console.log("QuillEditor hook mounted");
-    console.log("Element:", this.el);
-
     const editorContainer = this.el.querySelector(".quill-editor");
-    console.log("Editor container:", editorContainer);
 
-    if (!editorContainer) {
-      console.error("Quill editor container not found");
-      return;
+    if (!editorContainer) return;
+
+    const quill = new Quill(editorContainer, {
+      theme: "snow",
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, false] }],
+          ["bold", "italic", "underline", "strike"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          [{ align: [] }],
+          ["link", "image"],
+          ["clean"],
+        ],
+      },
+      placeholder: "Tulis Konten Artikelmu .....",
+    });
+
+    // Load initial content from data attribute
+
+    const initialContent = this.el.dataset.content;
+    if (initialContent && initialContent.trim() !== "") {
+      quill.root.innerHTML = initialContent;
     }
 
-    try {
-      const quill = new Quill(editorContainer, {
-        theme: "snow",
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ["bold", "italic", "underline", "strike"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            [{ align: [] }],
-            ["link", "image"],
-            ["clean"],
-          ],
-        },
-        placeholder: "Tulis Konten Artikelmu .....",
-      });
+    // Sync to hidden input OUTSIDE this ignored div
 
-      console.log("Quill initialized:", quill);
-
-      // Load content from data attribute
-
-      const initialContent = this.el.dataset.content;
-      console.log("Initial content:", initialContent);
-
-      if (initialContent && initialContent.trim() !== "") {
-        quill.root.innerHTML = initialContent;
+    quill.on("text-change", () => {
+      const hiddenInput = document.getElementById("article_content");
+      if (hiddenInput) {
+        hiddenInput.value = quill.root.innerHTML;
       }
+    });
 
-      // Update hidden input when content changes
-
-      quill.on("text-change", () => {
-        const content = quill.root.innerHTML;
-        const hiddenInput = this.el.querySelector('input[type="hidden"]');
-        if (hiddenInput) {
-          hiddenInput.value = content;
-        }
-      });
-
-      this.quill = quill;
-    } catch (error) {
-      console.error("Error initializing Quill:", error);
-    }
+    this.quill = quill;
   },
 
   destroyed() {
-    console.log("QuillEditor hook destroyed");
-    if (this.quill) {
-      this.quill = null;
-    }
+    this.quill = null;
   },
 };
 
@@ -82,8 +63,13 @@ Hooks.TagInput = {
         const tag = this.el.value.trim();
 
         if (tag) {
-          this.pushEvent("add_tag", { tag: tag });
-          this.el.value = ""; // Clear input immediately
+          const target = this.el.dataset.target;
+          if (target) {
+            this.pushEventTo(target, "add_tag", { tag: tag });
+          } else {
+            this.pushEvent("add_tag", { tag: tag });
+          }
+          this.el.value = "";
         }
       }
     });

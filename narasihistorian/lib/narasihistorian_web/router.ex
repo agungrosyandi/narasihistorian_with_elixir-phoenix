@@ -45,6 +45,7 @@ defmodule NarasihistorianWeb.Router do
 
     get "/categories", CategoryController, :index
     get "/categories/:id", CategoryController, :show
+    get "/categories/:id/more", CategoryController, :more
   end
 
   # ============================================================================
@@ -80,15 +81,19 @@ defmodule NarasihistorianWeb.Router do
     live_session :admin_area,
       on_mount: [{NarasihistorianWeb.UserAuth, :ensure_authenticated}] do
       live "/dashboard", DashboardLive.Index, :index
+      live "/dashboard/drafts", DashboardLive.Drafts, :index
+      live "/dashboard/profile", DashboardLive.Profile, :index
 
       live "/articles", ArticleLive.Index, :index
-      live "/articles/new", ArticleLive.Form, :new
-      live "/articles/:id/edit", ArticleLive.Form, :edit
+      # live "/articles/new", ArticleLive.Form, :new
+      # live "/articles/:id/edit", ArticleLive.Form, :edit
+      live "/articles/new", ArticleLive.Index, :new
+      live "/articles/:id/edit", ArticleLive.Index, :edit
 
       live "/categories", CategoryLive.Index, :index
-      live "/categories/new", CategoryLive.Form, :new
+      live "/categories/new", CategoryLive.Index, :new
+      live "/categories/:id/edit", CategoryLive.Index, :edit
       live "/categories/:id", CategoryLive.Show, :show
-      live "/categories/:id/edit", CategoryLive.Form, :edit
     end
   end
 
@@ -99,8 +104,8 @@ defmodule NarasihistorianWeb.Router do
   scope "/api", NarasihistorianWeb.Api do
     pipe_through :api
 
-    get "/articles", ArticleController, :index
-    get "/articles/:id", ArticleController, :show
+    # get "/articles", ArticleController, :index
+    # get "/articles/:id", ArticleController, :show
   end
 
   # ============================================================================

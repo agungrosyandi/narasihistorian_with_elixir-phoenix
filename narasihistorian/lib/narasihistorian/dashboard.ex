@@ -27,10 +27,8 @@ defmodule Narasihistorian.Dashboard do
     |> Repo.aggregate(:count)
   end
 
-  # Returns draft vs published ratio as a map with counts and percentages.
-
   # ============================================================================
-  # CREATE CATEGORY
+  # Returns draft vs published ratio as a map with counts and percentages.
   # ============================================================================
 
   def get_draft_vs_published_ratio do
@@ -50,10 +48,8 @@ defmodule Narasihistorian.Dashboard do
     }
   end
 
-  # get_draft_vs_published_ratio -- Cached version
-
   # ============================================================================
-  # CREATE CATEGORY
+  # get_draft_vs_published_ratio -- Cached version
   # ============================================================================
 
   def get_draft_vs_published_ratio_cached do
@@ -62,10 +58,8 @@ defmodule Narasihistorian.Dashboard do
     end)
   end
 
-  # Returns articles trend grouped by date for the specified number of days.
-
   # ============================================================================
-  # CREATE CATEGORY
+  # Returns articles trend grouped by date for the specified number of days.
   # ============================================================================
 
   def get_articles_trend(days \\ 30) do
@@ -85,10 +79,8 @@ defmodule Narasihistorian.Dashboard do
     |> fill_missing_dates(days)
   end
 
-  # get_articles_trend Cached version
-
   # ============================================================================
-  # CREATE CATEGORY
+  # get_articles_trend Cached version
   # ============================================================================
 
   def get_articles_trend_cached(days \\ 30) do
@@ -97,10 +89,8 @@ defmodule Narasihistorian.Dashboard do
     end)
   end
 
-  # Returns top performing articles by view count.
-
   # ============================================================================
-  # CREATE CATEGORY
+  # Returns top performing articles by view count.
   # ============================================================================
 
   def get_top_articles_by_views(limit \\ 10) do
@@ -111,10 +101,8 @@ defmodule Narasihistorian.Dashboard do
     |> Repo.all()
   end
 
-  # get_top_articles_by_views Cached version
-
   # ============================================================================
-  # CREATE CATEGORY
+  # get_top_articles_by_views Cached version
   # ============================================================================
 
   def get_top_articles_by_views_cached(limit \\ 10) do
@@ -124,10 +112,8 @@ defmodule Narasihistorian.Dashboard do
   end
 
   # ============================================================================
-  # CREATE CATEGORY
-  # ============================================================================
-
   # Returns articles with their comment counts.
+  # ============================================================================
 
   def get_articles_with_comment_count(limit \\ 10) do
     Article
@@ -143,10 +129,8 @@ defmodule Narasihistorian.Dashboard do
     |> Repo.all()
   end
 
-  # Cached version
-
   # ============================================================================
-  # CREATE CATEGORY
+  # Cached version
   # ============================================================================
 
   def get_articles_with_comment_count_cached(limit \\ 10) do
@@ -155,10 +139,8 @@ defmodule Narasihistorian.Dashboard do
     end)
   end
 
-  # Returns publishing frequency statistics.
-
   # ============================================================================
-  # CREATE CATEGORY
+  # Returns publishing frequency statistics.
   # ============================================================================
 
   def get_publishing_frequency(period \\ :weekly, days \\ 30) do
@@ -178,10 +160,8 @@ defmodule Narasihistorian.Dashboard do
     end
   end
 
-  # get_publishing_frequency Cached version
-
   # ============================================================================
-  # CREATE CATEGORY
+  # get_publishing_frequency Cached version
   # ============================================================================
 
   def get_publishing_frequency_cached(period \\ :daily, days \\ 30) do
@@ -412,10 +392,8 @@ defmodule Narasihistorian.Dashboard do
   end
 
   # ============================================================================
-  # PRIVATE HELPERS
-  # ============================================================================
-
   # Private helper to fill missing dates with zero counts
+  # ============================================================================
 
   defp get_daily_frequency(datetime_from) do
     Article

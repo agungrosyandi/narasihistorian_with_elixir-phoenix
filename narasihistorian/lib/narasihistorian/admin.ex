@@ -5,6 +5,8 @@ defmodule Narasihistorian.Admin do
   alias Narasihistorian.Repo
   alias Narasihistorian.Uploader
 
+  alias Narasihistorian.SidebarCache
+
   alias Ecto.Multi
   alias Narasihistorian.Tags
 
@@ -27,12 +29,11 @@ defmodule Narasihistorian.Admin do
     Article
     |> filter_by_user_permission(current_user)
     |> search_by(filter["q"])
+    |> join(:left, [a], u in assoc(a, :user), as: :user)
+    |> preload([a, user: u], user: u)
     |> sort(filter["sort_by"])
-    |> preload(:user)
     |> paginate(page, per_page)
   end
-
-  def change_article(%Article{} = article, attrs \\ %{}), do: Article.changeset(article, attrs)
 
   def get_article!(id) when is_binary(id), do: get_article!(String.to_integer(id))
 
@@ -56,7 +57,9 @@ defmodule Narasihistorian.Admin do
   # CRUD
   # ============================================================================
 
+  # ======================================================================
   # CREATE ARTICLE -- real time features WEBSOCKET
+  # ======================================================================
 
   def create_article(attrs \\ %{}, user) do
     %Article{}
@@ -89,6 +92,7 @@ defmodule Narasihistorian.Admin do
     |> case do
       {:ok, %{article: _article}} = result ->
         Dashboard.notify_article_created()
+        SidebarCache.invalidate()
         result
 
       error ->
@@ -96,7 +100,9 @@ defmodule Narasihistorian.Admin do
     end
   end
 
+  # =====================================================================
   # UPDATE ARTICLE -- real time features WEBSOCKET
+  # =====================================================================
 
   def update_article(%Article{} = article, attrs, current_user) do
     if Policy.can_edit?(current_user, article) do
@@ -108,6 +114,8 @@ defmodule Narasihistorian.Admin do
           if Map.has_key?(attrs, "status") || Map.has_key?(attrs, :status) do
             Dashboard.notify_article_status_changed()
           end
+
+          SidebarCache.invalidate()
 
           result
 
@@ -138,6 +146,8 @@ defmodule Narasihistorian.Admin do
             Dashboard.notify_article_status_changed()
           end
 
+          SidebarCache.invalidate()
+
           result
 
         error ->
@@ -148,7 +158,11 @@ defmodule Narasihistorian.Admin do
     end
   end
 
+  def change_article(%Article{} = article, attrs \\ %{}), do: Article.changeset(article, attrs)
+
+  # ===================================================================================
   # DELETE ARTICLE -- real time features to dashboard + (with cloud storage cleanup)
+  # ===================================================================================
 
   def delete_article(%Article{} = article, current_user) do
     if Policy.can_delete?(current_user, article) do
@@ -158,6 +172,7 @@ defmodule Narasihistorian.Admin do
       |> case do
         {:ok, _deleted_article} = result ->
           Dashboard.notify_article_deleted()
+          SidebarCache.invalidate()
           result
 
         error ->
@@ -168,7 +183,9 @@ defmodule Narasihistorian.Admin do
     end
   end
 
-  # REMOVE IMAGE FROM ARTICLE (keep article, just remove image)
+  # ====================================================================
+  #  # REMOVE IMAGE FROM ARTICLE (keep article, just remove image)
+  # ======================================================================
 
   def remove_article_image(%Article{} = article) do
     if article.image, do: delete_image_from_r2(article.image)
@@ -190,7 +207,9 @@ defmodule Narasihistorian.Admin do
     end
   end
 
-  # Delete image from R2
+  # =============================================
+  # PRIVATE HELPER DELETE IMAGE FROM R2
+  # =============================================
 
   defp delete_image_from_r2(image_url) when is_binary(image_url) do
     case Uploader.extract_key(image_url) do
@@ -216,33 +235,33 @@ defmodule Narasihistorian.Admin do
 
   defp delete_image_from_r2(_), do: :ok
 
-  # search by query
+  # =============================================
+  # PRIVATE HELPER SEARCH BY QUERY
+  # =============================================
 
   defp search_by(query, q) when q in ["", nil], do: query
 
   defp search_by(query, q) do
-    :timer.sleep(1000)
-
     search_term = "%#{q}%"
 
     from a in query,
       where:
         ilike(a.article_name, ^search_term) or
-          ilike(a.content, ^search_term)
+          ilike(a.search_content, ^search_term)
   end
 
-  # filter by sort
+  # =============================================
+  # PRIVATE HELPER FILTER BY SORT
+  # =============================================
 
   defp sort(query, "author_asc") do
     query
-    |> join(:left, [a], u in assoc(a, :user))
-    |> order_by([a, u], asc: u.username)
+    |> order_by([a, user: u], asc: u.username)
   end
 
   defp sort(query, "author_desc") do
     query
-    |> join(:left, [a], u in assoc(a, :user))
-    |> order_by([a, u], desc: u.username)
+    |> order_by([a, user: u], desc: u.username)
   end
 
   defp sort(query, "inserted_at_asc"), do: order_by(query, asc: :inserted_at)
@@ -255,19 +274,26 @@ defmodule Narasihistorian.Admin do
 
   defp sort(query, _), do: order_by(query, :id)
 
-  # pagination helper
+  # =============================================
+  # PRIVATE HELPER PAGINATION HELPER
+  # =============================================
 
   defp paginate(query, page, per_page) do
     offset = (page - 1) * per_page
+
+    count_query =
+      query
+      |> exclude(:order_by)
+      |> exclude(:preload)
+
+    total_count = Repo.aggregate(count_query, :count, :id)
+    total_pages = ceil(total_count / per_page)
 
     results =
       query
       |> limit(^per_page)
       |> offset(^offset)
       |> Repo.all()
-
-    total_count = Repo.aggregate(query, :count, :id)
-    total_pages = ceil(total_count / per_page)
 
     %{
       entries: results,

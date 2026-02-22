@@ -5,6 +5,9 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
 
   alias Narasihistorian.Dashboard
 
+  import NarasihistorianWeb.CustomComponents,
+    only: [pagination_controls: 1, truncate: 2]
+
   @number_per_page_pagination_offset 5
 
   # ============================================================================
@@ -28,8 +31,12 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
   # ============================================================================
 
   @impl true
-  def handle_params(params, _uri, %{assigns: %{current_user: current_user}} = socket) do
-    if socket.assigns.searching do
+  def handle_params(
+        params,
+        _uri,
+        %{assigns: %{current_user: current_user, searching: searching}} = socket
+      ) do
+    if searching do
       send(self(), {:load_articles, params})
       {:noreply, socket}
     else
@@ -174,9 +181,9 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
           </.form>
         </div>
 
-        <%!-------------------------%>
+        <%!-------------------------------------%>
         <%!-- LOADING STATES & TABLE --%>
-        <%!-------------------------%>
+        <%!-------------------------------------%>
 
         <%= cond do %>
           <% @searching -> %>
@@ -209,19 +216,12 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
             <div class="border border-gray-600 p-3 rounded-lg overflow-x-auto">
               <.table id="articles" rows={@streams.articles}>
                 <:col :let={{_id, article}} label="Title">
-                  <div class="flex items-center gap-3">
-                    <div class="flex-1">
-                      <.link
-                        navigate={~p"/articles/#{article.id}"}
-                        class="font-semibold hover:text-primary transition-colors"
-                      >
-                        {truncate(article.article_name, 30)}
-                      </.link>
-                      <div class="text-sm text-gray-400 mt-3">
-                        {article.content |> quill_plain_text() |> String.slice(0, 30)}...
-                      </div>
-                    </div>
-                  </div>
+                  <.link
+                    navigate={~p"/articles/#{article.id}"}
+                    class="font-semibold hover:text-primary transition-colors"
+                  >
+                    {truncate(article.article_name, 30)}
+                  </.link>
                 </:col>
 
                 <:col :let={{_id, article}} label="Status">
@@ -268,7 +268,11 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
             <%!-------------------------%>
 
             <%= if @pagination do %>
-              <.pagination_controls pagination={@pagination} params={@form.params} />
+              <.pagination_controls
+                pagination={@pagination}
+                params={@form.params}
+                base_path={~p"/user/articles"}
+              />
             <% end %>
         <% end %>
       </div>
@@ -277,97 +281,8 @@ defmodule NarasihistorianWeb.User.ArticleLive.Index do
   end
 
   # ============================================================================
-  # PAGINATION CONTROLS
+  # PRIVATE HELPER BADGE
   # ============================================================================
-
-  def pagination_controls(assigns) do
-    ~H"""
-    <div class="flex items-center justify-between mt-6">
-      <div class="text-sm text-gray-400">
-        Showing {(@pagination.page - 1) * @pagination.per_page + 1} to {min(
-          @pagination.page * @pagination.per_page,
-          @pagination.total_count
-        )} of {@pagination.total_count} results
-      </div>
-
-      <div class="join">
-        <%= if @pagination.page > 1 do %>
-          <.link
-            patch={build_pagination_path(@params, @pagination.page - 1)}
-            class="join-item btn btn-sm"
-          >
-            «
-          </.link>
-        <% else %>
-          <button class="join-item btn btn-sm btn-disabled">«</button>
-        <% end %>
-
-        <%= for page <- pagination_range(@pagination) do %>
-          <%= if page == @pagination.page do %>
-            <button class="join-item btn btn-sm btn-active">{page}</button>
-          <% else %>
-            <.link patch={build_pagination_path(@params, page)} class="join-item btn btn-sm">
-              {page}
-            </.link>
-          <% end %>
-        <% end %>
-
-        <%= if @pagination.page < @pagination.total_pages do %>
-          <.link
-            patch={build_pagination_path(@params, @pagination.page + 1)}
-            class="join-item btn btn-sm"
-          >
-            »
-          </.link>
-        <% else %>
-          <button class="join-item btn btn-sm btn-disabled">»</button>
-        <% end %>
-      </div>
-    </div>
-    """
-  end
-
-  # ============================================================================
-  # PRIVATE HELPER
-  # ============================================================================
-
-  defp truncate(text, length) when is_binary(text) do
-    if String.length(text) > length do
-      String.slice(text, 0, length) <> "..."
-    else
-      text
-    end
-  end
-
-  defp truncate(nil, _length), do: ""
-
-  defp build_pagination_path(params, page) do
-    new_params = Map.put(params || %{}, "page", to_string(page))
-    ~p"/user/articles?#{new_params}"
-  end
-
-  defp pagination_range(pagination) do
-    total_pages = pagination.total_pages
-    current_page = pagination.page
-
-    cond do
-      total_pages <= 7 -> 1..total_pages
-      current_page <= 4 -> 1..7
-      current_page >= total_pages - 3 -> (total_pages - 6)..total_pages
-      true -> (current_page - 3)..(current_page + 3)
-    end
-  end
-
-  defp quill_plain_text(nil), do: ""
-
-  defp quill_plain_text(html) do
-    html
-    |> String.replace(~r/<br\s*\/?>/i, " ")
-    |> String.replace(~r/<\/p>/i, " ")
-    |> String.replace(~r/<[^>]*>/, "")
-    |> String.replace(~r/\s+/, " ")
-    |> String.trim()
-  end
 
   defp status_badge_class("published"), do: "badge-success"
   defp status_badge_class("draft"), do: "badge-warning"

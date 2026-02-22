@@ -1,150 +1,140 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     Narasihistorian.Repo.insert!(%Narasihistorian.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
-
 alias Narasihistorian.Repo
 alias Narasihistorian.Articles.Article
 alias Narasihistorian.Categories.Category
+alias Narasihistorian.Accounts.User
 
-rome =
-  %Category{
-    category_name: "Ancient Rome",
-    slug: "ancient-rome"
-  }
+# ============================================================================
+# CATEGORIES
+# ============================================================================
+
+categories =
+  [
+    %{
+      category_name: "Ancient Rome",
+      slug: "ancient-rome",
+      description: "Periode Roma yang paling dikenal dan sering dikutip oleh ahli sejarah",
+      image_category: "/images/ancient-rome.jpg"
+    },
+    %{
+      category_name: "Middle Ages",
+      slug: "middle-ages",
+      description: "Periode Eropa setelah keruntuhan Romawi barat",
+      image_category: "/images/medieval-age.jpg"
+    },
+    %{
+      category_name: "Ages of Discovery",
+      slug: "ages-of-discovery",
+      description: "Era penjelajahan samudera oleh bangsa Eropa",
+      image_category: "/images/age-of-discovery.jpg"
+    },
+    %{
+      category_name: "Napoleonic War",
+      slug: "napoleonic-war",
+      description: "Peperangan besar yang melanda benua Eropa",
+      image_category: "/images/napoleonic-war.jpg"
+    },
+    %{
+      category_name: "World War 1/2",
+      slug: "world-war-1/2",
+      description: "Peperangan besar awal abad ke 20",
+      image_category: "/images/world-war-2.jpg"
+    },
+    %{
+      category_name: "Cold War",
+      slug: "cold-war",
+      description: "Persaingan blok barat dan timur pasca PD2",
+      image_category: "/images/cold-war.jpg"
+    }
+  ]
+  |> Enum.map(fn cat ->
+    case Repo.get_by(Category, slug: cat.slug) do
+      nil ->
+        %Category{}
+        |> Ecto.Changeset.cast(cat, [:category_name, :slug, :description, :image_category])
+        |> Repo.insert!()
+
+      existing ->
+        existing
+    end
+  end)
+
+IO.puts("Categories ready: #{length(categories)}")
+
+# ============================================================================
+# USERS
+# ============================================================================
+
+users = Repo.all(User)
+
+if users == [] do
+  raise "No users found! Please create at least one user first via /register"
+end
+
+IO.puts("Users found: #{length(users)}")
+
+# ============================================================================
+# ARTICLE TEMPLATES
+# ============================================================================
+
+titles = [
+  "Sejarah Peradaban",
+  "Kejayaan Kekaisaran",
+  "Runtuhnya Dinasti",
+  "Perang Besar",
+  "Revolusi Politik",
+  "Penaklukan Wilayah",
+  "Kebangkitan Bangsa",
+  "Era Keemasan",
+  "Konflik Bersejarah",
+  "Perjanjian Damai",
+  "Ekspedisi Militer",
+  "Warisan Budaya",
+  "Transformasi Sosial",
+  "Krisis Kekuasaan",
+  "Legenda Sejarah"
+]
+
+contents = [
+  "<p>Peristiwa bersejarah ini terjadi pada masa kejayaan kekaisaran besar yang pernah menguasai sebagian besar wilayah dunia. Para pemimpin saat itu mengambil keputusan penting yang mengubah arah peradaban manusia untuk berabad-abad ke depan.</p><p>Dampak dari kejadian ini masih dapat dirasakan hingga saat ini, terutama dalam sistem pemerintahan dan budaya masyarakat modern.</p>",
+  "<p>Dalam catatan sejarah, periode ini merupakan salah satu yang paling penuh gejolak. Berbagai kekuatan besar saling bersaing untuk mendominasi wilayah strategis yang kaya sumber daya alam.</p><p>Para sejarawan mencatat bahwa keputusan yang diambil pada masa ini menjadi fondasi bagi tatanan dunia yang kita kenal sekarang.</p>",
+  "<p>Kisah ini bermula dari sebuah konflik kecil yang kemudian berkembang menjadi perang besar yang melibatkan hampir seluruh kekuatan dunia pada zamannya. Ribuan tentara gugur dalam pertempuran yang berlangsung selama bertahun-tahun.</p><p>Namun dari kehancuran tersebut, lahirlah sebuah peradaban baru yang lebih maju dan lebih toleran terhadap perbedaan.</p>",
+  "<p>Peradaban ini dikenal dengan kemajuan ilmu pengetahuan dan teknologinya yang jauh melampaui zamannya. Para ilmuwan dan filsuf dari era ini memberikan kontribusi besar bagi perkembangan pemikiran manusia.</p><p>Warisan intelektual mereka menjadi dasar bagi revolusi ilmiah yang terjadi beberapa abad kemudian di Eropa.</p>",
+  "<p>Revolusi ini dimulai dari ketidakpuasan rakyat terhadap sistem pemerintahan yang korup dan tidak adil. Gerakan rakyat yang awalnya kecil kemudian membesar dan berhasil menggulingkan kekuasaan yang telah berlangsung selama ratusan tahun.</p><p>Perubahan yang terjadi membawa angin segar bagi kehidupan masyarakat, meskipun prosesnya penuh dengan pengorbanan dan penderitaan.</p>"
+]
+
+images = [
+  "/images/ancient-rome.jpg",
+  "/images/medieval-age.jpg",
+  "/images/world-war-2.jpg",
+  "/images/cold-war.jpg"
+]
+
+# ============================================================================
+# SEED ARTICLES
+# ============================================================================
+
+IO.puts("Seeding 1000 fake articles...")
+
+category_ids = Enum.map(categories, & &1.id)
+user_ids = Enum.map(users, & &1.id)
+
+1..1000
+|> Enum.each(fn i ->
+  title =
+    "#{Enum.random(titles)} #{i} - #{Enum.random(["Kuno", "Modern", "Abad Pertengahan", "Kontemporer"])}"
+
+  %Article{}
+  |> Article.changeset(%{
+    article_name: title,
+    content: Enum.random(contents),
+    status: Enum.random(["published", "published", "published"]),
+    category_id: Enum.random(category_ids),
+    image: Enum.random(images)
+  })
+  |> Ecto.Changeset.put_change(:user_id, Enum.random(user_ids))
   |> Repo.insert!()
 
-middle =
-  %Category{
-    category_name: "Middle Ages",
-    slug: "middle-ages"
-  }
-  |> Repo.insert!()
+  if rem(i, 500) == 0, do: IO.puts("Inserted #{i} articles...")
+end)
 
-discovery =
-  %Category{
-    category_name: "Ages of Discovery",
-    slug: "ages-of-discovery"
-  }
-  |> Repo.insert!()
-
-napoleonic =
-  %Category{
-    category_name: "Napoleonic War",
-    slug: "napoleonic-war"
-  }
-  |> Repo.insert!()
-
-world =
-  %Category{
-    category_name: "World War 1/2",
-    slug: "world-war-1/2"
-  }
-  |> Repo.insert!()
-
-cold =
-  %Category{
-    category_name: "Cold War",
-    slug: "cold-war"
-  }
-  |> Repo.insert!()
-
-%Article{
-  article_name: "Ancient Rome",
-  content:
-    "Periode Roma yang paling dikenal dan sering dikutip oleh ahli sejarah Roma era Republik, karena menjadi dasar bagi pilar peradaban dunia barat",
-  image: "/images/ancient-rome.jpg",
-  category: rome
-}
-|> Repo.insert!()
-
-%Article{
-  article_name: "Middle Ages",
-  content:
-    "Periode Eropa setelah keruntuhan Romawi barat, yang dimana peran Gereja Katolik Roma menjadi sangat dominan secara ekonomi maupun politik",
-  image: "/images/medieval-age.jpg",
-  category: middle
-}
-|> Repo.insert!()
-
-%Article{
-  article_name: "Age of Discovery",
-  content:
-    "Era dimulainya penjelajahan samudera yang diinisiasi oleh Spanyol untuk mencari dunia baru dengan semangat Gospel, Glory, dan Gold",
-  image: "/images/age-of-discovery.jpg",
-  category: discovery
-}
-|> Repo.insert!()
-
-%Article{
-  article_name: "Napoleonic War",
-  content:
-    "Peperangan besar yang melanda benua Eropa setelah revolusi Perancis, ketika naiknya Napoleon Bonaparte menjadi kaisar Perancis berambisi menguasai seluruh daratan Eropa",
-  image: "/images/napoleonic-war.jpg",
-  category: napoleonic
-}
-|> Repo.insert!()
-
-%Article{
-  article_name: "World War 1/2",
-  content:
-    "Awal abad ke 20 ditandai dengan situasi peperangan besar yang dampaknya melanda seluruh dunia terutama di Eropa, akibat munculnya persaingan militer antar blok negara-negara besar Eropa",
-  image: "/images/world-war-2.jpg",
-  category: world
-}
-|> Repo.insert!()
-
-%Article{
-  article_name: "Cold War",
-  content:
-    "Berakhirnya perang dunia ke 2 tidak membuat persaingan antar blok belum berakhir, karena melahirkan 2 kubu pemenang perang, yaitu blok barat pimpinan Amerika Serikat dan blok timur pimpinan Uni Soviet",
-  image: "/images/cold-war.jpg",
-  category: cold
-}
-|> Repo.insert!()
-
-%Article{
-  article_name: "Mesopotamian Civilization",
-  content:
-    "Salah satu peradaban tertua di dunia yang berkembang di antara Sungai Tigris dan Eufrat, dikenal sebagai tempat lahirnya tulisan dan hukum tertulis.",
-  image:
-    "https://humanoriginproject.com/wp-content/uploads/2018/11/ancient-mesopotamian-civilizations-thumbnail.jpg",
-  category: middle
-}
-|> Repo.insert!()
-
-%Article{
-  article_name: "Ancient Egypt",
-  content:
-    "Peradaban besar di lembah Sungai Nil yang terkenal dengan piramida, hieroglif, dan sistem kepercayaan terhadap kehidupan setelah kematian.",
-  image:
-    "https://cdn.britannica.com/57/122157-050-21261E20/Side-view-Sphinx-Great-Pyramid-of-Khufu.jpg?w=300",
-  category: cold
-}
-|> Repo.insert!()
-
-%Article{
-  article_name: "Indus Valley Civilization",
-  content:
-    "Peradaban kuno di wilayah Asia Selatan yang memiliki tata kota maju seperti Mohenjo-daro dan Harappa.",
-  image:
-    "https://cdn.britannica.com/22/196822-050-0E40EBC2/Ruins-city-Harappa-Pakistan-Punjab.jpg?w=300",
-  category: cold
-}
-|> Repo.insert!()
-
-%Article{
-  article_name: "Ancient China",
-  content:
-    "Peradaban besar Asia Timur yang berkembang sepanjang Sungai Kuning, terkenal dengan dinasti, filsafat Konfusianisme, dan inovasi teknologi.",
-  image: "https://cdn.mos.cms.futurecdn.net/kBZA9k5TiE3GwrehfFLMv3-650-80.jpg.webp",
-  category: discovery
-}
-|> Repo.insert!()
+IO.puts("Done! 30 fake articles inserted.")

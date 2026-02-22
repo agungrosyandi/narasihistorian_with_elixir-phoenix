@@ -8,6 +8,8 @@ defmodule NarasihistorianWeb.ArticleController do
   alias Narasihistorian.Comments.Comment
   alias Narasihistorian.Tags
 
+  alias Narasihistorian.SidebarCache
+
   @take_articles 6
   @take_comments 1
   @comments_per_page 5
@@ -21,8 +23,9 @@ defmodule NarasihistorianWeb.ArticleController do
       Articles.filter_articles(params, nil)
 
     filter_by_categories = Categories.category_name_and_slugs()
-    recent_articles = Articles.list_recent_articles(@take_articles)
-    popular_articles = Articles.list_popular_articles(@take_articles)
+
+    recent_articles = SidebarCache.get_recent_articles(@take_articles)
+    popular_articles = SidebarCache.get_popular_articles(@take_articles)
 
     conn
     |> assign(:articles, articles)
@@ -112,9 +115,9 @@ defmodule NarasihistorianWeb.ArticleController do
     |> render(:show)
   end
 
-  # ============================================================================
-  # COMMENTS MORE — HTML fragment infinite scroll
-  # ============================================================================
+  # ========================================
+  # COMMENT
+  # ========================================
 
   def comments_more(conn, %{"id" => id} = params) do
     page = params["page"] |> String.to_integer()
@@ -132,7 +135,7 @@ defmodule NarasihistorianWeb.ArticleController do
   end
 
   # ============================================================================
-  # TAG — first page
+  # TAG
   # ============================================================================
 
   def by_tag(conn, %{"tag_slug" => tag_slug} = _params) do
@@ -153,10 +156,6 @@ defmodule NarasihistorianWeb.ArticleController do
         |> render(:by_tag)
     end
   end
-
-  # ============================================================================
-  # TAG MORE — HTML fragment for tag page load more
-  # ============================================================================
 
   def by_tag_more(conn, %{"tag_slug" => tag_slug} = params) do
     case Tags.get_tag_by_slug(tag_slug) do

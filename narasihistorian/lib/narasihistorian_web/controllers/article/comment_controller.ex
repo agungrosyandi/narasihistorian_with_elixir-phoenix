@@ -2,16 +2,19 @@ defmodule NarasihistorianWeb.CommentController do
   use NarasihistorianWeb, :controller
 
   alias Narasihistorian.Comments
+  alias Narasihistorian.Articles
 
   # ============================================================================
   # CREATE COMMENT
   # ============================================================================
 
   def create(conn, %{"id" => article_id, "comment" => comment_params}) do
+    user_id = conn.assigns.current_user.id
+
     comment_params =
       comment_params
       |> Map.put("article_id", article_id)
-      |> Map.put("user_id", conn.assigns.current_user.id)
+      |> Map.put("user_id", user_id)
 
     case Comments.create_comment(comment_params) do
       {:ok, _comment} ->
@@ -20,11 +23,12 @@ defmodule NarasihistorianWeb.CommentController do
         |> redirect(to: ~p"/articles/#{article_id}")
 
       {:error, changeset} ->
-        article = Narasihistorian.Articles.get_articles!(article_id)
+        article = Articles.get_articles!(article_id)
+        article_comments = article.comments
 
         conn
         |> assign(:article, article)
-        |> assign(:comments, article.comments)
+        |> assign(:comments, article_comments)
         |> assign(:form, Phoenix.Component.to_form(changeset, as: :comment))
         |> put_flash(:error, "Failed to add comment")
         |> redirect(to: ~p"/articles/#{article_id}")

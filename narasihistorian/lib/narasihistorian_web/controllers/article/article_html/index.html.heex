@@ -51,90 +51,10 @@
       <div class="flex-[2_1_0%]  overflow-x-hidden">
         <%= if @search_query == "" and @selected_category == "" do %>
           <%= if @popular_articles != [] do %>
-            <div class="relative mb-10">
-              <div class="swiper popular-swiper" id="popularSwiper">
-                <div class="swiper-wrapper">
-                  <%= for article <- @popular_articles do %>
-                    <div
-                      class="swiper-slide popular-slide cursor-pointer group"
-                      data-href={~p"/articles/#{article.id}"}
-                    >
-                      <%!-- Background image --%>
-
-                      <div class="relative rounded-xl h-[420px] md:h-[520px] overflow-hidden">
-                        <%= if article.image do %>
-                          <img
-                            src={article.image}
-                            alt={article.article_name}
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          />
-                        <% else %>
-                          <div class="w-full h-full bg-gray-800 flex items-center justify-center">
-                            <.icon name="hero-photo" class="w-16 h-16 text-gray-600" />
-                          </div>
-                        <% end %>
-
-                        <%!-- Gradient overlay --%>
-
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
-                        </div>
-
-                        <%!-- Content overlay --%>
-
-                        <div class="absolute bottom-0 left-0 right-0 p-6 md:p-10 max-w-3xl">
-                          <%!-- Category badge + view count --%>
-
-                          <div class="flex items-center gap-3 mb-3">
-                            <span class="inline-block bg-[#fedf16e0] text-black text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-sm">
-                              {article.category.category_name}
-                            </span>
-                            <span class="flex items-center gap-1 text-gray-300 text-xs">
-                              <.icon name="hero-fire" class="w-3.5 h-3.5 text-orange-400" />
-                              {article.view_count} views
-                            </span>
-                          </div>
-
-                          <%!-- Title --%>
-
-                          <h3 class="text-white font-bold text-xl md:text-3xl leading-tight mb-3 line-clamp-2">
-                            {article.article_name}
-                          </h3>
-
-                          <%!-- Meta --%>
-
-                          <div class="flex items-center gap-2 text-gray-400 text-xs">
-                            <span class="text-gray-300 font-medium">{article.user.username}</span>
-                            <span>·</span>
-                            <time>{time_ago_short(article.inserted_at)}</time>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  <% end %>
-                </div>
-
-                <%!-- =========================--%>
-                <%!-- NAVIGATION ARROWS --%>
-                <%!-- =========================--%>
-
-                <div
-                  id="popularPrev"
-                  class="swiper-button-prev !text-[#fedf16e0] !w-5 !h-5 after:!text-base"
-                >
-                </div>
-                <div
-                  id="popularNext"
-                  class="swiper-button-next !text-[#fedf16e0] !w-5 !h-5 after:!text-base"
-                >
-                </div>
-
-                <%!-- =========================--%>
-                <%!-- PAGINATION --%>
-                <%!-- =========================--%>
-
-                <div id="popularPagination" class="swiper-pagination !bottom-3"></div>
-              </div>
-            </div>
+            <.card_swiper_carousel_big
+              id="cardSwiperCarouselBig"
+              articles={@popular_articles}
+            />
           <% end %>
         <% end %>
       </div>
@@ -147,218 +67,46 @@
     <%= if @search_query == "" and @selected_category == "" do %>
       <section class="overflow-x-hidden">
         <%= if @recent_articles != [] do %>
-          <%!-- ============= --%>
-          <%!-- SECTION LABEL --%>
-          <%!-- ============= --%>
+          <.section_header title="Terbaru" />
 
-          <div class="flex items-center justify-between my-10">
-            <div class="flex items-center gap-3">
-              <span class="w-1 h-5 bg-white/30 rounded-full block"></span>
-              <h2 class="text-sm font-bold uppercase tracking-widest text-gray-400">
-                Terbaru
-              </h2>
-            </div>
-            <.link
-              href={~p"/articles"}
-              class="text-base text-[#fedf16e0] font-semibold hover:underline"
-            >
-              Lihat semua →
-            </.link>
-          </div>
-
-          <%!-- ============= --%>
-          <%!-- CARD --%>
-          <%!-- ============= --%>
-
-          <div class="swiper recent-swiper" id="recentSwiper">
-            <div class="swiper-wrapper pb-10">
-              <%= for article <- @recent_articles do %>
-                <div class="swiper-slide !h-auto">
-                  <.link
-                    href={~p"/articles/#{article.id}"}
-                    class="group block shadow-2xl rounded-xl overflow-hidden hover:bg-base-300 transition-all duration-300 hover:-translate-y-1  hover:shadow-2xl h-full"
-                  >
-                    <%!-- ------------- --%>
-                    <%!-- IMAGE --%>
-                    <%!-- ------------- --%>
-
-                    <div class="relative h-44 overflow-hidden">
-                      <%= if article.image do %>
-                        <img
-                          src={article.image}
-                          alt={article.article_name}
-                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      <% else %>
-                        <div class="w-full h-full bg-gray-700 flex items-center justify-center">
-                          <.icon name="hero-photo" class="w-10 h-10 text-gray-500" />
-                        </div>
-                      <% end %>
-                    </div>
-
-                    <%!-- ------------- --%>
-                    <%!-- BODY --%>
-                    <%!-- ------------- --%>
-
-                    <div class="p-5 flex flex-col gap-5">
-                      <h3 class="text-base font-bold text-white leading-snug line-clamp-2 group-hover:text-[#fedf16e0] transition-colors">
-                        {truncate(article.article_name, 30)}
-                      </h3>
-
-                      <div class="flex items-center justify-between mt-auto text-xs text-gray-300 pt-2">
-                        <time>{time_ago_short(article.inserted_at)}</time>
-                        <span class="flex items-center gap-1">
-                          <.icon name="hero-eye" class="w-3.5 h-3.5" />
-                          {article.view_count}
-                        </span>
-                      </div>
-                    </div>
-                  </.link>
-                </div>
-              <% end %>
-            </div>
-
-            <%!-- =========================--%>
-            <%!-- NAVIGATION ARROWS --%>
-            <%!-- =========================--%>
-
-            <div
-              id="recentPrev"
-              class="swiper-button-prev !text-[#fedf16e0] !w-5 !h-5 hover:!text-white after:!text-base"
-            >
-            </div>
-            <div
-              id="recentNext"
-              class="swiper-button-next !text-[#fedf16e0] !w-5 !h-5 hover:!text-white after:!text-base"
-            >
-            </div>
-
-            <%!-- ------------- --%>
-            <%!-- PAGINATION --%>
-            <%!-- ------------- --%>
-
-            <div id="recentPagination" class="swiper-pagination"></div>
-          </div>
+          <.card_swiper_carousel
+            id="cardSwiperCarousel"
+            articles={@recent_articles}
+          />
         <% end %>
       </section>
-
-      <%!-- ============================================================ --%>
-      <%!-- GRID SECTION LABEL --%>
-      <%!-- ============================================================ --%>
-
-      <div class="flex items-center gap-3 my-10">
-        <span class="w-1 h-5 bg-white/30 rounded-full block"></span>
-        <h2 class="text-sm font-bold uppercase tracking-widest text-white/50">
-          Semua Artikel
-        </h2>
-      </div>
     <% end %>
 
     <%!-- ============================================================ --%>
-    <%!-- ARTICLE GRID --%>
+    <%!-- ARTICLE GRID  --%>
     <%!-- ============================================================ --%>
 
-    <%= if @articles == [] do %>
-      <%!-- ---------------------------------- --%>
-      <%!-- ARTICLE NOT FOUND OR NILL --%>
-      <%!-- ---------------------------------- --%>
+    <.section_header title="Semua Artikel" />
 
+    <%= if @articles == [] do %>
       <div class="h-[25rem] mx-auto rounded-lg text-center shadow-xl flex gap-5 flex-col items-center justify-center">
-        <p>
-          Sorry, Artikel tidak ditemukan
-          <.link patch={~p"/"} class="text-[#fedf16e0] font-bold">
-            <.icon name="hero-arrows-right-left" class="w-4 h-4" />
-            <span class="border-b pb-2 text-white hover:text-[#fedf16e0]">
-              Kembali ke pencarian
-            </span>
-          </.link>
-        </p>
-        <.icon name="hero-no-symbol" class="w-10 h-10" />
+        Sorry, Artikel tidak ditemukan
+        <.link patch={~p"/"} class="text-[#fedf16e0] font-bold">
+          <span class="border-b pb-2 text-white hover:text-[#fedf16e0]">
+            Kembali ke pencarian
+          </span>
+        </.link>
       </div>
     <% else %>
-      <%!-- ---------------------------------- --%>
-      <%!-- ARTICLE FOUND OR EXIST --%>
-      <%!-- ---------------------------------- --%>
-
       <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <%= for article <- @articles do %>
-          <.link
-            href={~p"/articles/#{article.id}"}
-            class="group card  shadow-2xl hover:bg-base-300 transition-all duration-300"
-          >
-            <%!-- ------------- --%>
-            <%!-- CATEGORY NAME --%>
-            <%!-- ------------- --%>
-
-            <div class="flex justify-start p-5 text-base font-bold">
-              <.icon name="hero-list-bullet" class="w-5 h-5 mt-1 mr-2 text-[#fedf16e0]" />
-              {article.category.category_name}
-            </div>
-            <div class="flex flex-row md:flex-col">
-              <%!-- ------------- --%>
-              <%!-- IMAGE --%>
-              <%!-- ------------- --%>
-
-              <figure class="relative overflow-hidden rounded-xl h-64 flex-1 md:flex-auto">
-                <img
-                  src={article.image}
-                  alt={article.article_name}
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </figure>
-
-              <%!-- ------------- --%>
-              <%!-- META --%>
-              <%!-- ------------- --%>
-
-              <div class="card-body flex-1 md:flex-auto">
-                <h2 class="card-title group-hover:text-primary transition-colors">
-                  {truncate(article.article_name, 30)}
-                </h2>
-                <p class="text-base-content/70 line-clamp-3">
-                  {article.content |> quill_plain_text() |> String.slice(0, 30)}...
-                </p>
-                <p class="text-xs text-gray-300 mt-4">
-                  Penulis:&nbsp <span class="text-white font-bold">{article.user.username}</span>
-                </p>
-                <div class="flex flex-row flex-wrap justify-between items-center mt-2">
-                  <time class="text-xs pb-2">
-                    {time_ago_short(article.inserted_at)}
-                  </time>
-                  <div>
-                    <p class="text-xs text-gray-300 pb-2">
-                      <.icon name="hero-eye" class="w-4 h-4 mr-1" />
-                      {article.view_count}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </.link>
+          <.article_card article={article} />
         <% end %>
       </div>
 
-      <%!-- ---------------------------------- --%>
-      <%!-- LOAD MORE --%>
-      <%!-- ---------------------------------- --%>
-
       <div id="load-more-container" class="flex flex-col items-center mt-12 gap-3">
-        <%= if @next_cursor do %>
-          <button
-            id="load-more-btn"
-            class="btn btn-outline border-[#fedf16e0] text-xs text-gray-100 hover:bg-[#fedf16e0] hover:text-black hover:border-[#fedf16e0] px-10"
-            data-next-cursor={@next_cursor}
-            data-search={@search_query}
-            data-category={@selected_category}
-            data-url="/articles/more"
-            data-target="articles-grid"
-            onclick="loadMore(this)"
-          >
-            Muat Lebih Banyak
-          </button>
-        <% else %>
-          <p class="text-sm text-base-content/40 py-4">Semua artikel telah dimuat</p>
-        <% end %>
+        <.load_more
+          next_cursor={@next_cursor}
+          url="/articles/more"
+          target="articles-grid"
+          search_query={@search_query}
+          category={@selected_category}
+        />
       </div>
     <% end %>
 
@@ -366,62 +114,8 @@
     <%!-- FOOTER --%>
     <%!-- ============================================================ --%>
 
-    <div class="border-t border-gray-500 mt-10"></div>
-    <footer class="relative gap-2 flex flex-col justify-between items-center py-10">
-      <div class="relative flex flex-col justify-between items-center md:flex-row md:gap-10">
-        <%!-- ------------- --%>
-        <%!-- IMAGE --%>
-        <%!-- ------------- --%>
-
-        <div class="w-[100%] flex-1">
-          <img
-            class="relative h-[full] w-full object-cover rounded-xl"
-            src="/images/closng-background-cover.jpg"
-            alt="My Image"
-          />
-        </div>
-
-        <%!-- ------------- --%>
-        <%!-- DESCRIPTION --%>
-        <%!-- ------------- --%>
-
-        <div class="py-10 gap-5 flex-1 flex flex-col justify-center items-center md:px-5">
-          <div>
-            <span class="text-[#ffffffe0] font-bold text-xl">Tentang Narasi</span>
-            <span class="text-[#fedf16e0] font-bold text-xl">Historian</span>
-          </div>
-          <p class="text-center text-base-content/60">
-            Narasihistorian merupakan media konten yang berfokus pada sejarah
-            peradaban global dengan visualisasi yang simple dan interaktif
-            baik itu berupa konten artikel ataupun video infografik.
-          </p>
-        </div>
-      </div>
-      <div class="flex flex-row gap-5 justify-between w-full items-center">
-        <small class="text-[#ffffffe0] font-bold text-xs">
-          <.icon name="hero-minus-circle" class="w-4 h-4 mb-1 mr-1" /> 2024
-        </small>
-        <div class="flex items-center gap-5 text-xs">
-          <.link
-            href="mailto:agungrosyandi@gmail.com"
-            class="text-white hover:text-[#fedf16e0] text-sm font-medium text-center transition-all duration-200"
-          >
-            <.icon name="hero-chevron-right" class="w-4 h-4 mb-1" /> Email
-          </.link>
-          <.link
-            href="https://www.instagram.com/narasihistorian/"
-            class="text-white hover:text-[#fedf16e0] text-sm font-medium text-center transition-all duration-200"
-          >
-            <.icon name="hero-chevron-right" class="w-4 h-4 mb-1" /> instagram
-          </.link>
-          <.link
-            href="https://www.youtube.com/channel/UCNoUf4xYawhvK6dD94oDEDg"
-            class="text-white hover:text-[#fedf16e0] text-sm font-medium text-center transition-all duration-200"
-          >
-            <.icon name="hero-chevron-right" class="w-4 h-4 mb-1" /> youtube
-          </.link>
-        </div>
-      </div>
-    </footer>
+    <%= if @search_query == "" and @selected_category == "" do %>
+      <.footer_home_public_page />
+    <% end %>
   </div>
 </Layouts.app>
